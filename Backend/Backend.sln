@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ebret4m4n.API", "Ebret4m4n\Ebret4m4n.API.csproj", "{40102ECD-CAAB-4EDC-8153-994241AE50CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ebret4m4n.Contracts", "Ebret4m4n.Contracts\Ebret4m4n.Contracts.csproj", "{A4FBDD49-BD44-410B-BD32-86508D9A282D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ebret4m4n.Repository", "Ebret4m4n.Repository\Ebret4m4n.Repository.csproj", "{48C82575-FDC3-4EC3-B10B-2CCE170FBFF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ebret4m4n.Entities", "Ebret4m4n.Entities\Ebret4m4n.Entities.csproj", "{BF41DB56-198C-472B-B5C2-C6CCA4114445}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ebret4m4n.Shared", "Ebret4m4n.Shared\Ebret4m4n.Shared.csproj", "{5714366E-58BC-4B08-98CF-895736A444F3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40102ECD-CAAB-4EDC-8153-994241AE50CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40102ECD-CAAB-4EDC-8153-994241AE50CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40102ECD-CAAB-4EDC-8153-994241AE50CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40102ECD-CAAB-4EDC-8153-994241AE50CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4FBDD49-BD44-410B-BD32-86508D9A282D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4FBDD49-BD44-410B-BD32-86508D9A282D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4FBDD49-BD44-410B-BD32-86508D9A282D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4FBDD49-BD44-410B-BD32-86508D9A282D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{48C82575-FDC3-4EC3-B10B-2CCE170FBFF3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{48C82575-FDC3-4EC3-B10B-2CCE170FBFF3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{48C82575-FDC3-4EC3-B10B-2CCE170FBFF3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{48C82575-FDC3-4EC3-B10B-2CCE170FBFF3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF41DB56-198C-472B-B5C2-C6CCA4114445}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF41DB56-198C-472B-B5C2-C6CCA4114445}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF41DB56-198C-472B-B5C2-C6CCA4114445}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF41DB56-198C-472B-B5C2-C6CCA4114445}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5714366E-58BC-4B08-98CF-895736A444F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5714366E-58BC-4B08-98CF-895736A444F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5714366E-58BC-4B08-98CF-895736A444F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5714366E-58BC-4B08-98CF-895736A444F3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
