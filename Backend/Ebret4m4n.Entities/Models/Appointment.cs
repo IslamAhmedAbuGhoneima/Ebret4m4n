@@ -1,25 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Ebret4m4n.Entities.Models
+
+namespace Ebret4m4n.Entities.Models;
+
+[Index(nameof(UserId),Name = "IX_Appointment_UserId")]
+[Index(nameof(ChildId), Name = "IX_Appointment_ChildId")]
+public class Appointment
 {
-    public class Appointment
-    {
-        public int Id { get; set; }
-        public DateTime Date { get; set; }
-        public string Status { get; set; }
-        public string Location { get; set; }
+    public Guid Id { get; set; }
 
-        [ForeignKey("Child")]
-        public int ChildId { get; set; }
-        public Child Child { get; set; }
+    public DateTime Date { get; set; }
 
-        [ForeignKey("User")]
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
-    }
+    public string Day => Date.ToString("dddd");
+
+    public string Status { get; set; } = null!;
+
+    public string Location { get; set; } = null!;
+
+    [ForeignKey("Child")]
+    public Guid ChildId { get; set; }
+    public Child Child { get; set; } = null!;
+
+    [ForeignKey("User")]
+    public string UserId { get; set; } = null!;
+    public ApplicationUser User { get; set; } = null!;
+
+    [ForeignKey("HealthCareCenter")]
+    public Guid HealthCareCenterId { get; set; }
+    public HealthCareCenter HealthCareCenter { get; set; }
 }

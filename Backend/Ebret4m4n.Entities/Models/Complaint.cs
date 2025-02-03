@@ -1,20 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Ebret4m4n.Entities.Models
+
+namespace Ebret4m4n.Entities.Models;
+
+[Index(nameof(UserId),Name = "IX_Complaint_UserId")]
+public class Complaint
 {
-    public class Complaint
-    {
-        public int Id { get; set; }
-        public string Message { get; set; }
+    public Guid Id { get; set; }
 
-        [ForeignKey("User")]
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
-        
-    }
+    public string Message { get; set; } = null!;
+
+    [ForeignKey("User")]
+    public string UserId { get; set; } = null!;
+    public ApplicationUser User { get; set; }
+    
 }

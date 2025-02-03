@@ -8,5 +8,14 @@ public class RolesConfiguration : IEntityTypeConfiguration<IdentityRole>
 {
     public void Configure(EntityTypeBuilder<IdentityRole> builder)
     {
+        IdentityRole[] Roles = 
+        {
+            new IdentityRole("Parent"),
+            new IdentityRole("Doctor"),
+            new IdentityRole("AdminOfHC"),
+            new IdentityRole("AdminOfMinistryOfHealth"),
+        };
+
+        builder.HasData(Roles);
     }
 }

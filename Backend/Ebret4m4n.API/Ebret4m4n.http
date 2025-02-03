@@ -1,6 +1,0 @@
-@Ebret4m4n_HostAddress = http://localhost:5187
-
-GET {{Ebret4m4n_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

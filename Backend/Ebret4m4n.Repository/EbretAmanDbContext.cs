@@ -11,6 +11,30 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
     public EbretAmanDbContext(DbContextOptions<EbretAmanDbContext> options)
         : base(options) { }
 
+
+    public DbSet<Child> Children { get; set; }
+
+    public DbSet<HealthCareCenter> HealthCareCenters { get; set; }
+
+    public DbSet<HealthCareAppointment> HealthCareAppointments { get; set; }
+
+    public DbSet<Appointment> Appointments { get; set; }
+
+    public DbSet<Notification> Notifications { get; set; }
+
+    public DbSet<Diseas> Diseas { get; set; }
+
+    public DbSet<SideEffect> SideEffects { get; set; }
+
+    public DbSet<Vaccine> Vaccines { get; set; }
+
+    public DbSet<Complaint> Complaints { get; set; }
+
+    public DbSet<Chat> Chats { get; set; }
+
+    public DbSet<Certificate> Certificates { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(typeof(RolesConfiguration).Assembly);

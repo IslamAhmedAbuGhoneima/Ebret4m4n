@@ -1,0 +1,6 @@
+@Ebret4m4n.API_HostAddress = http://localhost:5112
+
+GET {{Ebret4m4n.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

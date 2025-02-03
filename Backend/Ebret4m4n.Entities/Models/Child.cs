@@ -1,35 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Ebret4m4n.Entities.Models
+
+namespace Ebret4m4n.Entities.Models;
+
+[Index(nameof(Name),Name = "IX_Child_Name")]
+public class Child
 {
-    public class Child
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int Age { get; set; }
-        public double Weight { get; set; }
-        public char Gender { get; set; }
+    public Guid Id { get; set; }
 
-        //DiseasesHistory
+    public string Name { get; set; } = null!;
 
-        //public List<IFormFile> Images { get; set; }
+    public DateTime BirthDate { get; set; }
 
-        public ICollection<Vaccine>? Vaccines { get; set; } = [];
-        public ICollection<Diseas>? Diseas { get; set; } = []; 
+    public int AgeInMonth => (int)(DateTime.Now.Subtract(BirthDate).TotalDays / 30);
 
-        [ForeignKey("Certificate")]
-        public int CertificateId { get; set; }
-        public Certificate Certificate { get; set; }
-        [ForeignKey("User")]
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+    public double Weight { get; set; }
 
+    public char Gender { get; set; }
 
+    //DiseasesHistory
 
-    }
+    //public List<IFormFile> DiseasRepors { get; set; }
+
+    [ForeignKey("Certificate")]
+    public Guid CertificateId { get; set; }
+    public Certificate Certificate { get; set; }
+
+    [ForeignKey("User")]
+    public string UserId { get; set; }
+    public ApplicationUser User { get; set; }
+
+    public ICollection<Vaccine>? Vaccines { get; set; } = [];
+
+    public ICollection<Diseas>? Diseas { get; set; } = [];
 }

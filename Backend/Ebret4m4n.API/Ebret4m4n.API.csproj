@@ -11,11 +11,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Ebret4m4n.Repository\Ebret4m4n.Repository.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ebret4m4n.Repository\Ebret4m4n.Repository.csproj" />
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>
