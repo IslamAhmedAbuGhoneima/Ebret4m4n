@@ -21,8 +21,6 @@ public class Child
 
     //DiseasesHistory
 
-    //public List<IFormFile> DiseasRepors { get; set; }
-
     [ForeignKey("Certificate")]
     public Guid CertificateId { get; set; }
     public Certificate Certificate { get; set; }
@@ -34,4 +32,6 @@ public class Child
     public ICollection<Vaccine>? Vaccines { get; set; } = [];
 
     public ICollection<Diseas>? Diseas { get; set; } = [];
+
+    public ICollection<HealthReportFile>? HealthReportFiles { get; set; } = [];
 }

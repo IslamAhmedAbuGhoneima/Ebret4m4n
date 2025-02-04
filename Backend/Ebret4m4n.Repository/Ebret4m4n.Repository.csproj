@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Ebret4m4n.Entities\Ebret4m4n.Entities.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
 </Project>

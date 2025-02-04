@@ -34,6 +34,9 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Certificate> Certificates { get; set; }
 
+    public DbSet<HealthReportFile> HealthReportFiles { get; set; }
+
+    public DbSet<Inventory> Inventories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
