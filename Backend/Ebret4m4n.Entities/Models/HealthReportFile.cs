@@ -6,7 +6,7 @@ public class HealthReportFile
 {
     public string FilePath { get; set; } = null!;
 
-    public DateTime UploadedOn => DateTime.Now;
+    public DateTime UploadedOn { get; set; }
 
     [ForeignKey("Child")]
     public Guid ChildId { get; set; }

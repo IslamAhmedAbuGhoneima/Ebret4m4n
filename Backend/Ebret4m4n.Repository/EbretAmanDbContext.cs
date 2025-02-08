@@ -11,12 +11,9 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
     public EbretAmanDbContext(DbContextOptions<EbretAmanDbContext> options)
         : base(options) { }
 
-
     public DbSet<Child> Children { get; set; }
 
     public DbSet<HealthCareCenter> HealthCareCenters { get; set; }
-
-    public DbSet<HealthCareAppointment> HealthCareAppointments { get; set; }
 
     public DbSet<Appointment> Appointments { get; set; }
 

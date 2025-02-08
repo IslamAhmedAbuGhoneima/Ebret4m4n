@@ -1,6 +1,12 @@
-﻿namespace Ebret4m4n.Entities.Models;
+﻿using Ebret4m4n.Entities.Interfaces;
 
-public class AdminOfHC : ApplicationUser
+namespace Ebret4m4n.Entities.Models;
+
+public class AdminOfHC : ApplicationUser, IHealthCareCenter
 {
     public int NursingNumber { get; set; }
+
+    public string HealthCareCenterName { get; set; } = null!;
+
+    public string HealthCareLocation { get; set; } = null!;
 }

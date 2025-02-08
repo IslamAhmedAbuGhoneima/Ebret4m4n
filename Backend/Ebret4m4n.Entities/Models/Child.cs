@@ -21,12 +21,13 @@ public class Child
 
     //DiseasesHistory
 
-    [ForeignKey("Certificate")]
-    public Guid CertificateId { get; set; }
-    public Certificate Certificate { get; set; }
+    // Remove
+    //[ForeignKey("Certificate")]
+    //public Guid CertificateId { get; set; }
+    //public Certificate Certificate { get; set; }
 
     [ForeignKey("User")]
-    public string UserId { get; set; }
+    public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; }
 
     public ICollection<Vaccine>? Vaccines { get; set; } = [];

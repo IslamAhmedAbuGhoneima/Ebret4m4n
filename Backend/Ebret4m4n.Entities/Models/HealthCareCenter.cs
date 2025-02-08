@@ -1,27 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
-
+﻿
+using Ebret4m4n.Entities.Interfaces;
 
 namespace Ebret4m4n.Entities.Models;
 
-[Index(nameof(Name), Name = "IX_HealthCareCenter_Name")]
-public class HealthCareCenter
+public class HealthCareCenter : IHealthCareCenter
 {
-    public Guid Id { get; set; }
+    public Guid HealthCareCenterId { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string HealthCareCenterName { get; set; }
 
-    public string? Location { get; set; }
+    public string FirstDay { get; set; } = null!;
 
-    [ForeignKey("Doctor")]
-    public string DoctorId { get; set; } = null!;
-    public Doctor? Doctor { get; set; }
+    public string SecondDay { get; set; } = null!;
 
-    [ForeignKey("User")]
-    public string? UserId { get; set; }
-    public ApplicationUser? User {  get; set; }
+    public string HealthCareLocation { get; set; }
 
-    [ForeignKey("AdminOfHC")]
-    public string AdminOfHCId { get; set; } = null!;
-    public AdminOfHC? AdminOfHC { get; set; }
+    #region new fields
+    ICollection<ApplicationUser> Users { get; set; } = [];
+    ICollection<Appointment> Appointments { get; set; } = [];
+    ICollection<Certificate> Certificates { get; set; } = [];
+    #endregion
+
 }

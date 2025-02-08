@@ -8,9 +8,11 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
-        builder.HasDiscriminator<string>("user_type")
-            .HasValue<Doctor>("doctor")
-            .HasValue<AdminOfHC>("HC Admin")
-            .HasValue<ApplicationUser>("parent");
+        //builder.HasDiscriminator<string>("user_type")
+        //    .HasValue<Doctor>("doctor")
+        //    .HasValue<AdminOfHC>("HC Admin")
+        //    .HasValue<ApplicationUser>("parent");
+
+        builder.UseTptMappingStrategy();
     }
 }
