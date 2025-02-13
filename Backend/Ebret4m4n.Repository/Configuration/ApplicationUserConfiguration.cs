@@ -8,10 +8,19 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
-        //builder.HasDiscriminator<string>("user_type")
-        //    .HasValue<Doctor>("doctor")
-        //    .HasValue<AdminOfHC>("HC Admin")
-        //    .HasValue<ApplicationUser>("parent");
+        //builder.HasKey(x => x.Id);
+        builder.Property(e => e.FirstName)
+            .IsRequired()
+            .HasMaxLength(50);
+        builder.Property(e => e.LastName)
+            .IsRequired()
+            .HasMaxLength(50);
+        builder.Property(e => e.Address)
+            .HasMaxLength(200);
+        builder.Property(e => e.Email)
+            .IsRequired()
+            .HasMaxLength(50);
+
 
         builder.UseTptMappingStrategy();
     }

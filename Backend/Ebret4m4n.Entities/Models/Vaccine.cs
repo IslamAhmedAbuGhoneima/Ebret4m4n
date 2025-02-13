@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ebret4m4n.Entities.Models;
 
-[Index(nameof(Name),Name ="IX_Vacccine_Name")]
+//[Index(nameof(Name),Name ="IX_Vacccine_Name")]
 public class Vaccine
 {
     public Guid Id { get; set; }
@@ -19,7 +19,6 @@ public class Vaccine
 
     public int ChildAge { get; set; }
 
-    public bool IsDefult { get; set; }
 
     [ForeignKey("Child")]
     public Guid ChildId { get; set; }

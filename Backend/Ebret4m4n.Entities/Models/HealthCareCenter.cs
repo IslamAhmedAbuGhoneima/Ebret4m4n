@@ -6,14 +6,13 @@ namespace Ebret4m4n.Entities.Models;
 public class HealthCareCenter : IHealthCareCenter
 {
     public Guid HealthCareCenterId { get; set; }
-
-    public string HealthCareCenterName { get; set; }
+    public string HealthCareCenterName { get; set; }=null!;
 
     public string FirstDay { get; set; } = null!;
 
     public string SecondDay { get; set; } = null!;
 
-    public string HealthCareLocation { get; set; }
+    public string HealthCareLocation { get; set; }= null!;
 
     #region new fields
     ICollection<ApplicationUser> Users { get; set; } = [];

@@ -9,7 +9,7 @@ public class HealthReportFileConfiguration : IEntityTypeConfiguration<HealthRepo
     public void Configure(EntityTypeBuilder<HealthReportFile> builder)
     {
         builder.HasKey(H => H.FilePath);
-
+        
         builder.Property(H => H.UploadedOn)
             .HasDefaultValueSql("GETDATE()");
     }

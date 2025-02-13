@@ -4,8 +4,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ebret4m4n.Entities.Models;
 
-[Index(nameof(VaccineId),Name = "IX_Inventory_VaccineId")]
-// [Index(nameof(HealthCareCenterId), Name = "IX_Inventory_HealthCareCenterId")]
+//[Index(nameof(VaccineId),Name = "IX_Inventory_VaccineId")]
+//[Index(nameof(Vaccine.Name),Name = "IX_Inventory_VaccineName")]
+/// <summary>
+/// /[Index(nameof(HealthCareCenterId), Name = "IX_Inventory_HealthCareCenterId")]
+/// </summary>
 public class Inventory : IHealthCareCenter
 {
     public Guid Id { get; set; }
@@ -23,11 +26,10 @@ public class Inventory : IHealthCareCenter
     public string HealthCareCenterName { get; set; }
 
     public string HealthCareLocation { get; set; }
+    public string FirstDay { get; set; }
+    public string SecondDay { get ; set; }
 
     #endregion
 
-    //Remove
-    //[ForeignKey("HealthCareCenter")]
-    //public Guid HealthCareCenterId { get; set; }
-    //public HealthCareCenter HealthCareCenter { get; set; }
+    
 }
