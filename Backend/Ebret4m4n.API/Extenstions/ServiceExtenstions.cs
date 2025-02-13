@@ -1,5 +1,7 @@
-﻿using Ebret4m4n.Entities.Models;
+﻿using Ebret4m4n.Contracts;
+using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Repository;
+using Ebret4m4n.Repository.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,4 +39,6 @@ public static class ServiceExtenstions
         .AddEntityFrameworkStores<EbretAmanDbContext>()
         .AddDefaultTokenProviders();
 
+    public static void UnitOfWorkConfiguration(this IServiceCollection service)
+        => service.AddScoped<IUnitOfWork, UnitOfWork>();
 }

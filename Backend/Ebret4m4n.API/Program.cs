@@ -4,9 +4,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .ConfigureApiBehaviorOptions(opts => opts.SuppressModelStateInvalidFilter = true);
 
 builder.Services.ConfigureCors();
+
+builder.Services.UnitOfWorkConfiguration();
 
 builder.Services.ConfigureAddDbContext(builder.Configuration);
 builder.Services.ConfigureAddIdentity();
