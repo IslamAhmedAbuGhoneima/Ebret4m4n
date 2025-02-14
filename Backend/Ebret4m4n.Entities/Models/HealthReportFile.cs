@@ -9,7 +9,7 @@ public class HealthReportFile
     public DateTime UploadedOn { get; set; }
 
     [ForeignKey("Child")]
-    public Guid ChildId { get; set; }
+    public string ChildId { get; set; } = null!; 
     public Child Child { get; set; }
 
 }

@@ -1,10 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 namespace Ebret4m4n.Entities.Models;
-
-
-
-//[Index(nameof(ChildId), Name = "IX_Certificate_ChildId")]
 
 
 public class Certificate
@@ -14,7 +9,7 @@ public class Certificate
     public DateTime date { get; set; }
 
     [ForeignKey("Child")]
-    public Guid ChildId { get; set; }
+    public string ChildId { get; set; } = null!;
     public Child Child { get; set; } 
 
     [ForeignKey("HealthCareCenter")]

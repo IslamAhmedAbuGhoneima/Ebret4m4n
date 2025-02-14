@@ -9,7 +9,9 @@ public class AdminOfHC : ApplicationUser, IHealthCareCenter
     public string HealthCareCenterName { get; set; } = null!;
 
     public string HealthCareLocation { get; set; } = null!;
-    public string FirstDay { get; set; }
-    public string SecondDay { get ; set ; }
+
+    public WeekDays FirstDay { get; set; }
+
+    public WeekDays SecondDay { get ; set ; }
     
 }

@@ -4,8 +4,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ebret4m4n.Entities.Models;
 
-//[Index(nameof(UserId),Name = "IX_Appointment_UserId")]
-//[Index(nameof(ChildId), Name = "IX_Appointment_ChildId")]
 public class Appointment
 {
     public Guid Id { get; set; }
@@ -19,7 +17,7 @@ public class Appointment
     public string Location { get; set; } = null!;
 
     [ForeignKey("Child")]
-    public Guid ChildId { get; set; }
+    public string ChildId { get; set; } = null!;
     public Child Child { get; set; } = null!;
 
     [ForeignKey("User")]

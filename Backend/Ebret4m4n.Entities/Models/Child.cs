@@ -1,13 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace Ebret4m4n.Entities.Models;
 
-//[Index(nameof(Name),Name = "IX_Child_Name")]
 public class Child
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; } = null!;
 
     public string Name { get; set; } = null!;
 

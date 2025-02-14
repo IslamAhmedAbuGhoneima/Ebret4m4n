@@ -21,7 +21,7 @@ public class BaseRepository<T>(EbretAmanDbContext context) :
         context.Set<T>().Where(condition) :
         context.Set<T>().AsNoTracking().Where(condition);
 
-    public async Task<T?> FindByIdAsync(Guid id)
+    public async Task<T> FindByIdAsync(Guid id)
        => await context.Set<T>().FindAsync(id);
         
 

@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace Ebret4m4n.Entities.Models;
 
-//[Index(nameof(Name),Name ="IX_Vacccine_Name")]
 public class Vaccine
 {
     public Guid Id { get; set; }
@@ -21,7 +19,7 @@ public class Vaccine
 
 
     [ForeignKey("Child")]
-    public Guid ChildId { get; set; }
+    public string ChildId { get; set; } = null!;
     public Child Child {  get; set; }
 
     public ICollection<SideEffect> SideEffects { get; set; } = [];

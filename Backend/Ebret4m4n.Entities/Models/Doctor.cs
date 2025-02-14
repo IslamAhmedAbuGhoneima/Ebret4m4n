@@ -10,6 +10,8 @@ public class Doctor : ApplicationUser, IHealthCareCenter
     public string HealthCareCenterName { get; set; } = null!;
 
     public string HealthCareLocation { get; set; } = null!;
-    public string FirstDay { get; set ; } = null!;
-    public string SecondDay { get ; set; } = null!;
+
+    public WeekDays FirstDay { get; set ; } 
+
+    public WeekDays SecondDay { get ; set; } 
 }

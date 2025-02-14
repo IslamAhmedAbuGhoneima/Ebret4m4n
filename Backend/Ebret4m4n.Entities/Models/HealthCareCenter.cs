@@ -6,11 +6,12 @@ namespace Ebret4m4n.Entities.Models;
 public class HealthCareCenter : IHealthCareCenter
 {
     public Guid HealthCareCenterId { get; set; }
-    public string HealthCareCenterName { get; set; }=null!;
 
-    public string FirstDay { get; set; } = null!;
+    public string HealthCareCenterName { get; set; } = null!;
 
-    public string SecondDay { get; set; } = null!;
+    public WeekDays FirstDay { get; set; }
+
+    public WeekDays SecondDay { get; set; } 
 
     public string HealthCareLocation { get; set; }= null!;
 

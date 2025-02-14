@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace Ebret4m4n.Entities.Models;
 
-//[Index(nameof(UserId),Name = "IX_Complaint_UserId")]
 public class Complaint
 {
     public Guid Id { get; set; }
