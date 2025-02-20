@@ -5,13 +5,13 @@ namespace Ebret4m4n.Entities.Models;
 
 public class Doctor : ApplicationUser, IHealthCareCenter
 {
+    #region Properties
     public int DoctorNumber { get; set; }
 
     public string HealthCareCenterName { get; set; } = null!;
 
-    public string HealthCareLocation { get; set; } = null!;
+    public DayOfWeek FirstDay { get; set; }
 
-    public WeekDays FirstDay { get; set ; } 
-
-    public WeekDays SecondDay { get ; set; } 
+    public DayOfWeek SecondDay { get; set; }  
+    #endregion
 }

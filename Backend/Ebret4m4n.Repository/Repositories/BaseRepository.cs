@@ -13,7 +13,8 @@ public class BaseRepository<T>(EbretAmanDbContext context) :
 
 
     public IQueryable<T> FindAll(bool trackChanges)
-        => context.Set<T>();
+        => trackChanges ? context.Set<T>() :
+        context.Set<T>().AsNoTracking();
 
 
     public IQueryable<T> FindByCondition(Expression<Func<T, bool>> condition, bool trackChanges)

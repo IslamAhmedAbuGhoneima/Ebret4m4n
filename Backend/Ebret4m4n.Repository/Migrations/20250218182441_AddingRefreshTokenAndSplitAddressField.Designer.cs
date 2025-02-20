@@ -4,6 +4,7 @@ using Ebret4m4n.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ebret4m4n.Repository.Migrations
 {
     [DbContext(typeof(EbretAmanDbContext))]
-    partial class EbretAmanDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250218182441_AddingRefreshTokenAndSplitAddressField")]
+    partial class AddingRefreshTokenAndSplitAddressField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace Ebret4m4n.Repository.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
-                    b.Property<Guid?>("HealthCareCenterId")
+                    b.Property<Guid>("HealthCareCenterId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LastName")
@@ -544,17 +547,17 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1ae13225-48c0-4588-98ee-99538cf08d16",
+                            Id = "eea5447a-7889-4458-b6ac-92c5ba404809",
                             Name = "Doctor"
                         },
                         new
                         {
-                            Id = "080ae79d-234b-4705-893c-c39f7372e0d0",
+                            Id = "fc80e67a-2bb3-485b-b6e8-7857ebecc9d5",
                             Name = "AdminOfHC"
                         },
                         new
                         {
-                            Id = "d96aef87-1fad-423c-9dc4-5b81440d4fb7",
+                            Id = "d3645457-7df9-46b5-acf3-5d6e3095a986",
                             Name = "AdminOfMinistryOfHealth"
                         });
                 });
@@ -678,6 +681,10 @@ namespace Ebret4m4n.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("HealthCareLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("NursingNumber")
                         .HasColumnType("int");
 
@@ -704,6 +711,10 @@ namespace Ebret4m4n.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("HealthCareLocation")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecondDay")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -715,7 +726,9 @@ namespace Ebret4m4n.Repository.Migrations
                 {
                     b.HasOne("Ebret4m4n.Entities.Models.HealthCareCenter", "HealthCareCenter")
                         .WithMany()
-                        .HasForeignKey("HealthCareCenterId");
+                        .HasForeignKey("HealthCareCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("HealthCareCenter");
                 });

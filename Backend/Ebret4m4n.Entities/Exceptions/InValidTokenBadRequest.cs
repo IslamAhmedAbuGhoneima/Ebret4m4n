@@ -1,0 +1,8 @@
+﻿namespace Ebret4m4n.Entities.Exceptions;
+
+public class InValidTokenBadRequest : BadRequestException
+{
+    public InValidTokenBadRequest() 
+        : base("Invalid token.")
+    { }
+}

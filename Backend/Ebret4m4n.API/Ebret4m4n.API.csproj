@@ -4,9 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>d5349d62-d087-4034-b5f4-a740a3886a6e</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.12">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -16,10 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ebret4m4n.Repository\Ebret4m4n.Repository.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Ebret4m4n.Shared\Ebret4m4n.Shared.csproj" />
   </ItemGroup>
 
 </Project>

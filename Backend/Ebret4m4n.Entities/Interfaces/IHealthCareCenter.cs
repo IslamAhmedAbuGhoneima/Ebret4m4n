@@ -1,23 +1,21 @@
 ﻿namespace Ebret4m4n.Entities.Interfaces;
-public enum WeekDays
-{
-    Sunday,
-    Monday,
-    Tuesday,
-    Wednesday,
-    Thursday,
-    Saturday
-}
+
 public interface IHealthCareCenter
 {
-    public Guid HealthCareCenterId { get; set; }
+    //public Guid HealthCareCenterId { get; set; }
 
     public string HealthCareCenterName { get; set; }
 
-    public WeekDays FirstDay { get; set; }
+    public DayOfWeek FirstDay { get; set; }
 
-    public WeekDays SecondDay { get; set; }
+    public DayOfWeek SecondDay { get; set; }
 
-    public string HealthCareLocation { get; set; }
-    
+    //public string HealthCareLocation { get; set; }
+
+    public string Governorate { get; set; }
+
+    public string City { get; set; }
+
+    public string Village { get; set; }
+ 
 }

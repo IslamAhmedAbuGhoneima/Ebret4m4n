@@ -15,8 +15,15 @@ public class HealthCareCenterConfiguration : IEntityTypeConfiguration<HealthCare
             .IsRequired()
             .HasMaxLength(50);
 
-        builder.Property(p => p.HealthCareLocation)
+        builder.Property(p => p.Governorate)
+            .HasMaxLength(30)
             .IsRequired();
+
+        builder.Property(p => p.City)
+            .HasMaxLength(30);
+
+        builder.Property(p => p.Village)
+            .HasMaxLength(30);
 
         builder.Property(p => p.FirstDay)
             .HasConversion<string>()

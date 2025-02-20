@@ -4,14 +4,14 @@ namespace Ebret4m4n.Entities.Models;
 
 public class AdminOfHC : ApplicationUser, IHealthCareCenter
 {
+    #region Properites
+
     public int NursingNumber { get; set; }
 
     public string HealthCareCenterName { get; set; } = null!;
 
-    public string HealthCareLocation { get; set; } = null!;
+    public DayOfWeek FirstDay { get; set; }
 
-    public WeekDays FirstDay { get; set; }
-
-    public WeekDays SecondDay { get ; set ; }
-    
+    public DayOfWeek SecondDay { get; set; }
+    #endregion
 }

@@ -11,9 +11,6 @@ public class AdminOfHCConfiguration : IEntityTypeConfiguration<AdminOfHC>
         builder.Property(p => p.NursingNumber)
             .IsRequired();
 
-        builder.Property(p => p.HealthCareLocation)
-            .IsRequired();
-
         builder.Property(p => p.HealthCareCenterName)
             .IsRequired()
             .HasMaxLength(50);

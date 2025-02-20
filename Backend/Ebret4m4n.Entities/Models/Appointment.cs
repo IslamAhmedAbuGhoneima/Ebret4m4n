@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace Ebret4m4n.Entities.Models;
 
 public class Appointment
 {
+    #region Properties
     public Guid Id { get; set; }
 
     public DateTime Date { get; set; }
@@ -15,7 +15,9 @@ public class Appointment
     public string Status { get; set; } = null!;  //Enum
 
     public string Location { get; set; } = null!;
+    #endregion
 
+    #region Relations
     [ForeignKey("Child")]
     public string ChildId { get; set; } = null!;
     public Child Child { get; set; } = null!;
@@ -26,5 +28,6 @@ public class Appointment
 
     [ForeignKey("HealthCareCenter")]
     public Guid HealthCareCenterId { get; set; }
-    public HealthCareCenter HealthCareCenter { get; set; }
+    public HealthCareCenter HealthCareCenter { get; set; } 
+    #endregion
 }

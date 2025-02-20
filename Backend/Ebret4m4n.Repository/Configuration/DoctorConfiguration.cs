@@ -15,10 +15,6 @@ public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
             .IsRequired()
             .HasMaxLength(50);
 
-        builder.Property(p => p.HealthCareLocation)
-            .IsRequired();
-
-
         builder.Property(p => p.FirstDay)
                     .HasConversion<string>()
                     .IsRequired();

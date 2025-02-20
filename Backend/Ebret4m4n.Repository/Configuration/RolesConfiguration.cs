@@ -10,10 +10,9 @@ public class RolesConfiguration : IEntityTypeConfiguration<IdentityRole>
     {
         IdentityRole[] Roles = 
         {
-            new IdentityRole("Parent"),
-            new IdentityRole("Doctor"),
-            new IdentityRole("AdminOfHC"),
-            new IdentityRole("AdminOfMinistryOfHealth"),
+            new ("Doctor"),
+            new ("AdminOfHC"),
+            new ("AdminOfMinistryOfHealth"),
         };
 
         builder.HasData(Roles);

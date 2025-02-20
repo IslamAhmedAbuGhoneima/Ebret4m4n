@@ -1,4 +1,5 @@
 ﻿using Ebret4m4n.Entities.ErrorModels;
+using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 
 namespace Ebret4m4n.API.Extenstions
@@ -18,7 +19,9 @@ namespace Ebret4m4n.API.Extenstions
                     {
                         context.Response.StatusCode = contextFeature?.Error switch
                         {
+                            BadRequestException => StatusCodes.Status400BadRequest,
                             _ => StatusCodes.Status500InternalServerError
+                            
                         };
 
                         await context.Response.WriteAsync(new ErrorDetails

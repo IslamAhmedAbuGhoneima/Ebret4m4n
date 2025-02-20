@@ -10,14 +10,24 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
     {
         builder.Property(e => e.FirstName)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(20);
 
         builder.Property(e => e.LastName)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(20);
 
-        builder.Property(e => e.Address)
-            .HasMaxLength(200);
+        //builder.Property(e => e.Address)
+        //    .HasMaxLength(200);
+
+        builder.Property(e => e.Governorate)
+            .HasMaxLength(30)
+            .IsRequired();
+
+        builder.Property(e => e.City)
+            .HasMaxLength(30);
+
+        builder.Property(e => e.Village)
+            .HasMaxLength(30);
 
         builder.Property(e => e.Email)
             .IsRequired()

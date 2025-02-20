@@ -26,8 +26,15 @@ public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
             .HasConversion<string>()
             .IsRequired();
 
-        builder.Property(p => p.HealthCareLocation)
+        builder.Property(p => p.Governorate)
+            .HasMaxLength(30)
             .IsRequired();
+
+        builder.Property(p => p.City)
+            .HasMaxLength(30);
+
+        builder.Property(p => p.Village)
+            .HasMaxLength(30);
 
         builder.HasIndex(p => p.HealthCareCenterId);
     }
