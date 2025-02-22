@@ -1,22 +1,17 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Ebret4m4n.Shared.DTOs
+namespace Ebret4m4n.Shared.DTOs;
+
+public class UpdateChildDto
 {
-    public class UpdateChildDto
-    {
-        [Required]
-        public string Name { get; set; } = null!;
-        [Range(1, 15)]
-        public double Weight { get; set; } 
+    [Required(ErrorMessage ="يجب ادخال اسم الطفل")]
+    public string Name { get; set; } = null!;
 
-        public string? PatientHistory { get; set; }
-        public List<IFormFile> imageFiles { get; set; }
-        public List<string> deleteImagePaths { get; set; }
-    }
+    [Range(1, 15,ErrorMessage ="يجب ادخال وزن الطفل اكثر من 1كجم")]
+    public double Weight { get; set; } 
+
+    public string? PatientHistory { get; set; }
+
+    public List<IFormFile>? ImageFiles { get; set; }
 }

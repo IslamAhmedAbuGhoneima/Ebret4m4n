@@ -1,0 +1,12 @@
+[
+  {
+    "name": "vac1",
+    "docesRequired": 2,
+    "childAge": 3
+  },
+  {
+    "name": "vac2",
+    "docesRequired": 3,
+    "childAge": 5
+  }
+]

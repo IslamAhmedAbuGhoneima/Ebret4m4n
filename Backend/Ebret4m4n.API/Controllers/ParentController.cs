@@ -1,153 +1,148 @@
-﻿using Azure;
+﻿using Ebret4m4n.API.ChildBaseVaccines;
 using Ebret4m4n.Contracts;
+using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
-using Ebret4m4n.Repository.Repositories;
 using Ebret4m4n.Shared.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IO; 
+using System.Security.Claims;
+using System.Text.Json;
 
 
-namespace Ebret4m4n.API.Controllers
+namespace Ebret4m4n.API.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class ParentController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ParentController : ControllerBase
+    private readonly IUnitOfWork _unitOfWork;
+
+    public ParentController(IUnitOfWork unitOfWork)
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public ParentController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddChild([FromBody]AddChildDto dto)
-        {
-           // var response = new ServiceResponse<Child>();
-           
-            if(!ModelState.IsValid)
-            {
-                return UnprocessableEntity(ModelState);
-            }
-            var child = new Child
-            {
-                Id =dto.Id,
-                Name = dto.Name,
-                BirthDate = dto.BirthDate,
-                Weight = dto.Weight,
-                Gender = dto.Gender,
-                UserId = dto.ParentId
-            };
-
-            if(dto.healthReportFiles is not null)
-            {
-                foreach (var images in dto.healthReportFiles)
-                {
-                    var image = new HealthReportFile
-                    {
-                        FilePath = images.FileName,
-                        ChildId = dto.Id
-                    };
-                    child.HealthReportFiles.Add(image);
-                }
-                List<HealthReportFile> imagesSaved=SaveImages(dto.healthReportFiles);
-            }
-
-            if (dto.vaccines is not null)
-            {
-                foreach (var vaccine in dto.vaccines)
-                {
-                    var v = new Vaccine
-                    {
-                        ChildId = dto.Id,
-                        Name = vaccine.Name,
-                        ChildAge = vaccine.ChildAge
-                    };
-                    child.Vaccines.Add(v);
-                }
-            }
-             _unitOfWork.ChildRepo.Add(child);
-            await _unitOfWork.SaveAsync();
-
-            //response.Data = child;
-            //response.Success = true;
-            //response.Message = "Child added successfully with image";
-
-            return Ok();
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateChild(string Id,[FromBody] UpdateChildDto dto)
-        {
-            if (!ModelState.IsValid)
-            {
-                return UnprocessableEntity(ModelState);
-            }
-
-            var child = await _unitOfWork.ChildRepo.FindAsync(e=>e.Id==Id,true);
-            if (child is null)
-            {
-                return NotFound();
-            }
-             child.Name = dto.Name;
-             child.Weight = dto.Weight;
-             if (!string.IsNullOrEmpty(dto.PatientHistory))
-                        child.PatientHistory = dto.PatientHistory;
-             
-            //Delet files from server and database
-            if (dto.deleteImagePaths != null)
-            {
-                child.HealthReportFiles = child.HealthReportFiles?.Where(h => !dto.deleteImagePaths.Contains(h.FilePath)).ToList();
-
-                foreach (var path in dto.deleteImagePaths)
-                {
-                    string fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
-                    if (System.IO.File.Exists(fullPath))
-                        System.IO.File.Delete(fullPath);
-                }
-            }
-            //Add new images in server
-            if (dto.imageFiles is not null)
-            {
-                foreach (var images in dto.imageFiles)
-                {
-                    var image = new HealthReportFile
-                    {
-                        FilePath = images.FileName,
-                        ChildId = Id
-                    };
-                    child.HealthReportFiles.Add(image);
-                }
-                List<HealthReportFile> imagesSaved = SaveImages(dto.imageFiles);
-            }
-
-            _unitOfWork.ChildRepo.Update(child);
-            await _unitOfWork.SaveAsync();
-            return Ok();
-
-        }
-        private List<HealthReportFile> SaveImages(ICollection<IFormFile> imageFiles)
-        {
-            var savedFiles = new List<HealthReportFile>();
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Images");
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
-
-            foreach (var imageFile in imageFiles)
-            {
-                if (imageFile.FileName.Length > 0)
-                {
-                    string FileName = imageFile.FileName;
-                    string FilePath = Guid.NewGuid().ToString() + Path.GetExtension(FileName);
-                    string imagePath = Path.Combine(uploadsFolder, FileName);
-                    System.IO.File.Copy(FilePath, imagePath);
-
-                    savedFiles.Add(new HealthReportFile { FilePath = imagePath, UploadedOn = DateTime.Now });
-                }
-            }
-
-            return savedFiles;
-        }
-        
+        _unitOfWork = unitOfWork;
     }
+
+    [Authorize]
+    [HttpPost("child-add")]
+    public async Task<IActionResult> AddChild([FromBody]AddChildDto dto)
+    {
+        if(!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
+        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        
+        var child = new Child
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            BirthDate = dto.BirthDate,
+            Weight = dto.Weight,
+            Gender = dto.Gender,
+            UserId = parentId
+        };
+
+        if (dto.healthReportFiles != null) 
+        {
+            var childReports = SaveReportFiles(dto.healthReportFiles, dto.Id);
+            await _unitOfWork.HealthyReportRepo.AddRangeAsync(childReports);
+        }
+
+        if (dto.vaccines != null) 
+        {
+            string path = 
+                Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "Vaccines.json");
+
+            using (var strem = new FileStream(path, FileMode.Open))
+            {
+                var baseVaccines = JsonSerializer.Deserialize<List<BaseVaccine>>(strem);
+                var childVaccineList = new List<Vaccine>();
+                
+                foreach(var vac in dto.vaccines)
+                {
+                    var baseVaccine =  baseVaccines.FirstOrDefault(v => v.Name == vac.Name);
+                    var vaccine = new Vaccine
+                    {
+                        Name = baseVaccine.Name,
+                        DocesRequired = baseVaccine.DocesRequired,
+                        DocesTaken = baseVaccine.DocesRequired,
+                        IsTaken = true,
+                        ChildAge = baseVaccine.ChildAge
+                    };
+                    childVaccineList.Add(vaccine);
+                }
+
+                await _unitOfWork.VaccineRepo.AddRangeAsync(childVaccineList);
+            }
+        }
+
+        await _unitOfWork.ChildRepo.AddAsync(child);
+
+        await _unitOfWork.SaveAsync();
+
+        return Ok();
+    }
+
+    [Authorize]
+    [HttpPut("{id}/child-update")]
+    public async Task<IActionResult> UpdateChild(string id, [FromBody] UpdateChildDto dto)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
+        var child = await _unitOfWork.ChildRepo.FindAsync(e => e.Id == id, true);
+
+        if (child is null)
+            throw new NotFoundBadRequest($"Child with {id} Not found"); 
+
+        child.Name = dto.Name;
+        child.Weight = dto.Weight;
+        child.PatientHistory = dto.PatientHistory;
+
+        if(dto.ImageFiles is not null)
+        {
+            var childHealthFiles = SaveReportFiles(dto.ImageFiles, id);
+            await _unitOfWork.HealthyReportRepo.AddRangeAsync(childHealthFiles);
+        }
+
+        _unitOfWork.ChildRepo.Update(child);
+        await _unitOfWork.SaveAsync();
+
+        return Ok(new { Message = "Child updated successfully" });
+    }
+
+    private List<HealthReportFile>? SaveReportFiles(List<IFormFile> imageFiles, string childId)
+    {
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "ChildReports");
+
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+
+        
+        var healthReports = new List<HealthReportFile>();
+
+        foreach (var file in imageFiles)
+        {
+            if (file.Length <= 5120)
+            {
+                var fileName = Guid.NewGuid().ToString();
+                var fileExtenstion = Path.GetExtension(file.FileName);
+
+                var reportPath = Path.Combine(path, fileName, fileExtenstion);
+
+                using(var stream = new FileStream(path, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+                healthReports.Add(new HealthReportFile
+                {
+                    FilePath = Path.Combine($"/ChildReports/{fileName}{fileExtenstion}"),
+                    ChildId = childId
+                });
+            }
+            else
+                throw new FileLoadException("file size to large");
+        }
+        return healthReports;
+    }  
 }

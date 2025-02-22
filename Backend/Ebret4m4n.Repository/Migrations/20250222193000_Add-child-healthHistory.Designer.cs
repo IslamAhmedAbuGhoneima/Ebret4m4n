@@ -4,6 +4,7 @@ using Ebret4m4n.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ebret4m4n.Repository.Migrations
 {
     [DbContext(typeof(EbretAmanDbContext))]
-    partial class EbretAmanDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250222193000_Add-child-healthHistory")]
+    partial class AddchildhealthHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -248,6 +251,7 @@ namespace Ebret4m4n.Repository.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PatientHistory")
+                        .IsRequired()
                         .HasMaxLength(2500)
                         .HasColumnType("nvarchar(2500)");
 
@@ -548,17 +552,17 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "67cb5f09-35ca-4d5a-ae7a-ad9cb8ffaed8",
+                            Id = "4a35fa06-8114-4849-b60c-4bda78ce0213",
                             Name = "Doctor"
                         },
                         new
                         {
-                            Id = "654fb45c-aa85-402b-9bec-57f8a6905dea",
+                            Id = "db0547c2-999e-4b71-b359-662c6e404048",
                             Name = "AdminOfHC"
                         },
                         new
                         {
-                            Id = "389f6f82-ad6f-4f59-b083-169b4a54c9f1",
+                            Id = "5ba49944-2ba5-4706-8a09-c0e25c60a6cf",
                             Name = "AdminOfMinistryOfHealth"
                         });
                 });

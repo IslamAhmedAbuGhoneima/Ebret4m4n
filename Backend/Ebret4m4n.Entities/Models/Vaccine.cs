@@ -19,7 +19,6 @@ public class Vaccine
     public int ChildAge { get; set; }
     #endregion
 
-
     #region Relations
     [ForeignKey("Child")]
     public string ChildId { get; set; } = null!;

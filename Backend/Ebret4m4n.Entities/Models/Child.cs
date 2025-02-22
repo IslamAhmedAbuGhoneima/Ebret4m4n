@@ -18,7 +18,7 @@ public class Child
 
     public char Gender { get; set; }
 
-    public string PatientHistory {  get; set; }
+    public string? PatientHistory {  get; set; }
     
     #endregion
 

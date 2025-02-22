@@ -3,6 +3,7 @@ using Ebret4m4n.Entities.ConfigurationModels;
 using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -18,6 +19,7 @@ namespace Ebret4m4n.API.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class AuthenticateController(UserManager<ApplicationUser> userManager,
+    SignInManager<ApplicationUser> signInManager,
     IEmailSender emailSender,
     IOptions<JwtConfiguration> jwtConfig) : ControllerBase
 {
@@ -45,7 +47,7 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
         var result = await userManager.CreateAsync(user, model.Password);
 
         if (result.Succeeded)
-            return Ok(new { Message = "User created successfully." });
+            return CreatedAtAction("UserProfile", user);
 
         var errors = result.Errors.Select(e => e.Description);
         return BadRequest(new { Errors = errors });
@@ -57,17 +59,23 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
         if(!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        bool userFound = await ValidateUser(model.Email, model.Password);
 
-        if (!userFound)
+        _user = await userManager.FindByEmailAsync(model.Email);
+
+        if(_user is null)
+            throw new LoginBadRequest();
+
+        bool checkPassword = await userManager.CheckPasswordAsync(_user, model.Password);
+
+        if (await userManager.IsLockedOutAsync(_user!))
+            throw new LockedOutBadRequest();
+
+        if (!checkPassword)
         {
-            if (await userManager.IsLockedOutAsync(_user!))
-                return BadRequest(new { Message = "You are Locked try again later" });
-
             await userManager.AccessFailedAsync(_user!);
-            return NotFound(new { Message = "Wrong email or password" });
+            throw new LoginBadRequest();
         }
-
+        
         await userManager.ResetAccessFailedCountAsync(_user!);
         var response = await GenerageToken(true);
 
@@ -107,11 +115,12 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
 
         var callbackUrl = Url.Action("ResetPassword", "Authenticate",
             new { userId = _user.Id, token = token }, protocol: HttpContext.Request.Scheme);
-
-
+        
         string email = model.Email;
         string subject = "Reset Password";
-        string body = await GenerateEmailMessage(callbackUrl);
+        string body = await GenerateEmailMessage(callbackUrl!,
+            "Reset Your Password",
+            "You requested a password reset.Click the link below to reset it:");
 
         await emailSender.SendEmailAsync(email, subject, body);
 
@@ -127,7 +136,7 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
         _user = await userManager.FindByIdAsync(model.UserId);
 
         if (_user is null)
-            throw new InValidTokenBadRequest();
+            throw new NotFoundBadRequest($"user with {model.UserId} not found");
 
 
         string decodedToken = WebUtility.UrlDecode(model.Token);
@@ -142,20 +151,80 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
     }
 
 
-    #region Private actions
-
-    private async Task<bool> ValidateUser(string email, string password)
+    [Authorize]
+    [HttpPost("reset-email")]
+    public async Task<IActionResult> ResetEmail([FromBody] ResetEmailDto model)
     {
-        var user = await userManager.FindByEmailAsync(email);
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        _user = await userManager.FindByIdAsync(userId);
 
-        _user = user;
+        if (_user is null)
+            throw new NotFoundBadRequest($"user with {userId} not found");
 
-        if (_user is null ||
-            !await userManager.CheckPasswordAsync(_user, password))
-            return false;
+        var token = await userManager.GenerateChangeEmailTokenAsync(_user, model.NewEmail);
 
-        return true;
+        var callbackUrl = Url.Action("ResetPassword", "Authenticate",
+            new { userId = _user.Id, email = model.NewEmail, token = token }, protocol: HttpContext.Request.Scheme);
+
+
+        string newEmail = model.NewEmail;
+        string subject = "Change Email";
+        string body = await GenerateEmailMessage(callbackUrl!,
+            "Change your email",
+            "You requested an email reset.Click the link below to reset it:");
+
+        await emailSender.SendEmailAsync(newEmail, subject, body);
+
+        return Ok(new { Message = "You will receive email message for reste your email" });
     }
+
+    [HttpGet("email-change")]
+    public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailDto model)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
+        _user = await userManager.FindByIdAsync(model.UserId);
+        if (_user is null)
+            throw new NotFoundBadRequest($"user with {model.UserId} not found");
+
+        var decodedToken = WebUtility.UrlDecode(model.Token);
+        var newEmail = model.NewEmail;
+
+        var result = await userManager.ChangeEmailAsync(_user, newEmail, decodedToken);
+
+        if (!result.Succeeded)
+            throw new InValidTokenBadRequest();
+
+        await signInManager.RefreshSignInAsync(_user);
+        return Ok(new { Message = "your Email Updated Successfully" });
+    }
+
+
+    [HttpGet("user-profile/{id:guid}")]
+    public async Task<IActionResult> UserProfile(Guid id)
+    {
+        string userId = id.ToString();
+        _user = await userManager.FindByIdAsync(userId);
+
+        if (_user is null)
+            throw new NotFoundBadRequest($"user with {userId} not found");
+
+        var userDto = new UserDataDto
+        {
+            FirstName = _user.FirstName,
+            LastName = _user.LastName,
+            Email = _user.Email,
+            PhoneNumber = _user.PhoneNumber,
+            Governorate = _user.Governorate,
+            City = _user.City,
+            Village = _user.Village
+        };
+
+        return Ok(userDto);
+    }
+
+    #region Private actions
 
     private async Task<TokenDto> GenerageToken(bool populateExp)
     {
@@ -252,22 +321,22 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
         return principal;
     }
 
-    private async Task<string> GenerateEmailMessage(string resetLink)
+    private async Task<string> GenerateEmailMessage(string resetLink, string emailTitle, string emailBody)
     {
-        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "EmailTemplates", "ResetPassword.html");
+        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "EmailTemplates", "EmailMessage.html");
         Console.WriteLine(templatePath);
 
         // Check if file exists
         if (!System.IO.File.Exists(templatePath))
-        {
-            return "Email template not found!";
-        }
+            throw new FileNotFoundException("Something went wrong with your Request Please Contact Support");
 
         // Read the file content
-        string emailBody = await System.IO.File.ReadAllTextAsync(templatePath);
-        emailBody = emailBody.Replace("{RESET_LINK}", resetLink);
+        string emailMessage = await System.IO.File.ReadAllTextAsync(templatePath);
+        emailMessage = emailMessage.Replace("{RESET_LINK}", resetLink);
+        emailMessage = emailMessage.Replace("EMAILTITLE", emailTitle);
+        emailMessage = emailMessage.Replace("EMAILBODY", emailBody);
 
-        return emailBody;
+        return emailMessage;
     } 
 
     #endregion
