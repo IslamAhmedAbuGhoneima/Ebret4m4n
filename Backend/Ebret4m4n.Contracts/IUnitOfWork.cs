@@ -2,5 +2,8 @@
 
 public interface IUnitOfWork
 {
+    IChildRepository ChildRepo { get; }
+
+
     Task SaveAsync();
 }

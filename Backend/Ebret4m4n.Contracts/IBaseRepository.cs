@@ -8,7 +8,7 @@ public interface IBaseRepository<T>
 
     IQueryable<T> FindByCondition(Expression<Func<T, bool>> condition, bool trackChanges);
 
-    Task<T> FindByIdAsync(Guid id);
+    Task<T> FindAsync(Expression<Func<T, bool>> condition, bool trackChanges, params string[]? includes);
 
     void Add(T entity);
     void Update(T entity);

@@ -22,10 +22,18 @@ public class BaseRepository<T>(EbretAmanDbContext context) :
         context.Set<T>().Where(condition) :
         context.Set<T>().AsNoTracking().Where(condition);
 
-    public async Task<T> FindByIdAsync(Guid id)
-       => await context.Set<T>().FindAsync(id);
-        
+    public async Task<T> FindAsync(Expression<Func<T, bool>> condition, bool trackChanges, params string[]? includes)
+    {
+        IQueryable<T> entity = trackChanges ? context.Set<T>() :
+            context.Set<T>().AsNoTracking();
 
+        if (includes is not null)
+        {
+            foreach (string include in includes)
+                entity = entity.Include(include);
+        }
+        return await entity.FirstOrDefaultAsync(condition);
+    }
     public void Remove(T entity)
         => context.Remove(entity);
 

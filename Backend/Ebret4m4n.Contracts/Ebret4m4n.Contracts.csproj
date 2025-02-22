@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Ebret4m4n.Entities\Ebret4m4n.Entities.csproj" />
+  </ItemGroup>
+
 </Project>

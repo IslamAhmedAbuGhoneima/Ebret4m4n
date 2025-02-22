@@ -17,6 +17,9 @@ public class Child
     public double Weight { get; set; }
 
     public char Gender { get; set; }
+
+    public string PatientHistory {  get; set; }
+    
     #endregion
 
     #region Relations

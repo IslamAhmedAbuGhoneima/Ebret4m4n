@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Ebret4m4n.Shared\Ebret4m4n.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Images\" />
+  </ItemGroup>
+
 </Project>
