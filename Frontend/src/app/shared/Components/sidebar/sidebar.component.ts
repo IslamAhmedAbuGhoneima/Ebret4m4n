@@ -1,16 +1,17 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { slideInOut } from '../../Animations/sidebar-transition';
+import { BehaviorSubject } from 'rxjs';
 import { HiddenSidebarService } from '../../Services/hidden-sidebar.service';
 
+
 @Component({
-  selector: 'app-navbar',
+  selector: 'app-sidebar',
   standalone: false,
   animations: [slideInOut],
-  templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css',
+  templateUrl: './sidebar.component.html',
+  styleUrl: './sidebar.component.css',
 })
-
-export class NavbarComponent {
+export class SidebarComponent {
   navbarState: string = 'hidden';
   constructor(private hiddenSidebarService: HiddenSidebarService) {
   }

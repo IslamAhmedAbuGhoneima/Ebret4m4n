@@ -1,1 +1,94 @@
-<p>navbar works!</p>
+<header class=" relative z-[39]">
+  <div class="container p-4">
+    <div class="flex justify-between items-center">
+      <a routerLink="/home" class="logo outline-none border-none text-black text-3xl font-bold">
+        <h2>
+          إبرة
+          <span class="inline-block text-green-500">أمان</span>
+        </h2>
+      </a>
+      <div class="links">
+        <div class="links-home-page hidden">
+          <ul class="flex gap-x-4 items-center text-base font-semibold text-gray-700">
+            <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+              <a class="p-2">جدول التطعيمات</a>app-sidebar
+            </li>
+            <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+              <a class="p-2">من نحن</a>
+            </li>
+            <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+              <a class="p-2">تواصل معنا</a>
+            </li>
+          </ul>
+        </div>
+        <div class="anthor-links hidden md:block">
+          <!-- parent and doctor links -->
+          <div class="pd-links hidden">
+            <ul class="flex gap-x-10 items-center text-base font-semibold text-gray-700">
+              <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+                <a class="p-2">الرئيسية </a>
+              </li>
+              <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+                <a class="p-2">أطفالي</a>
+              </li>
+              <li *ngIf="true" class="hover:text-green-500 transition-all duration-200 ease-linear">
+                <a class="p-2"> الأطفال</a>
+              </li>
+              <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+                <a class="p-2"> إبلاغ عن شكوى </a>
+              </li>
+            </ul>
+          </div>
+          <div class="admin-hospital-links ">
+            <ul class="flex gap-x-10 items-center text-base font-semibold text-gray-700">
+              <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+                <a class="p-2"> الأطفال القادمون</a>
+              </li>
+              <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+                <a class="p-2">اللقاحات</a>
+              </li>
+            </ul>
+          </div>
+          <div class="Ministry-links hidden">
+            <ul class="flex gap-x-10 items-center text-base font-semibold text-gray-700">
+              <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+                <a class="p-2">الوحدات الصحية </a>
+              </li>
+              <li class="hover:text-green-500 transition-all duration-200 ease-linear">
+                <a class="p-2"> الشكاوى</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="account items-end gap-x-3 hidden md:flex">
+        <div class="flex items-center gap-x-1">
+          <a *ngIf="false"><ng-icon name="heroChatBubbleOvalLeft" class="text-green-800 font-bold" />
+          </a>
+          <a href=""><ng-icon name="heroBell" class="text-green-800 font-bold" />
+          </a>
+        </div>
+
+        <div class="flex items-center gap-x-1">
+          <a><ng-icon name="heroUser" class="text-green-800 font-bold" /> </a>
+          <a href=""> محمد </a>
+        </div>
+      </div>
+      <button (click)="toggleNavbar()"
+        class="toggle-menu w-8 h-4 relative cursor-pointer group focus:outline-none md:hidden">
+        <span class="bg-black absolute left-0 h-1 transition-all duration-200 w-[70%] top-0 group-focus::w-full"></span>
+        <span class="bg-black absolute left-0 h-1 transition-all duration-200 w-full top-[8px]"></span>
+        <span
+          class="bg-black absolute left-0 h-1 transition-all duration-200 w-[70%] top-[16px] group-focus::w-full"></span>
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="navbarState === 'visible'"
+    class="fixed top-0 left-0 w-full h-full bg-white bg-opacity-40 backdrop-blur-md z-40">
+  </div>
+
+  <div [@slideInOut]="navbarState" class="fixed top-0 left-0 h-full w-80 bg-white text-black z-50">
+    <app-sidebar></app-sidebar>
+  </div>
+</header>
