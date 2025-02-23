@@ -6,6 +6,7 @@ using Ebret4m4n.Shared.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -26,7 +27,7 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
     private readonly JwtConfiguration _jwtConfig = jwtConfig.Value;
     private ApplicationUser? _user;
 
-    [HttpPost]
+    [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto model)
     {
         if(!ModelState.IsValid)
@@ -46,11 +47,24 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
 
         var result = await userManager.CreateAsync(user, model.Password);
 
-        if (result.Succeeded)
-            return CreatedAtAction("UserProfile", user);
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => e.Description);
+            return BadRequest(new { Errors = errors });
+        }
 
-        var errors = result.Errors.Select(e => e.Description);
-        return BadRequest(new { Errors = errors });
+        var userDto = new UserDataDto
+        {
+            FirstName = user.FirstName,
+            LastName = user.LastName,
+            Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            Governorate = user.Governorate,
+            City = user.City,
+            Village = user.Village,
+            Children = []
+        };
+        return CreatedAtAction("UserProfile", new { id = user.Id }, userDto);
     }
 
     [HttpPost("login")]
@@ -205,10 +219,30 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
     public async Task<IActionResult> UserProfile(Guid id)
     {
         string userId = id.ToString();
-        _user = await userManager.FindByIdAsync(userId);
+        _user = await userManager.Users
+            .Include(U => U.Children.Where(C => C.UserId == userId))
+            .FirstOrDefaultAsync(U => U.Id == userId);
 
         if (_user is null)
             throw new NotFoundBadRequest($"user with {userId} not found");
+
+
+        var userChildren = new List<ChildDto>();
+        foreach(var child in _user.Children)
+        {
+            var childDto = new ChildDto
+            {
+                Id = child.Id,
+                Name = child.Name,
+                AgeInMonth = child.AgeInMonth,
+                BirthDate = child.BirthDate,
+                Gender = child.Gender,
+                Weight = child.Weight,
+                PatientHistory = child.PatientHistory
+            };
+            userChildren.Add(childDto);
+        }
+
 
         var userDto = new UserDataDto
         {
@@ -216,6 +250,7 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
             LastName = _user.LastName,
             Email = _user.Email,
             PhoneNumber = _user.PhoneNumber,
+            Children = userChildren,
             Governorate = _user.Governorate,
             City = _user.City,
             Village = _user.Village

@@ -14,6 +14,8 @@ public record UserDataDto
 
     public string? PhoneNumber { get; init; }
 
-    public string? Village { get; init; } 
+    public string? Village { get; init; }
+
+    public List<ChildDto>? Children { get; init; } = [];
 
 }
