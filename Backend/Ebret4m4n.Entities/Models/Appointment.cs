@@ -3,6 +3,12 @@
 
 namespace Ebret4m4n.Entities.Models;
 
+public enum BookStatus : byte
+{
+    Booked,
+    Cancelled,
+}
+
 public class Appointment
 {
     #region Properties
@@ -12,7 +18,7 @@ public class Appointment
 
     public string Day => Date.ToString("dddd");
 
-    public string Status { get; set; } = null!;  //Enum
+    public BookStatus Status { get; set; }  //Enum
 
     public string Location { get; set; } = null!;
     #endregion

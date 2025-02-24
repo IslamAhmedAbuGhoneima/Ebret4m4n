@@ -35,5 +35,38 @@ public class HealthCareCenterConfiguration : IEntityTypeConfiguration<HealthCare
 
         builder.HasIndex(p => p.HealthCareCenterName);
 
+
+        List<HealthCareCenter> healthCareCenters = [
+            new ()
+            {
+                HealthCareCenterName = "الوحده المحليه بقريه ابوجرج",
+                Governorate = "المنيا",
+                City = "بني مزار",
+                Village = "ابوجرج",
+                FirstDay = DayOfWeek.Monday,
+                SecondDay = DayOfWeek.Tuesday
+            },
+            new ()
+            {
+                HealthCareCenterName = "الوحده المحليه بقريه البرجايه",
+                Governorate = "المنيا",
+                City = "المنيا",
+                Village = "البرجايه",
+                FirstDay = DayOfWeek.Saturday,
+                SecondDay = DayOfWeek.Tuesday
+            },
+            new ()
+            {
+                HealthCareCenterName = "الوحده المحليه بقريه دهمرو",
+                Governorate = "المنيا",
+                City = "مغاغا",
+                Village = "دهمرو",
+                FirstDay = DayOfWeek.Sunday,
+                SecondDay = DayOfWeek.Wednesday
+            },
+        ];
+
+        builder.HasData(healthCareCenters);
+
     }
 }

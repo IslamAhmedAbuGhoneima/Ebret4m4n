@@ -4,6 +4,7 @@ using Ebret4m4n.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ebret4m4n.Repository.Migrations
 {
     [DbContext(typeof(EbretAmanDbContext))]
-    partial class EbretAmanDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250224163048_AddEnumForAppointmentTable")]
+    partial class AddEnumForAppointmentTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -361,38 +364,6 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasIndex("HealthCareCenterName");
 
                     b.ToTable("HealthCareCenters");
-
-                    b.HasData(
-                        new
-                        {
-                            HealthCareCenterId = new Guid("d204490a-dbfe-4fa3-91db-668520040203"),
-                            City = "بني مزار",
-                            FirstDay = "Monday",
-                            Governorate = "المنيا",
-                            HealthCareCenterName = "الوحده المحليه بقريه ابوجرج",
-                            SecondDay = "Tuesday",
-                            Village = "ابوجرج"
-                        },
-                        new
-                        {
-                            HealthCareCenterId = new Guid("ed45f30f-747e-46b1-9236-b34f9bbfeeed"),
-                            City = "المنيا",
-                            FirstDay = "Saturday",
-                            Governorate = "المنيا",
-                            HealthCareCenterName = "الوحده المحليه بقريه البرجايه",
-                            SecondDay = "Tuesday",
-                            Village = "البرجايه"
-                        },
-                        new
-                        {
-                            HealthCareCenterId = new Guid("dc2a4f1c-52c6-4522-97be-f37df0aad6ec"),
-                            City = "مغاغا",
-                            FirstDay = "Sunday",
-                            Governorate = "المنيا",
-                            HealthCareCenterName = "الوحده المحليه بقريه دهمرو",
-                            SecondDay = "Wednesday",
-                            Village = "دهمرو"
-                        });
                 });
 
             modelBuilder.Entity("Ebret4m4n.Entities.Models.HealthReportFile", b =>
@@ -581,17 +552,17 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "42e5c00f-c1c1-419d-9b6a-6d1ed51afda6",
+                            Id = "b80ad8a6-30ef-47f5-bacc-55b12eea3def",
                             Name = "Doctor"
                         },
                         new
                         {
-                            Id = "702f2511-d4dd-4602-8c57-471d2517ee86",
+                            Id = "4a06094a-2c0e-4c86-868c-0b02722504f2",
                             Name = "AdminOfHC"
                         },
                         new
                         {
-                            Id = "9c0aa03b-6cbe-4a75-8826-83b65eaa25f9",
+                            Id = "5047958f-7ebd-454d-afcb-74ed4a21d3e8",
                             Name = "AdminOfMinistryOfHealth"
                         });
                 });

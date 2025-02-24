@@ -5,6 +5,11 @@ namespace Ebret4m4n.Entities.Models;
 
 public class HealthCareCenter : IHealthCareCenter
 {
+    public HealthCareCenter()
+    {
+        HealthCareCenterId = Guid.NewGuid();
+    }
+
     #region Properties
     public Guid HealthCareCenterId { get; set; }
 

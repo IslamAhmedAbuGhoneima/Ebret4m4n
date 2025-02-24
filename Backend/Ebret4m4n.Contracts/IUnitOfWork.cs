@@ -3,8 +3,14 @@
 public interface IUnitOfWork
 {
     IChildRepository ChildRepo { get; }
+
     IHealthyReportRepository HealthyReportRepo { get; }
+
     IVaccineRepository VaccineRepo { get; }
 
-    Task SaveAsync();
+    IAppointmentRepository AppointmentRepo { get; }
+
+    IHealthCareCenterRepository HealthCareCenterRepo { get; }
+
+    Task<int> SaveAsync();
 }

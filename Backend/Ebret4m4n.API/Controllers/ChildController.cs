@@ -2,9 +2,11 @@
 using Ebret4m4n.Contracts;
 using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
-using Ebret4m4n.Shared.DTOs;
+using Ebret4m4n.Shared.DTOs.ChildDtos;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -22,53 +24,42 @@ public class ChildController : ControllerBase
         _unitOfWork = unitOfWork;
     }
 
-    [HttpGet("{id}/Git-Child")]
-    public async Task<IActionResult> GetById(string id)
+    [HttpGet("{id}/child")]
+    public async Task<IActionResult> GetChild(string id)
     {
-        var child = await _unitOfWork.ChildRepo.FindAsync(e => e.Id == id, true);
+        var child = await _unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false);
 
         if (child is null)
-            return UnprocessableEntity($"Child with {id} Not found");
+            throw new NotFoundBadRequest($"Child with {id} Not found");
 
-        ChildDto childDto = new()
-        {
-            Id = child.Id,
-            Name = child.Name,
-            AgeInMonth = child.AgeInMonth,
-            BirthDate = child.BirthDate,
-            Weight = child.Weight,
-            Gender = child.Gender,
-            PatientHistory = child.PatientHistory,
-        };
+        var childDto = child.Adapt<ChildDto>();
 
         return Ok(childDto);
     }
+
     [Authorize]
-    [HttpGet("Get-All-Child-ForParent")]
-    public async Task<IActionResult> GetAllChildForParent()
+    [HttpGet("children")]
+    public async Task<IActionResult> GetChildren()
     {
         var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        ICollection<Child> children = _unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, true).ToList();
+        var children = 
+            await _unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, false).ToListAsync();
 
         if (children is null)
-            return UnprocessableEntity("No child found for this parent");
+            throw new NotFoundBadRequest("you don not have any child");
 
-        List<ChildDto> childDtos = new();
+        List<ChildDto> childrenDtos = new();
 
         foreach (var child in children)
         {
-            childDtos.Add(new ChildDto
-            {
-                Id = child.Id,
-                Name = child.Name,
-                AgeInMonth = child.AgeInMonth,
-                BirthDate = child.BirthDate,
-                Weight = child.Weight
-            });
+            var childDto = child.Adapt<ChildDto>();
+            childrenDtos.Add(childDto);
         }
-        return Ok(childDtos);
+
+        return Ok(childrenDtos);
     }
+
     [Authorize]
     [HttpPost("child-add")]
     public async Task<IActionResult> AddChild([FromBody]AddChildDto dto)
@@ -76,17 +67,16 @@ public class ChildController : ControllerBase
         if(!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
+        var checkUniqNameIdentifier =
+            await _unitOfWork.ChildRepo.FindAsync(C => C.Id == dto.Id, false);
+
+        if (checkUniqNameIdentifier != null)
+            throw new BadRequestException("من فضلك ادخل رقم الطفل القومي الصحيح");
+
         var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        
-        var child = new Child
-        {
-            Id = dto.Id,
-            Name = dto.Name,
-            BirthDate = dto.BirthDate,
-            Weight = dto.Weight,
-            Gender = dto.Gender,
-            UserId = parentId
-        };
+
+
+        var child = (dto,parentId).Adapt<Child>();
 
         if (dto.healthReportFiles != null) 
         {
@@ -96,37 +86,16 @@ public class ChildController : ControllerBase
 
         if (dto.vaccines != null) 
         {
-            string path = 
-                Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "Vaccines.json");
-
-            using (var strem = new FileStream(path, FileMode.Open))
-            {
-                var baseVaccines = JsonSerializer.Deserialize<List<BaseVaccine>>(strem);
-                var childVaccineList = new List<Vaccine>();
-                
-                foreach(var vac in dto.vaccines)
-                {
-                    var baseVaccine =  baseVaccines.FirstOrDefault(v => v.Name == vac.Name);
-                    var vaccine = new Vaccine
-                    {
-                        Name = baseVaccine.Name,
-                        DocesRequired = baseVaccine.DocesRequired,
-                        DocesTaken = baseVaccine.DocesRequired,
-                        IsTaken = true,
-                        ChildAge = baseVaccine.ChildAge
-                    };
-                    childVaccineList.Add(vaccine);
-                }
-
-                await _unitOfWork.VaccineRepo.AddRangeAsync(childVaccineList);
-            }
+            var childVaccineList = ReadFromJsonFile(dto.vaccines, dto.Id);
+            await _unitOfWork.VaccineRepo.AddRangeAsync(childVaccineList);
         }
 
         await _unitOfWork.ChildRepo.AddAsync(child);
 
-        await _unitOfWork.SaveAsync();
+        var result = await _unitOfWork.SaveAsync();
 
-        return Ok();
+
+        return Ok(new { Message = "Child created successfully" });
     }
 
     [Authorize]
@@ -141,9 +110,7 @@ public class ChildController : ControllerBase
         if (child is null)
             throw new NotFoundBadRequest($"Child with {id} Not found"); 
 
-        child.Name = dto.Name;
-        child.Weight = dto.Weight;
-        child.PatientHistory = dto.PatientHistory;
+        dto.Adapt(child);
 
         if(dto.ImageFiles is not null)
         {
@@ -191,5 +158,29 @@ public class ChildController : ControllerBase
                 throw new FileLoadException("file size to large");
         }
         return healthReports;
-    }  
+    }
+
+    private List<Vaccine> ReadFromJsonFile(List<ChildVaccineDto> vaccines, string childId)
+    {
+        string path =
+                Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "vaccines.json");
+
+        var childVaccineList = new List<Vaccine>();
+
+        using (var strem = new FileStream(path, FileMode.Open))
+        {
+            var baseVaccines = JsonSerializer.Deserialize<List<BaseVaccine>>(strem);
+            
+
+            foreach (var vac in vaccines)
+            {
+                var baseVaccine = baseVaccines.FirstOrDefault(v => v.name == vac.Name);
+
+                var vaccine = (baseVaccine, childId).Adapt<Vaccine>();
+
+                childVaccineList.Add(vaccine);
+            }
+        }
+        return childVaccineList;
+    }
 }

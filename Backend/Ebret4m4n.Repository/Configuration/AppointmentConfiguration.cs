@@ -14,6 +14,8 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
             .IsRequired();
 
         builder.Property(p => p.Status)
+            .HasConversion<string>()
+            .HasMaxLength(15)
             .IsRequired();
 
         builder.Property(p => p.Location)

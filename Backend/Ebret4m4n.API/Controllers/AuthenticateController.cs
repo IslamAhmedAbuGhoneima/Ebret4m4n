@@ -3,6 +3,9 @@ using Ebret4m4n.Entities.ConfigurationModels;
 using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs;
+using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
+using Ebret4m4n.Shared.DTOs.ChildDtos;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +22,7 @@ namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthenticateController(UserManager<ApplicationUser> userManager,
+public class AuthenticationController(UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     IEmailSender emailSender,
     IOptions<JwtConfiguration> jwtConfig) : ControllerBase
@@ -33,17 +36,7 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
         if(!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var user = new ApplicationUser()
-        {
-            FirstName = model.FirstName,
-            LastName = model.LastName,
-            UserName = $"{model.FirstName} {model.LastName}",
-            Email = model.Email,
-            PhoneNumber = model.PhoneNumber,
-            Governorate = model.Governorate,
-            City = model.City,
-            Village = model.Village,
-        };
+        var user = model.Adapt<ApplicationUser>();
 
         var result = await userManager.CreateAsync(user, model.Password);
 
@@ -53,17 +46,8 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
             return BadRequest(new { Errors = errors });
         }
 
-        var userDto = new UserDataDto
-        {
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber,
-            Governorate = user.Governorate,
-            City = user.City,
-            Village = user.Village,
-            Children = []
-        };
+        var userDto = user.Adapt<UserDataDto>();
+
         return CreatedAtAction("UserProfile", new { id = user.Id }, userDto);
     }
 
@@ -215,7 +199,7 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
     }
 
 
-    [HttpGet("user-profile/{id:guid}")]
+    [HttpGet("{id:guid}/user-profile")]
     public async Task<IActionResult> UserProfile(Guid id)
     {
         string userId = id.ToString();
@@ -230,31 +214,11 @@ public class AuthenticateController(UserManager<ApplicationUser> userManager,
         var userChildren = new List<ChildDto>();
         foreach(var child in _user.Children)
         {
-            var childDto = new ChildDto
-            {
-                Id = child.Id,
-                Name = child.Name,
-                AgeInMonth = child.AgeInMonth,
-                BirthDate = child.BirthDate,
-                Gender = child.Gender,
-                Weight = child.Weight,
-                PatientHistory = child.PatientHistory
-            };
+            var childDto = child.Adapt<ChildDto>();
             userChildren.Add(childDto);
         }
 
-
-        var userDto = new UserDataDto
-        {
-            FirstName = _user.FirstName,
-            LastName = _user.LastName,
-            Email = _user.Email,
-            PhoneNumber = _user.PhoneNumber,
-            Children = userChildren,
-            Governorate = _user.Governorate,
-            City = _user.City,
-            Village = _user.Village
-        };
+        var userDto = _user.Adapt<UserDataDto>();
 
         return Ok(userDto);
     }

@@ -1,4 +1,6 @@
-﻿namespace Ebret4m4n.Shared.DTOs;
+﻿using Ebret4m4n.Shared.DTOs.ChildDtos;
+
+namespace Ebret4m4n.Shared.DTOs;
 
 public record UserDataDto
 {

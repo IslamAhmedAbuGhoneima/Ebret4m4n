@@ -1,5 +1,5 @@
 using Ebret4m4n.API.Extenstions;
-using Microsoft.AspNetCore.Identity;
+using Ebret4m4n.API.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +20,9 @@ builder.Services.AddJwtConfiguration(builder.Configuration);
 builder.Services.AddEmailSettingsConfiguration(builder.Configuration);
 builder.Services.ConfigureTokenLifespan();
 
+
+// Register Mapster
+MapsterConfig.RegisterMappings();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
