@@ -13,15 +13,62 @@ namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ParentController : ControllerBase
+public class ChildController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    public ParentController(IUnitOfWork unitOfWork)
+    public ChildController(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
 
+    [HttpGet("{id}/Git-Child")]
+    public async Task<IActionResult> GetById(string id)
+    {
+        var child = await _unitOfWork.ChildRepo.FindAsync(e => e.Id == id, true);
+
+        if (child is null)
+            return UnprocessableEntity($"Child with {id} Not found");
+
+        ChildDto childDto = new()
+        {
+            Id = child.Id,
+            Name = child.Name,
+            AgeInMonth = child.AgeInMonth,
+            BirthDate = child.BirthDate,
+            Weight = child.Weight,
+            Gender = child.Gender,
+            PatientHistory = child.PatientHistory,
+        };
+
+        return Ok(childDto);
+    }
+    [Authorize]
+    [HttpGet("Get-All-Child-ForParent")]
+    public async Task<IActionResult> GetAllChildForParent()
+    {
+        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        ICollection<Child> children = _unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, true).ToList();
+
+        if (children is null)
+            return UnprocessableEntity("No child found for this parent");
+
+        List<ChildDto> childDtos = new();
+
+        foreach (var child in children)
+        {
+            childDtos.Add(new ChildDto
+            {
+                Id = child.Id,
+                Name = child.Name,
+                AgeInMonth = child.AgeInMonth,
+                BirthDate = child.BirthDate,
+                Weight = child.Weight
+            });
+        }
+        return Ok(childDtos);
+    }
     [Authorize]
     [HttpPost("child-add")]
     public async Task<IActionResult> AddChild([FromBody]AddChildDto dto)
