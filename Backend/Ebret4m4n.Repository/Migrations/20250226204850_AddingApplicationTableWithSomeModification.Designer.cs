@@ -4,6 +4,7 @@ using Ebret4m4n.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ebret4m4n.Repository.Migrations
 {
     [DbContext(typeof(EbretAmanDbContext))]
-    partial class EbretAmanDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250226204850_AddingApplicationTableWithSomeModification")]
+    partial class AddingApplicationTableWithSomeModification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -122,6 +125,8 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasIndex(new[] { "Email" }, "IX_ApplicationUser_Email");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Ebret4m4n.Entities.Models.Appointment", b =>
@@ -144,6 +149,11 @@ namespace Ebret4m4n.Repository.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -201,7 +211,7 @@ namespace Ebret4m4n.Repository.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("MedicalStaffId")
+                    b.Property<string>("DoctorId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -216,7 +226,7 @@ namespace Ebret4m4n.Repository.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MedicalStaffId");
+                    b.HasIndex("DoctorId");
 
                     b.HasIndex("UserId");
 
@@ -363,7 +373,7 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            HealthCareCenterId = new Guid("7f196ab7-5cb6-4e23-bbe3-dc5549c234a6"),
+                            HealthCareCenterId = new Guid("44347d7e-1b87-42fd-b616-2fdfa121273b"),
                             City = "بني مزار",
                             FirstDay = "Monday",
                             Governorate = "المنيا",
@@ -373,7 +383,7 @@ namespace Ebret4m4n.Repository.Migrations
                         },
                         new
                         {
-                            HealthCareCenterId = new Guid("2011f890-53e5-4916-97a2-90a9fd3e14c8"),
+                            HealthCareCenterId = new Guid("d3e9a74c-ce72-4313-8196-9a3fc9a70735"),
                             City = "المنيا",
                             FirstDay = "Saturday",
                             Governorate = "المنيا",
@@ -383,7 +393,7 @@ namespace Ebret4m4n.Repository.Migrations
                         },
                         new
                         {
-                            HealthCareCenterId = new Guid("fa48413e-c673-4858-94ff-fb9ca8f4a8ff"),
+                            HealthCareCenterId = new Guid("6d36a91f-9f56-422d-9e23-12bb9799cf5d"),
                             City = "مغاغا",
                             FirstDay = "Sunday",
                             Governorate = "المنيا",
@@ -492,54 +502,6 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("JobApplications");
-                });
-
-            modelBuilder.Entity("Ebret4m4n.Entities.Models.MedicalStaff", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("FirstDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("HCCenterId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("HealthCareCenterCity")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("HealthCareCenterGovernment")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("HealthCareCenterName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("HealthCareCenterVillage")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("MedicalNumber")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.Property<string>("SecondDay")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("StaffRole")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("MedicalStaff");
                 });
 
             modelBuilder.Entity("Ebret4m4n.Entities.Models.Notification", b =>
@@ -657,21 +619,18 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "86c9850c-0513-49ad-bcf5-5406d5556ae8",
-                            Name = "doctor",
-                            NormalizedName = "DOCTOR"
+                            Id = "3d147488-207b-4882-90fd-47199e17618d",
+                            Name = "Doctor"
                         },
                         new
                         {
-                            Id = "0338d90f-1723-46be-9a59-a1dfb1083441",
-                            Name = "nurse",
-                            NormalizedName = "NURSE"
+                            Id = "3be7f495-4a53-447e-8295-b025f28bc03a",
+                            Name = "AdminOfHC"
                         },
                         new
                         {
-                            Id = "8192e45a-44df-459b-869e-3384cf01a8ff",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
+                            Id = "62ed60ec-1b5e-4eff-8fa6-ff3a31a2b8be",
+                            Name = "AdminOfMinistryOfHealth"
                         });
                 });
 
@@ -781,6 +740,88 @@ namespace Ebret4m4n.Repository.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Ebret4m4n.Entities.Models.AdminOfHC", b =>
+                {
+                    b.HasBaseType("Ebret4m4n.Entities.Models.ApplicationUser");
+
+                    b.Property<string>("FirstDay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("HCCenterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HealthCareCenterCity")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("HealthCareCenterGovernment")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("HealthCareCenterName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("HealthCareCenterVillage")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("MedicalNumber")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("SecondDay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("AdminOfHC");
+                });
+
+            modelBuilder.Entity("Ebret4m4n.Entities.Models.Doctor", b =>
+                {
+                    b.HasBaseType("Ebret4m4n.Entities.Models.ApplicationUser");
+
+                    b.Property<string>("FirstDay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("HCCenterId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("HealthCareCenterCity")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("HealthCareCenterGovernment")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("HealthCareCenterName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("HealthCareCenterVillage")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("MedicalNumber")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
+                    b.Property<string>("SecondDay")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("Doctor");
+                });
+
             modelBuilder.Entity("Ebret4m4n.Entities.Models.ApplicationUser", b =>
                 {
                     b.HasOne("Ebret4m4n.Entities.Models.HealthCareCenter", "HealthCareCenter")
@@ -850,9 +891,9 @@ namespace Ebret4m4n.Repository.Migrations
 
             modelBuilder.Entity("Ebret4m4n.Entities.Models.Chat", b =>
                 {
-                    b.HasOne("Ebret4m4n.Entities.Models.MedicalStaff", "MedicalStaff")
+                    b.HasOne("Ebret4m4n.Entities.Models.Doctor", "Doctor")
                         .WithMany()
-                        .HasForeignKey("MedicalStaffId")
+                        .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -862,7 +903,7 @@ namespace Ebret4m4n.Repository.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("MedicalStaff");
+                    b.Navigation("Doctor");
 
                     b.Navigation("User");
                 });
@@ -923,17 +964,6 @@ namespace Ebret4m4n.Repository.Migrations
                 });
 
             modelBuilder.Entity("Ebret4m4n.Entities.Models.JobApplications", b =>
-                {
-                    b.HasOne("Ebret4m4n.Entities.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Ebret4m4n.Entities.Models.MedicalStaff", b =>
                 {
                     b.HasOne("Ebret4m4n.Entities.Models.ApplicationUser", "User")
                         .WithMany()
@@ -1024,6 +1054,24 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasOne("Ebret4m4n.Entities.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ebret4m4n.Entities.Models.AdminOfHC", b =>
+                {
+                    b.HasOne("Ebret4m4n.Entities.Models.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("Ebret4m4n.Entities.Models.AdminOfHC", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Ebret4m4n.Entities.Models.Doctor", b =>
+                {
+                    b.HasOne("Ebret4m4n.Entities.Models.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("Ebret4m4n.Entities.Models.Doctor", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

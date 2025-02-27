@@ -13,16 +13,22 @@ namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ParentController : ControllerBase
+public class ParentController
+    (IUnitOfWork unitOfWork,UserManager<ApplicationUser> userManager) : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly UserManager<ApplicationUser> _userManager;
-
-    public ParentController(IUnitOfWork unitOfWork,
-        UserManager<ApplicationUser> userManager)
+    [Authorize]
+    [HttpGet("children-reservations")]
+    public IActionResult ParentReservations()
     {
-        _unitOfWork = unitOfWork;
-        _userManager = userManager;
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        var appointments =
+            unitOfWork.AppointmentRepo.FindByCondition(
+                a => a.UserId == userId , false, ["Child", "Vaccine"]);
+
+        var userReservationsDto = appointments.Adapt<List<UserReservationDto>>();
+
+        return Ok(userReservationsDto);
     }
 
     [Authorize]
@@ -31,7 +37,7 @@ public class ParentController : ControllerBase
     {
         var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        var user = await _userManager.Users
+        var user = await userManager.Users
             .Include(U => U.HealthCareCenter)
             .Include(U => U.Children.Where(c => c.Id == model.ChildId && c.UserId == parentId))
             .FirstOrDefaultAsync(U => U.Id == parentId);
@@ -45,8 +51,8 @@ public class ParentController : ControllerBase
 
         var appointment = (model, user.HealthCareCenter, parentId).Adapt<Appointment>();
 
-        await _unitOfWork.AppointmentRepo.AddAsync(appointment);
-        var result = await _unitOfWork.SaveAsync();
+        await unitOfWork.AppointmentRepo.AddAsync(appointment);
+        var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
             throw new BadRequestException("Your reservation was not saved, please try again");
@@ -60,19 +66,17 @@ public class ParentController : ControllerBase
     }
 
     [Authorize]
-    [HttpPost("{id:guid}/appointment-cancle")]
+    [HttpDelete("{id:guid}/appointment-cancle")]
     public async Task<IActionResult> AppointmentCancle(Guid id)
     {
-        var appointment = await _unitOfWork.AppointmentRepo.FindAsync(a => a.Id == id, true);
+        var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.Id == id, true);
 
         if (appointment == null)
-            throw new NotFoundBadRequest("there is no appointment for this child");
+            throw new NotFoundBadRequest("لا يوجد موعد خاص بهذا المستخدم");
 
-        appointment.Status = BookStatus.Cancelled;
+        unitOfWork.AppointmentRepo.Remove(appointment);
+        await unitOfWork.SaveAsync();
 
-        _unitOfWork.AppointmentRepo.Update(appointment);
-        await _unitOfWork.SaveAsync();
-
-        return Ok(new { Message = "You canclled your appointment" });
+        return Ok(new { Message = "تم الغاء الموعد" });
     }
 }

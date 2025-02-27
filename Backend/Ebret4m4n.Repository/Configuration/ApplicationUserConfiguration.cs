@@ -12,12 +12,13 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
             .IsRequired()
             .HasMaxLength(20);
 
+        builder.Property(e => e.UserName)
+            .HasMaxLength(250)
+            .IsRequired(false);
+
         builder.Property(e => e.LastName)
             .IsRequired()
             .HasMaxLength(20);
-
-        //builder.Property(e => e.Address)
-        //    .HasMaxLength(200);
 
         builder.Property(e => e.Governorate)
             .HasMaxLength(30)
@@ -32,7 +33,5 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         builder.Property(e => e.Email)
             .IsRequired()
             .HasMaxLength(50);
-
-        builder.UseTptMappingStrategy();
     }
 }

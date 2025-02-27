@@ -4,6 +4,7 @@ using Ebret4m4n.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ebret4m4n.Repository.Migrations
 {
     [DbContext(typeof(EbretAmanDbContext))]
-    partial class EbretAmanDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250227114619_ModyfingApplicationUserTableAndAddMedicalStaffTable")]
+    partial class ModyfingApplicationUserTableAndAddMedicalStaffTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -144,6 +147,11 @@ namespace Ebret4m4n.Repository.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -363,7 +371,7 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            HealthCareCenterId = new Guid("7f196ab7-5cb6-4e23-bbe3-dc5549c234a6"),
+                            HealthCareCenterId = new Guid("0a1ef8fa-0f95-4903-ad5c-f0f3bb2a4caf"),
                             City = "بني مزار",
                             FirstDay = "Monday",
                             Governorate = "المنيا",
@@ -373,7 +381,7 @@ namespace Ebret4m4n.Repository.Migrations
                         },
                         new
                         {
-                            HealthCareCenterId = new Guid("2011f890-53e5-4916-97a2-90a9fd3e14c8"),
+                            HealthCareCenterId = new Guid("5592b36d-24d8-4563-9dd8-9bb23e42453f"),
                             City = "المنيا",
                             FirstDay = "Saturday",
                             Governorate = "المنيا",
@@ -383,7 +391,7 @@ namespace Ebret4m4n.Repository.Migrations
                         },
                         new
                         {
-                            HealthCareCenterId = new Guid("fa48413e-c673-4858-94ff-fb9ca8f4a8ff"),
+                            HealthCareCenterId = new Guid("99944794-fc42-44dd-9d09-5ea58937d602"),
                             City = "مغاغا",
                             FirstDay = "Sunday",
                             Governorate = "المنيا",
@@ -657,19 +665,19 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "86c9850c-0513-49ad-bcf5-5406d5556ae8",
+                            Id = "fc04f205-a820-4b74-9ef7-95e26fcb9e82",
                             Name = "doctor",
                             NormalizedName = "DOCTOR"
                         },
                         new
                         {
-                            Id = "0338d90f-1723-46be-9a59-a1dfb1083441",
+                            Id = "7d8e3752-bc9e-4a48-9bc9-bd1e0c7d18e0",
                             Name = "nurse",
                             NormalizedName = "NURSE"
                         },
                         new
                         {
-                            Id = "8192e45a-44df-459b-869e-3384cf01a8ff",
+                            Id = "8dcaae69-13a6-4ce3-8d4c-98eea01a9112",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });

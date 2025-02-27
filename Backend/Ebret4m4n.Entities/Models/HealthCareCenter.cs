@@ -1,9 +1,6 @@
-﻿
-using Ebret4m4n.Entities.Interfaces;
+﻿namespace Ebret4m4n.Entities.Models;
 
-namespace Ebret4m4n.Entities.Models;
-
-public class HealthCareCenter : IHealthCareCenter
+public class HealthCareCenter 
 {
     public HealthCareCenter()
     {
@@ -19,7 +16,6 @@ public class HealthCareCenter : IHealthCareCenter
 
     public DayOfWeek SecondDay { get; set; }
 
-    //public string HealthCareLocation { get; set; } = null!;
     public string Governorate { get; set; } = null!;
 
     public string? City { get; set; }

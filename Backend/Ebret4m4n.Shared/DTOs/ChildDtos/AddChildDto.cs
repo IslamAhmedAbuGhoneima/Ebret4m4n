@@ -23,10 +23,9 @@ public record AddChildDto
     [AllowedValues(['F', 'f', 'm', 'M'], ErrorMessage = "يجب ان يكون جنس الطفل ذكر او انثي")]
     public char Gender { get; set; }
 
-
     public string? PatientHistory { get; set; }
 
     public List<IFormFile>? healthReportFiles { get; set; }
 
-    public List<ChildVaccineDto>? vaccines { get; set; }
+    public List<string>? vaccines { get; set; }
 }

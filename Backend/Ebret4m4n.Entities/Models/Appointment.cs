@@ -1,13 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-
-
 namespace Ebret4m4n.Entities.Models;
-
-public enum BookStatus : byte
-{
-    Booked,
-    Cancelled,
-}
 
 public class Appointment
 {
@@ -17,8 +9,6 @@ public class Appointment
     public DateTime Date { get; set; }
 
     public string Day => Date.ToString("dddd");
-
-    public BookStatus Status { get; set; }  //Enum
 
     public string Location { get; set; } = null!;
     #endregion
@@ -31,6 +21,11 @@ public class Appointment
     [ForeignKey("User")]
     public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
+
+    // new Relation
+    [ForeignKey("Vaccine")]
+    public Guid VaccineId { get; set; } 
+    public Vaccine Vaccine {  get; set; }
 
     [ForeignKey("HealthCareCenter")]
     public Guid HealthCareCenterId { get; set; }

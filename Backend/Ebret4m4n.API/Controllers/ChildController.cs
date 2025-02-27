@@ -1,14 +1,14 @@
 ﻿using Ebret4m4n.API.ChildBaseVaccines;
-using Ebret4m4n.Contracts;
 using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
+using Mapster;
+using Ebret4m4n.Contracts;
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -18,6 +18,7 @@ namespace Ebret4m4n.API.Controllers;
 public class ChildController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
+    //private readonly ILogger _logger;
 
     public ChildController(IUnitOfWork unitOfWork)
     {
@@ -27,7 +28,7 @@ public class ChildController : ControllerBase
     [HttpGet("{id}/child")]
     public async Task<IActionResult> GetChild(string id)
     {
-        var child = await _unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false);
+        var child = await _unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false, ["Vaccines"]);
 
         if (child is null)
             throw new NotFoundBadRequest($"Child with {id} Not found");
@@ -78,16 +79,17 @@ public class ChildController : ControllerBase
 
         var child = (dto,parentId).Adapt<Child>();
 
+        if(dto.healthReportFiles == null && dto.PatientHistory == null)
+        {
+            var vaccines = ReadFromJsonFile(dto.vaccines, child.Id);
+
+            await _unitOfWork.VaccineRepo.AddRangeAsync(vaccines);
+        }
+
         if (dto.healthReportFiles != null) 
         {
             var childReports = SaveReportFiles(dto.healthReportFiles, dto.Id);
             await _unitOfWork.HealthyReportRepo.AddRangeAsync(childReports);
-        }
-
-        if (dto.vaccines != null) 
-        {
-            var childVaccineList = ReadFromJsonFile(dto.vaccines, dto.Id);
-            await _unitOfWork.VaccineRepo.AddRangeAsync(childVaccineList);
         }
 
         await _unitOfWork.ChildRepo.AddAsync(child);
@@ -160,27 +162,34 @@ public class ChildController : ControllerBase
         return healthReports;
     }
 
-    private List<Vaccine> ReadFromJsonFile(List<ChildVaccineDto> vaccines, string childId)
+    private List<Vaccine> ReadFromJsonFile(List<string>? childVaccines, string childId)
     {
         string path =
                 Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "vaccines.json");
 
-        var childVaccineList = new List<Vaccine>();
+        using var strem = new FileStream(path, FileMode.Open);
+        var baseVaccines = JsonSerializer.Deserialize<List<BaseVaccine>>(strem);
 
-        using (var strem = new FileStream(path, FileMode.Open))
+        if(baseVaccines == null)
         {
-            var baseVaccines = JsonSerializer.Deserialize<List<BaseVaccine>>(strem);
-            
+            //_logger.LogError("cant serialize the json object to List of baseVaccines");
+            throw new BadRequestException("حدث خطا ما اثناء تسجيل الطفل الرجاء الاتصال بالدعم الفني للمساعده");
+        }
 
-            foreach (var vac in vaccines)
+        var vaccines = baseVaccines.Adapt<List<Vaccine>>();
+
+        foreach (var vaccine in vaccines)
+            vaccine.ChildId = childId;
+
+        if(childVaccines is not null)
+        {
+            foreach (var vaccineName in childVaccines)
             {
-                var baseVaccine = baseVaccines.FirstOrDefault(v => v.name == vac.Name);
-
-                var vaccine = (baseVaccine, childId).Adapt<Vaccine>();
-
-                childVaccineList.Add(vaccine);
+                var vaccine = vaccines.FirstOrDefault(v => v.Name == vaccineName);
+                vaccine.IsTaken = true;
+                vaccine.DocesTaken = vaccine.DocesRequired;
             }
         }
-        return childVaccineList;
+        return vaccines;
     }
 }

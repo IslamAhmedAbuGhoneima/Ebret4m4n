@@ -4,16 +4,27 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Ebret4m4n.Repository.Configuration;
 
-public class DoctorConfiguration : IEntityTypeConfiguration<Doctor>
+public class MedicalStaffConfiguration : IEntityTypeConfiguration<MedicalStaff>
 {
-    public void Configure(EntityTypeBuilder<Doctor> builder)
+    public void Configure(EntityTypeBuilder<MedicalStaff> builder)
     {
-        builder.Property(p => p.DoctorNumber)
+        builder.Property(p => p.MedicalNumber)
+            .HasMaxLength(25)
             .IsRequired();
 
         builder.Property(p => p.HealthCareCenterName)
             .IsRequired()
             .HasMaxLength(50);
+
+        builder.Property(p => p.HealthCareCenterGovernment)
+            .HasMaxLength(30)
+            .IsRequired();
+
+        builder.Property(p => p.HealthCareCenterCity)
+            .HasMaxLength(30);
+
+        builder.Property(p => p.HealthCareCenterVillage)
+            .HasMaxLength(30);
 
         builder.Property(p => p.FirstDay)
                     .HasConversion<string>()

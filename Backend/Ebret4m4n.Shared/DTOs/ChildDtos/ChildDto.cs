@@ -1,4 +1,6 @@
-﻿namespace Ebret4m4n.Shared.DTOs.ChildDtos;
+﻿using Ebret4m4n.Shared.DTOs.VaccinDto;
+
+namespace Ebret4m4n.Shared.DTOs.ChildDtos;
 
 public record ChildDto
 {
@@ -15,4 +17,6 @@ public record ChildDto
     public char Gender { get; set; }
 
     public string? PatientHistory { get; set; }
+
+    public List<ChildVaccinDto>? Vaccines { get; set; }
 }

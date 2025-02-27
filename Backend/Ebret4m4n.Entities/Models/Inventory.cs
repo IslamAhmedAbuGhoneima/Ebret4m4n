@@ -1,10 +1,9 @@
-﻿using Ebret4m4n.Entities.Interfaces;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ebret4m4n.Entities.Models;
 
 
-public class Inventory : IHealthCareCenter
+public class Inventory 
 {
     #region Properties
 
@@ -16,13 +15,11 @@ public class Inventory : IHealthCareCenter
 
     public string HealthCareCenterName { get; set; } = null!;
 
-    //public string HealthCareLocation { get; set; } = null!;
+    public string HealthCareCenterGovernment { get; set; } = null!;
 
-    public string Governorate { get; set; } = null!;
+    public string? HealthCareCenterCity { get; set; }
 
-    public string? City { get; set; }
-
-    public string? Village { get; set; }
+    public string? HealthCareCenterVillage { get; set; }
 
     public DayOfWeek FirstDay { get; set; }
 

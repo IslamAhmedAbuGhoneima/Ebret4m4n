@@ -2,6 +2,8 @@
 
 public class BaseVaccine
 {
+    public int id { get; set; }
+
     public string name { get; set; } = null!;
 
     public int docesRequired { get; set; }

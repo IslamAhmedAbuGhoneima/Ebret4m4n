@@ -1,4 +1,6 @@
-﻿namespace Ebret4m4n.Contracts;
+﻿using Ebret4m4n.Contracts;
+
+namespace Ebret4m4n.Contracts;
 
 public interface IUnitOfWork
 {
@@ -11,6 +13,10 @@ public interface IUnitOfWork
     IAppointmentRepository AppointmentRepo { get; }
 
     IHealthCareCenterRepository HealthCareCenterRepo { get; }
+
+    IJobApplicationRepository JobApplicationRepo { get; }
+
+    IMedicalStaffRepository StaffRepository { get; }
 
     Task<int> SaveAsync();
 }

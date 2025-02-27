@@ -28,6 +28,7 @@ public class VaccineConfiguration : IEntityTypeConfiguration<Vaccine>
             .HasDefaultValue(false);
 
         builder.HasIndex(x => x.Name);
+        builder.HasIndex(x => x.ChildId);
 
     }
 }

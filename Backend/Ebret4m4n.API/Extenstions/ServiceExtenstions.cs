@@ -4,6 +4,7 @@ using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Repository;
 using Ebret4m4n.Repository.Configuration;
 using Ebret4m4n.Repository.Repositories;
+using Ebret4m4n.Repository.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

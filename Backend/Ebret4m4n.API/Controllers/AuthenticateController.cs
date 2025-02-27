@@ -1,22 +1,23 @@
-﻿using Ebret4m4n.Contracts;
+﻿using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 using Ebret4m4n.Entities.ConfigurationModels;
-using Ebret4m4n.Entities.Exceptions;
-using Ebret4m4n.Entities.Models;
-using Ebret4m4n.Shared.DTOs;
-using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
-using Ebret4m4n.Shared.DTOs.ChildDtos;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Ebret4m4n.Shared.DTOs.ChildDtos;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Security.Claims;
 using System.Security.Cryptography;
+using Ebret4m4n.Entities.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Ebret4m4n.Shared.DTOs;
+using Ebret4m4n.Contracts;
 using System.Text;
+using System.Net;
+using Mapster;
+
 
 namespace Ebret4m4n.API.Controllers;
 
@@ -56,7 +57,6 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     {
         if(!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
-
 
         _user = await userManager.FindByEmailAsync(model.Email);
 
@@ -147,7 +147,6 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         return Ok(new { Message = "Password has been reset successfully." });
     }
-
 
     [Authorize]
     [HttpPost("reset-email")]
