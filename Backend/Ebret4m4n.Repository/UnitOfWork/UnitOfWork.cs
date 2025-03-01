@@ -10,8 +10,10 @@ public class UnitOfWork : IUnitOfWork
     private readonly IVaccineRepository _vaccineRepo;
     private readonly IAppointmentRepository _appointmentRepo;
     private readonly IHealthCareCenterRepository _healthCareCenterRepo;
-    private readonly IJobApplicationRepository _jobApplicationRepo;
+    private readonly IMedicalApplicationRepository _jobApplicationRepo;
     private readonly IMedicalStaffRepository _medicalStaffRepo;
+    private readonly IGovernorateAdminStaffRepository _governorateAdminRepo;
+    private readonly ICityAdminStaffRepository _cityAdminRepo;
 
     private readonly EbretAmanDbContext _dbContext;
 
@@ -23,8 +25,10 @@ public class UnitOfWork : IUnitOfWork
         _vaccineRepo = new VaccineRepository(_dbContext);
         _appointmentRepo = new AppointmentRepository(_dbContext);
         _healthCareCenterRepo = new HealthCareCenterRepository(_dbContext);
-        _jobApplicationRepo = new JobApplicationRepository(_dbContext);
+        _jobApplicationRepo = new MedicalApplicationRepository(_dbContext);
         _medicalStaffRepo = new MedicalStaffRepository(_dbContext);
+        _governorateAdminRepo = new GovernorateAdminStaffRepository(_dbContext);
+        _cityAdminRepo = new CityAdminStaffRepository(_dbContext); 
     }
 
     public EbretAmanDbContext Context => _dbContext;
@@ -39,9 +43,13 @@ public class UnitOfWork : IUnitOfWork
 
     public IHealthCareCenterRepository HealthCareCenterRepo => _healthCareCenterRepo;
 
-    public IJobApplicationRepository JobApplicationRepo => _jobApplicationRepo;
+    public IMedicalApplicationRepository MedicalApplicationRepo => _jobApplicationRepo;
 
     public IMedicalStaffRepository StaffRepository => _medicalStaffRepo;
+
+    public IGovernorateAdminStaffRepository GovernorateAdminRepo => _governorateAdminRepo;
+
+    public ICityAdminStaffRepository CityAdminRepo => _cityAdminRepo;
 
     public async Task<int> SaveAsync()
        => await _dbContext.SaveChangesAsync();

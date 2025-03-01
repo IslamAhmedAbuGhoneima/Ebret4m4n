@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Ebret4m4n.Entities.Models;
+﻿namespace Ebret4m4n.Entities.Models;
 
 
 public class Inventory 
@@ -15,7 +13,7 @@ public class Inventory
 
     public string HealthCareCenterName { get; set; } = null!;
 
-    public string HealthCareCenterGovernment { get; set; } = null!;
+    public string HealthCareCenterGovernorate { get; set; } = null!;
 
     public string? HealthCareCenterCity { get; set; }
 
@@ -27,9 +25,8 @@ public class Inventory
 
     #endregion
 
+
     #region Relations
-    [ForeignKey("Vaccine")]
-    public Guid VaccineId { get; set; }
-    public Vaccine Vaccine { get; set; }
+    public ICollection<Vaccine> Vaccines { get; set; } = [];
     #endregion
 }

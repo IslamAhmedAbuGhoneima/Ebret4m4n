@@ -17,6 +17,7 @@ using Ebret4m4n.Contracts;
 using System.Text;
 using System.Net;
 using Mapster;
+using System.Data;
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -26,6 +27,7 @@ namespace Ebret4m4n.API.Controllers;
 public class AuthenticationController(UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
     IEmailSender emailSender,
+    IUnitOfWork unitOfWork,
     IOptions<JwtConfiguration> jwtConfig) : ControllerBase
 {
     private readonly JwtConfiguration _jwtConfig = jwtConfig.Value;
@@ -276,6 +278,36 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         foreach (var role in userRoles)
             claims.Add(new(ClaimTypes.Role, role));
+
+        if (await userManager.IsInRoleAsync(_user, "doctor") ||
+            await userManager.IsInRoleAsync(_user, "organizer"))
+        {
+            var staffRecord = 
+                await unitOfWork.StaffRepository.FindAsync(s => s.UserId == _user.Id, false);
+
+            if (staffRecord is null)
+                throw new NotFoundBadRequest("لم نتمكن من ايجاد الوحده الصحيه التابعه لهذا المستخدم");
+
+            var workHealthCareId = staffRecord.HCCenterId.ToString()!;
+
+            claims.Add(new("healthCareId", workHealthCareId));
+        }
+        else if(await userManager.IsInRoleAsync(_user, "governorateAdmin"))
+        {
+            var governorateAdmin =
+                await unitOfWork.GovernorateAdminRepo.FindAsync(admin => admin.UserId == _user.Id, false);
+
+            claims.Add(new("governorate", governorateAdmin.Governorate));
+        }
+        else if (await userManager.IsInRoleAsync(_user, "cityAdmin"))
+        {
+            var cityAdmin =
+                await unitOfWork.CityAdminRepo.FindAsync(admin => admin.UserId == _user.Id, false);
+
+            claims.Add(new("governorate", cityAdmin.Governorate));
+            claims.Add(new("city", cityAdmin.City));
+
+        }
 
         return claims;
     }

@@ -15,7 +15,7 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
 
         builder.Property(p => p.Location)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(450);
 
         builder.HasIndex(p => p.UserId);
 

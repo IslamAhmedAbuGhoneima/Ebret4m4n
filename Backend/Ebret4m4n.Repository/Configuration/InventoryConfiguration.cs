@@ -16,7 +16,7 @@ public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
 
         builder.Property(p => p.HealthCareCenterName)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(150);
 
         builder.Property(p => p.FirstDay)
             .HasConversion<string>()
@@ -27,15 +27,18 @@ public class InventoryConfiguration : IEntityTypeConfiguration<Inventory>
             .IsRequired();
 
         
-        builder.Property(p => p.HealthCareCenterGovernment)
-            .HasMaxLength(30)
+        builder.Property(p => p.HealthCareCenterGovernorate)
+            .HasMaxLength(150)
             .IsRequired();
 
         builder.Property(p => p.HealthCareCenterCity)
-            .HasMaxLength(30);
+            .HasMaxLength(150);
 
         builder.Property(p => p.HealthCareCenterVillage)
-            .HasMaxLength(30);
+            .HasMaxLength(150);
+
+        builder.HasMany(I => I.Vaccines)
+            .WithOne();
 
         builder.HasIndex(p => p.HealthCareCenterId);
     }

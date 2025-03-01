@@ -14,9 +14,13 @@ public interface IUnitOfWork
 
     IHealthCareCenterRepository HealthCareCenterRepo { get; }
 
-    IJobApplicationRepository JobApplicationRepo { get; }
+    IMedicalApplicationRepository MedicalApplicationRepo { get; }
 
     IMedicalStaffRepository StaffRepository { get; }
+
+    IGovernorateAdminStaffRepository GovernorateAdminRepo { get; }
+
+    ICityAdminStaffRepository CityAdminRepo { get; }
 
     Task<int> SaveAsync();
 }

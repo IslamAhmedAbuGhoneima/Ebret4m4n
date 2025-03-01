@@ -10,7 +10,7 @@ public interface IBaseRepository<T>
 
     Task<T> FindAsync(Expression<Func<T, bool>> condition, bool trackChanges, params string[]? includes);
 
-    Task<bool> Exists(Expression<Func<T, bool>> condition);
+    Task<bool> ExistsAsync(Expression<Func<T, bool>> condition);
 
     Task AddAsync(T entity);
 

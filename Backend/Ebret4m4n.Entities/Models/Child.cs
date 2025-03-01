@@ -29,8 +29,6 @@ public class Child
 
     public ICollection<Vaccine>? Vaccines { get; set; } = [];
 
-    public ICollection<Diseas>? Diseas { get; set; } = [];
-
     public ICollection<Appointment>? Appointments {  get; set; } = [];
 
     public ICollection<HealthReportFile>? HealthReportFiles { get; set; } = []; 

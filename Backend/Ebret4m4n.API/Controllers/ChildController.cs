@@ -18,7 +18,6 @@ namespace Ebret4m4n.API.Controllers;
 public class ChildController : ControllerBase
 {
     private readonly IUnitOfWork _unitOfWork;
-    //private readonly ILogger _logger;
 
     public ChildController(IUnitOfWork unitOfWork)
     {
@@ -186,7 +185,6 @@ public class ChildController : ControllerBase
             foreach (var vaccineName in childVaccines)
             {
                 var vaccine = vaccines.FirstOrDefault(v => v.Name == vaccineName);
-                vaccine.IsTaken = true;
                 vaccine.DocesTaken = vaccine.DocesRequired;
             }
         }

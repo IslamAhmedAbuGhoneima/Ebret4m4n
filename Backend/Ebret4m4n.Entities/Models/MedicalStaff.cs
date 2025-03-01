@@ -16,7 +16,7 @@ public class MedicalStaff
 
     public string? HealthCareCenterName { get; set; }
 
-    public string? HealthCareCenterGovernment { get; set; }
+    public string? HealthCareCenterGovernorate { get; set; }
 
     public string? HealthCareCenterCity { get; set; }
 

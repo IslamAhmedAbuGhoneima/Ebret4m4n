@@ -3,8 +3,8 @@ using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
 using Ebret4m4n.Shared.DTOs.JobApplicationsDtos;
+using Ebret4m4n.Shared.DTOs.MedicalApplicationsDtos;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
-using Ebret4m4n.Shared.DTOs.VaccinDto;
 using Mapster;
 
 namespace Ebret4m4n.API.Mapping;
@@ -61,19 +61,19 @@ public static class MapsterConfig
             src => Math.Floor((src.Date - DateTime.Today).TotalDays))
             .Map(dest => dest, src => src);
 
-        TypeAdapterConfig<(JobApplicationDto applicationDto, string userId), JobApplications>.NewConfig()
+        TypeAdapterConfig<(MedicalApplicationDto applicationDto, string userId), MedicalApplication>.NewConfig()
             .Map(dest => dest.UserId, src => src.userId)
             .Map(dest => dest, src => src.applicationDto);
 
-        TypeAdapterConfig<JobApplications, JobPositionRequestsDto>.NewConfig()
-            .Map(dest => dest.applicantName, src => src.User.UserName)
-            .Map(dest => dest.applicantLocation, src => $"{src.User.Governorate},{src.User.City},{src.User.Village}");
+        TypeAdapterConfig<MedicalApplication, MedicalPositionRequestsDto>.NewConfig()
+            .Map(dest => dest.ApplicantName, src => src.User.UserName)
+            .Map(dest => dest.ApplicantLocation, src => $"{src.User.Governorate},{src.User.City},{src.User.Village}");
 
 
         TypeAdapterConfig<(ApplicationUser user, HealthCareCenter hcCenter,string MedicalNumber), MedicalStaff>.NewConfig()
             .Map(dest => dest.UserId, src => src.user.Id)
             .Map(dest => dest.MedicalNumber, src => src.MedicalNumber)
-            .Map(dest => dest.HealthCareCenterGovernment, src => src.hcCenter.Governorate)
+            .Map(dest => dest.HealthCareCenterGovernorate, src => src.hcCenter.Governorate)
             .Map(dest => dest.HealthCareCenterCity, src => src.hcCenter.City)
             .Map(dest => dest.HealthCareCenterVillage, src => src.hcCenter.Village)
             .Map(dest => dest.HCCenterId, src => src.hcCenter.HealthCareCenterId)

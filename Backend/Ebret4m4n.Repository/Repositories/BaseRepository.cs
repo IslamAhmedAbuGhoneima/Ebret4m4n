@@ -61,6 +61,6 @@ public class BaseRepository<T>(EbretAmanDbContext context) :
     public void Update(T entity)
         => context.Update(entity);
 
-    public async Task<bool> Exists(Expression<Func<T, bool>> condition)
+    public async Task<bool> ExistsAsync(Expression<Func<T, bool>> condition)
         => await context.Set<T>().AnyAsync(condition);
 }

@@ -19,8 +19,6 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Notification> Notifications { get; set; }
 
-    public DbSet<Diseas> Diseas { get; set; }
-
     public DbSet<SideEffect> SideEffects { get; set; }
 
     public DbSet<Vaccine> Vaccines { get; set; }
@@ -33,9 +31,13 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<HealthReportFile> HealthReportFiles { get; set; }
 
-    public DbSet<JobApplications> JobApplications { get; set; }
+    public DbSet<MedicalApplication> MedicalApplications { get; set; }
 
     public DbSet<Inventory> Inventories { get; set; }
+
+    public DbSet<GovernorateAdminStaff> GovernorateAdminStaff { get; set; }
+
+    public DbSet<CityAdminStaff> CityAdminStaff { get; set; }   
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

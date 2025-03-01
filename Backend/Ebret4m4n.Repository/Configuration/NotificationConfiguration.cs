@@ -12,7 +12,7 @@ public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
         
         builder.Property(p=>p.Title)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasMaxLength(150);
 
         builder.Property(p => p.Message)
             .IsRequired()

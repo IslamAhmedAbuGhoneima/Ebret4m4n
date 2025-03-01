@@ -10,8 +10,10 @@ public class RolesConfiguration : IEntityTypeConfiguration<IdentityRole>
     {
         IdentityRole[] roles = [
             new () { Name = "doctor", NormalizedName = "DOCTOR" },
-            new () { Name = "nurse", NormalizedName = "NURSE" },
-            new () { Name = "Admin", NormalizedName = "ADMIN" }
+            new () { Name = "organizer", NormalizedName = "ORGANIZER" },
+            new () { Name = "governorateAdmin", NormalizedName = "GOVERNORATEADMIN" },
+            new () { Name = "cityAdmin", NormalizedName = "CITYADMIN" },
+            new () { Name = "admin", NormalizedName = "ADMIN" }
         ];
 
         builder.HasData(roles);
