@@ -17,6 +17,7 @@ public interface IUnitOfWork
     IMedicalApplicationRepository MedicalApplicationRepo { get; }
 
     IMedicalStaffRepository StaffRepository { get; }
+    IComplaintRepo complaintRepo { get; }
 
     IGovernorateAdminStaffRepository GovernorateAdminRepo { get; }
 

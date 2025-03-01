@@ -24,7 +24,7 @@ public class HealthCareCenter
     #endregion
 
     #region Relations
-    ICollection<ApplicationUser> Users { get; set; } = [];
+    public ICollection<ApplicationUser> Users { get; set; } = [];
     ICollection<Appointment> Appointments { get; set; } = [];
     ICollection<Certificate> Certificates { get; set; } = [];
     #endregion

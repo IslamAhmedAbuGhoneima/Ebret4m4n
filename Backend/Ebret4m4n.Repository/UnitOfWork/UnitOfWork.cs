@@ -12,8 +12,12 @@ public class UnitOfWork : IUnitOfWork
     private readonly IHealthCareCenterRepository _healthCareCenterRepo;
     private readonly IMedicalApplicationRepository _jobApplicationRepo;
     private readonly IMedicalStaffRepository _medicalStaffRepo;
+<<<<<<< HEAD
     private readonly IGovernorateAdminStaffRepository _governorateAdminRepo;
     private readonly ICityAdminStaffRepository _cityAdminRepo;
+=======
+    private readonly IComplaintRepo _complaintRepo;
+>>>>>>> aa38714b6d67c28c4a36b1b428bf68773177ce26
 
     private readonly EbretAmanDbContext _dbContext;
 
@@ -27,8 +31,12 @@ public class UnitOfWork : IUnitOfWork
         _healthCareCenterRepo = new HealthCareCenterRepository(_dbContext);
         _jobApplicationRepo = new MedicalApplicationRepository(_dbContext);
         _medicalStaffRepo = new MedicalStaffRepository(_dbContext);
+<<<<<<< HEAD
         _governorateAdminRepo = new GovernorateAdminStaffRepository(_dbContext);
         _cityAdminRepo = new CityAdminStaffRepository(_dbContext); 
+=======
+        _complaintRepo = new ComplaintRepository(_dbContext);
+>>>>>>> aa38714b6d67c28c4a36b1b428bf68773177ce26
     }
 
     public EbretAmanDbContext Context => _dbContext;
@@ -47,9 +55,13 @@ public class UnitOfWork : IUnitOfWork
 
     public IMedicalStaffRepository StaffRepository => _medicalStaffRepo;
 
+<<<<<<< HEAD
     public IGovernorateAdminStaffRepository GovernorateAdminRepo => _governorateAdminRepo;
 
     public ICityAdminStaffRepository CityAdminRepo => _cityAdminRepo;
+=======
+    public IComplaintRepo complaintRepo => _complaintRepo;
+>>>>>>> aa38714b6d67c28c4a36b1b428bf68773177ce26
 
     public async Task<int> SaveAsync()
        => await _dbContext.SaveChangesAsync();
