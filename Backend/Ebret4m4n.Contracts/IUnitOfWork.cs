@@ -17,6 +17,7 @@ public interface IUnitOfWork
     IJobApplicationRepository JobApplicationRepo { get; }
 
     IMedicalStaffRepository StaffRepository { get; }
+    IComplaintRepo complaintRepo { get; }
 
     Task<int> SaveAsync();
 }

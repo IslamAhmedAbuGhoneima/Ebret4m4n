@@ -12,6 +12,7 @@ public class UnitOfWork : IUnitOfWork
     private readonly IHealthCareCenterRepository _healthCareCenterRepo;
     private readonly IJobApplicationRepository _jobApplicationRepo;
     private readonly IMedicalStaffRepository _medicalStaffRepo;
+    private readonly IComplaintRepo _complaintRepo;
 
     private readonly EbretAmanDbContext _dbContext;
 
@@ -25,6 +26,7 @@ public class UnitOfWork : IUnitOfWork
         _healthCareCenterRepo = new HealthCareCenterRepository(_dbContext);
         _jobApplicationRepo = new JobApplicationRepository(_dbContext);
         _medicalStaffRepo = new MedicalStaffRepository(_dbContext);
+        _complaintRepo = new ComplaintRepository(_dbContext);
     }
 
     public EbretAmanDbContext Context => _dbContext;
@@ -42,6 +44,8 @@ public class UnitOfWork : IUnitOfWork
     public IJobApplicationRepository JobApplicationRepo => _jobApplicationRepo;
 
     public IMedicalStaffRepository StaffRepository => _medicalStaffRepo;
+
+    public IComplaintRepo complaintRepo => _complaintRepo;
 
     public async Task<int> SaveAsync()
        => await _dbContext.SaveChangesAsync();

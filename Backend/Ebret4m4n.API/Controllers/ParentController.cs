@@ -79,4 +79,41 @@ public class ParentController
 
         return Ok(new { Message = "تم الغاء الموعد" });
     }
+
+    //[Authorize]
+    [HttpGet("Submit-Complaint")]
+    public async Task<IActionResult> SubmitComplaint()
+    {
+        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        var healthCareCenter = await unitOfWork.HealthCareCenterRepo
+        .FindByCondition(hc => hc.Users.Any(u => u.Id == parentId), false, "Users")
+        .FirstOrDefaultAsync();
+
+        var x = userManager.Users.Include(c => c.HealthCareCenter).FirstOrDefault(c => c.Id == parentId);
+
+
+        return healthCareCenter != null ?
+           Ok(healthCareCenter.HealthCareCenterName)
+           //Ok(x.HealthCareCenter.HealthCareCenterName)
+         : NotFound("غير مسجل بوحدة صحية");
+    }
+
+    //[Authorize]
+    [HttpPost("Send-Complaint")]
+    public async Task<IActionResult> SendComplaint( string Complaint)
+    {
+
+        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        Complaint complaint = new Complaint
+        {
+            Message = Complaint,
+            UserId = parentId
+        };
+
+        await unitOfWork.complaintRepo.AddAsync(complaint);
+        await unitOfWork.SaveAsync();
+        return Ok(complaint);
+    }
 }
