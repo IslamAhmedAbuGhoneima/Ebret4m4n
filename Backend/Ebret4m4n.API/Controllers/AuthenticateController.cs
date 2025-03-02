@@ -302,7 +302,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         else if (await userManager.IsInRoleAsync(_user, "cityAdmin"))
         {
             var cityAdmin =
-                await unitOfWork.CityAdminRepo.FindAsync(admin => admin.UserId == _user.Id, false);
+                await unitOfWork.CityAdminStaffRepository.FindAsync(admin => admin.UserId == _user.Id, false);
 
             claims.Add(new("governorate", cityAdmin.Governorate));
             claims.Add(new("city", cityAdmin.City));

@@ -17,11 +17,13 @@ public interface IUnitOfWork
     IMedicalApplicationRepository MedicalApplicationRepo { get; }
 
     IMedicalStaffRepository StaffRepository { get; }
-    IComplaintRepo complaintRepo { get; }
+    IComplaintRepo ComplaintRepo { get; }
 
     IGovernorateAdminStaffRepository GovernorateAdminRepo { get; }
+    ICityAdminStaffRepository CityAdminStaffRepository { get; }
+    IInventoryRepositpry InventoryRepo { get; }
 
-    ICityAdminStaffRepository CityAdminRepo { get; }
+
 
     Task<int> SaveAsync();
 }

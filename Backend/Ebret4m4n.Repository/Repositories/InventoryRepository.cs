@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Ebret4m4n.Repository.Repositories
 {
-    public class CityAdminStaffRepository : BaseRepository<CityAdminStaff>, ICityAdminStaffRepository
+    public class InventoryRepository :BaseRepository<Inventory>,IInventoryRepositpry
     {
-        public CityAdminStaffRepository(EbretAmanDbContext context) : base(context)
-        {
-        }
+        public InventoryRepository(EbretAmanDbContext context)
+            : base(context)
+        { }
     }
 }

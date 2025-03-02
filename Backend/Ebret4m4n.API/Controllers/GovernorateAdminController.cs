@@ -39,7 +39,7 @@ public class GovernorateAdminController
     public async Task<IActionResult> CityInfo([FromQuery]string cityName)
     {
         var cityAdminId =
-             (await unitOfWork.CityAdminRepo.FindAsync(C => C.City == cityName, false)).UserId;
+             (await unitOfWork.CityAdminStaffRepository.FindAsync(C => C.City == cityName, false)).UserId;
 
         if (cityAdminId is null)
             throw new NotFoundBadRequest("لا يوجد ادمن لهذه المدينه");

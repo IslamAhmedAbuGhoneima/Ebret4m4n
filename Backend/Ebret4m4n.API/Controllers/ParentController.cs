@@ -112,7 +112,7 @@ public class ParentController
             UserId = parentId
         };
 
-        await unitOfWork.complaintRepo.AddAsync(complaint);
+        await unitOfWork.ComplaintRepo.AddAsync(complaint);
         await unitOfWork.SaveAsync();
         return Ok(complaint);
     }

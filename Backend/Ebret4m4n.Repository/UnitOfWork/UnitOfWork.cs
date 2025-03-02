@@ -15,6 +15,7 @@ public class UnitOfWork : IUnitOfWork
     private readonly IGovernorateAdminStaffRepository _governorateAdminRepo;
     private readonly ICityAdminStaffRepository _cityAdminRepo;
     private readonly IComplaintRepo _complaintRepo;
+    private readonly IInventoryRepositpry _inventoryRepo;
 
 
     private readonly EbretAmanDbContext _dbContext;
@@ -29,9 +30,10 @@ public class UnitOfWork : IUnitOfWork
         _healthCareCenterRepo = new HealthCareCenterRepository(_dbContext);
         _jobApplicationRepo = new MedicalApplicationRepository(_dbContext);
         _medicalStaffRepo = new MedicalStaffRepository(_dbContext);
-        _governorateAdminRepo = new GovernorateAdminStaffRepository(_dbContext);
-        _cityAdminRepo = new CityAdminStaffRepository(_dbContext); 
+        _governorateAdminRepo = new GovernorateAdminStaffRepository(_dbContext); 
+        _cityAdminRepo = new CityAdminStaffRepository(_dbContext);
         _complaintRepo = new ComplaintRepository(_dbContext);
+        _inventoryRepo = new InventoryRepository(_dbContext);
     }
 
     public EbretAmanDbContext Context => _dbContext;
@@ -52,9 +54,11 @@ public class UnitOfWork : IUnitOfWork
 
     public IGovernorateAdminStaffRepository GovernorateAdminRepo => _governorateAdminRepo;
 
-    public ICityAdminStaffRepository CityAdminRepo => _cityAdminRepo;
+    public IComplaintRepo ComplaintRepo => _complaintRepo;
 
-    public IComplaintRepo complaintRepo => _complaintRepo;
+    public ICityAdminStaffRepository CityAdminStaffRepository => _cityAdminRepo;
+
+    public IInventoryRepositpry InventoryRepo => _inventoryRepo;
 
     public async Task<int> SaveAsync()
        => await _dbContext.SaveChangesAsync();
