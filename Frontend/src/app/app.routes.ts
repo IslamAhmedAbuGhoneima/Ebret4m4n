@@ -1,9 +1,7 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './standalone/home/home.component';
-import { LoginComponent } from './features/auth/Components/login/login.component';
-import { RegisterComponent } from './features/auth/Components/register/register.component';
+import { HomeComponent } from './standalone/pages/home/home.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
-import { NotFoundComponent } from './standalone/not-found/not-found.component';
+import { NotFoundComponent } from './standalone/components/not-found/not-found.component';
 
 export const routes: Routes = [
   {
@@ -13,32 +11,43 @@ export const routes: Routes = [
       { path: '', redirectTo: '/home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
       {
-        path: 'auth',
+        path: 'doctor',
         loadChildren: () =>
-          import('./features/auth/auth.module').then((m) => m.AuthModule),
+          import('./features/doctor/doctor.module').then((m) => m.DoctorModule),
       },
       {
-        path: 'user',
+        path: 'parent',
         loadChildren: () =>
-          import('./features/user/user.module').then((m) => m.UserModule),
+          import('./features/parent/parent.module').then((m) => m.ParentModule),
       },
       {
         path: 'health-ministry',
         loadChildren: () =>
           import(
-            './features/admin-of-ministry-of-health/admin-of-ministry-of-health.module'
-          ).then((m) => m.AdminOfMinistryOfHealthModule),
+            './features/health-ministry-admin/health-ministry-admin.module'
+          ).then((m) => m.HealthMinistryAdminModule),
       },
       {
-        path: 'healthcare',
+        path: 'city-centre-admin',
         loadChildren: () =>
-          import('./features/health-care-admin/health-care-admin.module').then(
-            (m) => m.HealthCareAdminModule
+          import('./features/city-centre-admin/city-centre-admin.module').then(
+            (m) => m.CityCentreAdminModule
+          ),
+      },
+      {
+        path: 'healthcare-organizer',
+        loadChildren: () =>
+          import('./features/healthcare-organizer/healthcare-organizer.module').then(
+            (m) => m.HeathCareOrganizerModule
           ),
       },
     ],
+
+  }, {
+    path: 'auth',
+    loadChildren: () =>
+      import('./features/auth/auth.module').then((m) => m.AuthModule),
   },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+
   { path: '**', component: NotFoundComponent }, //wild card path
 ];
