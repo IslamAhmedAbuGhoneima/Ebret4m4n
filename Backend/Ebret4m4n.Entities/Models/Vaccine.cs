@@ -10,10 +10,6 @@ public class Vaccine
 
     public string Name { get; set; } = null!;
 
-    public int DocesRequired { get; set; }
-
-    public int DocesTaken { get; set; }
-
     public bool IsTaken { get; set; }
 
     public int ChildAge { get; set; }

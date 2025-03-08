@@ -7,25 +7,25 @@ public record AddChildDto
 {
     [Required(ErrorMessage = "يجب ادخال الرقم القومي للطفل")]
     [MinLength(14, ErrorMessage = "يجب ان يكون الرقم القومي للطفل مكن من 14 رقم")]
-    public string Id { get; set; } = null!;
+    public string Id { get; init; } = null!;
 
     [Required(ErrorMessage = "يجب ادخال اسم للطفل")]
-    public string Name { get; set; } = null!;
+    public string Name { get; init; } = null!;
 
     [Required(ErrorMessage = "يجب ادخال تاريخ ميلاد الطفل")]
-    public DateTime BirthDate { get; set; }
+    public DateTime BirthDate { get; init; }
 
     [Required]
     [Range(1, 15, ErrorMessage = "يجب ان يكون وزن الطفل اكثر من 1كجم")]
-    public double Weight { get; set; }
+    public double Weight { get; init; }
 
     [Required(ErrorMessage = "يجب ادخال جنس الطفل")]
     [AllowedValues(['F', 'f', 'm', 'M'], ErrorMessage = "يجب ان يكون جنس الطفل ذكر او انثي")]
-    public char Gender { get; set; }
+    public char Gender { get; init; }
 
-    public string? PatientHistory { get; set; }
+    public string? PatientHistory { get; init; }
 
-    public List<IFormFile>? healthReportFiles { get; set; }
+    public List<IFormFile>? healthReportFiles { get; init; }
 
-    public List<string>? vaccines { get; set; }
+    public List<string>? vaccines { get; init; }
 }

@@ -1,6 +1,6 @@
 ﻿using Ebret4m4n.Shared.DTOs.ChildDtos;
 
-namespace Ebret4m4n.Shared.DTOs;
+namespace Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 
 public record UserDataDto
 {
@@ -12,7 +12,7 @@ public record UserDataDto
 
     public string Governorate { get; init; } = null!;
 
-    public string? City { get; init; } 
+    public string? City { get; init; }
 
     public string? PhoneNumber { get; init; }
 

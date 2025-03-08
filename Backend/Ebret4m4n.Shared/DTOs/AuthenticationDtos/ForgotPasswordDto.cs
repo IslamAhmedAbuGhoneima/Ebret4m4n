@@ -6,5 +6,5 @@ public record ForgotPasswordDto
 {
     [Required(ErrorMessage = "يجب ادخال عنوان البريد الالكتروني"),
         EmailAddress(ErrorMessage ="هذا البريد الالكتروني غير صالح")]
-    public string Email { get; set; } = null!;
+    public string Email { get; init; } = null!;
 }

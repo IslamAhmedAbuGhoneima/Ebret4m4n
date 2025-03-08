@@ -2,11 +2,11 @@
 
 public record CityRecordDetailsDto
 {
-    public string FirstName { get; set; } = null!;
+    public string FirstName { get; init; } = null!;
 
-    public string LastName { get; set; } = null!;
+    public string LastName { get; init; } = null!;
 
-    public string Email { get; set; } = null!;
+    public string Email { get; init; } = null!;
 
-    public List<string> VaccineInventory { get; set; } = [];
+    public List<MainInventoryDto> VaccineInventory { get; init; } = [];
 }

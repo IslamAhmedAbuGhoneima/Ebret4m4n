@@ -9,58 +9,50 @@ using System.Security.Claims;
 using System.Text.Json;
 using Mapster;
 using Ebret4m4n.Contracts;
+using Ebret4m4n.Shared.DTOs;
 
 
 namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
+[Authorize]
 [ApiController]
-public class ChildController : ControllerBase
+public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 {
-    private readonly IUnitOfWork _unitOfWork;
-
-    public ChildController(IUnitOfWork unitOfWork)
-    {
-        _unitOfWork = unitOfWork;
-    }
-
     [HttpGet("{id}/child")]
     public async Task<IActionResult> GetChild(string id)
     {
-        var child = await _unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false, ["Vaccines"]);
+        var child = await unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false, ["Vaccines"]);
 
         if (child is null)
             throw new NotFoundBadRequest($"Child with {id} Not found");
 
         var childDto = child.Adapt<ChildDto>();
 
-        return Ok(childDto);
+        var response = new GeneralResponse<ChildDto>(StatusCodes.Status200OK,childDto);
+
+        return Ok(response);
     }
 
-    [Authorize]
     [HttpGet("children")]
     public async Task<IActionResult> GetChildren()
     {
         var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
         var children = 
-            await _unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, false).ToListAsync();
+            await unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, false).ToListAsync();
 
         if (children is null)
             throw new NotFoundBadRequest("you don not have any child");
 
-        List<ChildDto> childrenDtos = new();
 
-        foreach (var child in children)
-        {
-            var childDto = child.Adapt<ChildDto>();
-            childrenDtos.Add(childDto);
-        }
+        var childrenDtos = children.Adapt<List<ChildDto>>();
 
-        return Ok(childrenDtos);
+        var response = new GeneralResponse<List<ChildDto>>(StatusCodes.Status200OK, childrenDtos);
+
+        return Ok(response);
     }
 
-    [Authorize]
     [HttpPost("child-add")]
     public async Task<IActionResult> AddChild([FromBody]AddChildDto dto)
     {
@@ -68,7 +60,7 @@ public class ChildController : ControllerBase
             return UnprocessableEntity(ModelState);
 
         var checkUniqNameIdentifier =
-            await _unitOfWork.ChildRepo.FindAsync(C => C.Id == dto.Id, false);
+            await unitOfWork.ChildRepo.FindAsync(C => C.Id == dto.Id, false);
 
         if (checkUniqNameIdentifier != null)
             throw new BadRequestException("من فضلك ادخل رقم الطفل القومي الصحيح");
@@ -80,33 +72,36 @@ public class ChildController : ControllerBase
 
         if(dto.healthReportFiles == null && dto.PatientHistory == null)
         {
-            var vaccines = ReadFromJsonFile(dto.vaccines, child.Id);
+            var vaccines = ReadVaccinesFromJsonFile(dto.vaccines, child.Id);
 
-            await _unitOfWork.VaccineRepo.AddRangeAsync(vaccines);
+            await unitOfWork.VaccineRepo.AddRangeAsync(vaccines);
         }
 
         if (dto.healthReportFiles != null) 
         {
             var childReports = SaveReportFiles(dto.healthReportFiles, dto.Id);
-            await _unitOfWork.HealthyReportRepo.AddRangeAsync(childReports);
+            await unitOfWork.HealthyReportRepo.AddRangeAsync(childReports);
         }
 
-        await _unitOfWork.ChildRepo.AddAsync(child);
+        await unitOfWork.ChildRepo.AddAsync(child);
 
-        var result = await _unitOfWork.SaveAsync();
+        var result = await unitOfWork.SaveAsync();
 
+        if (result == 0)
+            throw new BadRequestException("لم يتم حفظ الطفل الرجاء المحاوله مره اخري");
 
-        return Ok(new { Message = "Child created successfully" });
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اضافه الطفل بنجاح");
+
+        return Ok(response);
     }
 
-    [Authorize]
     [HttpPut("{id}/child-update")]
     public async Task<IActionResult> UpdateChild(string id, [FromBody] UpdateChildDto dto)
     {
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var child = await _unitOfWork.ChildRepo.FindAsync(e => e.Id == id, true);
+        var child = await unitOfWork.ChildRepo.FindAsync(e => e.Id == id, true);
 
         if (child is null)
             throw new NotFoundBadRequest($"Child with {id} Not found"); 
@@ -116,14 +111,34 @@ public class ChildController : ControllerBase
         if(dto.ImageFiles is not null)
         {
             var childHealthFiles = SaveReportFiles(dto.ImageFiles, id);
-            await _unitOfWork.HealthyReportRepo.AddRangeAsync(childHealthFiles);
+            await unitOfWork.HealthyReportRepo.AddRangeAsync(childHealthFiles);
         }
 
-        _unitOfWork.ChildRepo.Update(child);
-        await _unitOfWork.SaveAsync();
+        unitOfWork.ChildRepo.Update(child);
+        var result = await unitOfWork.SaveAsync();
 
-        return Ok(new { Message = "Child updated successfully" });
+        if (result == 0)
+            throw new BadRequestException("لم يتم تحديث بيانات هذا الطفل");
+
+        return NoContent();
     }
+
+    [HttpDelete("{childId:alpha}/child-remove")]
+    public async Task<IActionResult> RemoveChild(string childId)
+    {
+        var child = await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false);
+        if (child is null)
+            throw new BadRequestException("لم يتم ايجاد هذا الطفل");
+
+        unitOfWork.ChildRepo.Remove(child);
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم حذف هذا الطفل");
+
+        return NoContent();
+    }
+
 
     private List<HealthReportFile>? SaveReportFiles(List<IFormFile> imageFiles, string childId)
     {
@@ -161,19 +176,19 @@ public class ChildController : ControllerBase
         return healthReports;
     }
 
-    private List<Vaccine> ReadFromJsonFile(List<string>? childVaccines, string childId)
+    private List<Vaccine> ReadVaccinesFromJsonFile(List<string>? childVaccines, string childId)
     {
         string path =
                 Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "vaccines.json");
+
+        if (!Path.Exists(path))
+            throw new FileNotFoundException("لم يتم استرجاع القاحات الرجاء التواصل مع الدعم الفني");
 
         using var strem = new FileStream(path, FileMode.Open);
         var baseVaccines = JsonSerializer.Deserialize<List<BaseVaccine>>(strem);
 
         if(baseVaccines == null)
-        {
-            //_logger.LogError("cant serialize the json object to List of baseVaccines");
             throw new BadRequestException("حدث خطا ما اثناء تسجيل الطفل الرجاء الاتصال بالدعم الفني للمساعده");
-        }
 
         var vaccines = baseVaccines.Adapt<List<Vaccine>>();
 
@@ -185,7 +200,6 @@ public class ChildController : ControllerBase
             foreach (var vaccineName in childVaccines)
             {
                 var vaccine = vaccines.FirstOrDefault(v => v.Name == vaccineName);
-                vaccine.DocesTaken = vaccine.DocesRequired;
             }
         }
         return vaccines;

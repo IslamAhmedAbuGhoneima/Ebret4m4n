@@ -1,35 +1,30 @@
 ﻿using Ebret4m4n.Contracts;
-using Ebret4m4n.Entities.Models;
-using Ebret4m4n.Repository.UnitOfWork;
+using Ebret4m4n.Entities.Exceptions;
+using Ebret4m4n.Shared.DTOs;
+using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+using Mapster;
+using Ebret4m4n.Entities.Models;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
 [Authorize(Roles = "cityAdmin")]
 [ApiController]
-public class CityAdminController : ControllerBase
+public class CityAdminController
+    (IUnitOfWork unitOfWork,UserManager<ApplicationUser> userManager) : ControllerBase
 {
-    IUnitOfWork UnitOfWork;
-    //ApplicantPosition position = new ApplicantPosition();
-
-    public CityAdminController(IUnitOfWork unitOfWork)
-    {
-        UnitOfWork = unitOfWork;
-    }
-
 
     [HttpGet("healthcareCenter-village")]
     public async Task<IActionResult> GetHealthCareInVillageAsync()
     {
         var city = User.FindFirst("city")!.Value;
 
-        //var admin = await UnitOfWork.cityAdminStaffRepository.FindAsync(c=>c.UserId==adminId,false);
-
-        var healthCareCenters = await UnitOfWork.HealthCareCenterRepo
+        var healthCareCenters = await unitOfWork.HealthCareCenterRepo
             .FindByCondition(hc => hc.City == city, false)
             .Select(hc => hc.Village)
             .ToListAsync();
@@ -38,27 +33,27 @@ public class CityAdminController : ControllerBase
     }
 
     [HttpGet("{id:guid}/healthCareCenter")]
-    public IActionResult HealthCareDetails(Guid id)
+    public async Task<IActionResult> HealthCareDetails(Guid id)
     {
         
-        var healthCareCenter = UnitOfWork.HealthCareCenterRepo
-            .FindByCondition(hc => hc.HealthCareCenterId == id, false).FirstOrDefault();
+        var healthCareCenter = await unitOfWork.HealthCareCenterRepo
+            .FindAsync(hc => hc.HealthCareCenterId == id, false);
 
         if (healthCareCenter is null)
             return NotFound();
         // oraginzer info
         //الاسم - email-city-position
 
-        var organizer = UnitOfWork.MedicalApplicationRepo
-            .FindByCondition(m => m.HealthCareName == healthCareCenter.HealthCareCenterName
-           && m.ApplicantPosition == ApplicantPosition.Organizer, false).FirstOrDefault();
+        //var organizer = unitOfWork.MedicalApplicationRepo
+        //    .FindByCondition(m => m.HealthCareName == healthCareCenter.HealthCareCenterName
+        //   && m.ApplicantPosition == ApplicantPosition.Organizer, false).FirstOrDefault();
 
 
         //Doctor info
 
-        var doctor = UnitOfWork.MedicalApplicationRepo
-            .FindByCondition(m => m.HealthCareName == healthCareCenter.HealthCareCenterName
-            && m.ApplicantPosition == ApplicantPosition.Doctor, false).FirstOrDefault();
+        //var doctor = unitOfWork.MedicalApplicationRepo
+        //    .FindByCondition(m => m.HealthCareName == healthCareCenter.HealthCareCenterName
+        //    && m.ApplicantPosition == ApplicantPosition.Doctor, false).FirstOrDefault();
 
         // inventory info
 
@@ -67,49 +62,98 @@ public class CityAdminController : ControllerBase
         return Ok();
     }
 
+
+    [HttpPost("medical-postion-add")]
+    public async Task<IActionResult> AddMedicalPostion(MedicalStaffDto model)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
+        var healthCare =
+            await unitOfWork.HealthCareCenterRepo.FindAsync(hc => hc.HealthCareCenterId == model.HealthCareCenterId, false);
+
+        if (healthCare is null)
+            throw new BadRequestException("لم يتم العثور علي هذه الوحده الصحيه");
+
+        var user = model.Adapt<ApplicationUser>();
+
+        var result = await userManager.CreateAsync(user, model.Password);
+
+        if (!result.Succeeded)
+            throw new BadRequestException("لم يتم انشاء هذا المستخدم");
+
+        await userManager.AddToRoleAsync(user, model.StaffRole);
+
+        var medicalStaff = (model, healthCare).Adapt<MedicalStaff>();
+
+        medicalStaff.UserId = user.Id;
+            
+        await unitOfWork.StaffRepo.AddAsync(medicalStaff);
+        var dbResult = await unitOfWork.SaveAsync();
+
+        if (dbResult == 0)
+            throw new BadRequestException("لم يتم حفظ الباينات اللرجاء المحاوله مره اخري");
+
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اضافه هذا المستخدم بنجاح");
+
+        return Ok(response);
+    }
+
     [HttpGet("complaints")]
     public async Task<IActionResult> Complaints()
     {
         var city = User.FindFirst("city")!.Value;
 
-       // var admin = await UnitOfWork.cityAdminStaffRepository.FindAsync(c => c.UserId == adminId, false);
-
-        var complaints = await UnitOfWork.ComplaintRepo
-            .FindByCondition(c => c.User.City == city, false)
+        var complaints = await unitOfWork.ComplaintRepo
+            .FindByCondition(c => c.User.City == city, false, "User")
+            .Select(C => new ComplaintsDto(C.User.UserName, C.DateSubmitted))
             .ToListAsync();
+            
 
-        if (complaints.Count == 0)
-            return NotFound("لا توجد شكاوى");
+        if (complaints is null)
+            throw new NotFoundBadRequest("لا توجد شكاوي مسجله");
 
-        return Ok(complaints);
+        var response = new GeneralResponse<List<ComplaintsDto>> (StatusCodes.Status200OK, complaints);
+
+        return Ok(response);
     }
 
     [HttpGet("{id:guid}/complaint")]
-    public IActionResult Complaint(Guid id)
+    public async Task<IActionResult> Complaint(Guid id)
     {
-        var complaint = UnitOfWork.ComplaintRepo
-            .FindByCondition(c => c.Id == id, false).FirstOrDefault();
-        // user who send complaint and complaint
-        if (complaint is null)
-            return NotFound("لا توجد شكاوى ");
+        var complaint =
+            await unitOfWork.ComplaintRepo.FindAsync(c => c.Id == id, false, "User");
 
-        return Ok(complaint);
+        if (complaint is null)
+            throw new NotFoundBadRequest("لا توجد شكاوي مسجله لهذا المستخدم");
+
+        var healthCare = 
+            await unitOfWork.HealthCareCenterRepo.FindAsync(hc => hc.HealthCareCenterId == complaint.User.HealthCareCenterId, false);
+
+        var complaintDto = (complaint, healthCare).Adapt<ComplaintDto>();
+
+        var response = new GeneralResponse<ComplaintDto>(StatusCodes.Status200OK, complaintDto);
+
+        return Ok(response);
     }
 
     [HttpPost("{complaintId:guid}/handle-complaint")]
-    public IActionResult HandleComplaint(Guid complaintId)
+    public async Task<IActionResult> HandleComplaint(Guid complaintId)
     {
+        var complaint =
+            await unitOfWork.ComplaintRepo.FindAsync(C => C.Id == complaintId, false, "User");
+
+        if (complaint is null)
+            throw new NotFoundException("هذه الشكوي غير موجوده او تم حذفها");
+
+        // send email or notfication to user
 
         return Ok();
     }
 
-
     [HttpPost("{vaccineId:guid}/send-vaccine")]
     public IActionResult SendVaccine(Guid vaccineId , int amount)
     {
-
-
-
         return Ok();
     } 
 }

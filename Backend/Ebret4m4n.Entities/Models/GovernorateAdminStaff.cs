@@ -12,5 +12,8 @@ public class GovernorateAdminStaff
     [MaxLength(150)]
     public string Governorate { get; set; } = null!;
 
-    ICollection<CityAdminStaff> CityAdminStaffs { get; set; } = [];
+    public ICollection<CityAdminStaff> CityAdminStaffs { get; set; } = [];
+
+    public ICollection<MainInventory>? MainInventories { get; set; } = [];
+
 }

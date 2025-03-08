@@ -12,11 +12,13 @@ public class Child
 
     public DateTime BirthDate { get; set; }
 
-    public int AgeInMonth { get; private set; } //=> (int)(DateTime.Now.Subtract(BirthDate).TotalDays / 30);
+    public int AgeInMonth { get; private set; } 
 
     public double Weight { get; set; }
 
     public char Gender { get; set; }
+
+    public bool IsNoramal { get; set; } = true;
 
     public string? PatientHistory {  get; set; }
     

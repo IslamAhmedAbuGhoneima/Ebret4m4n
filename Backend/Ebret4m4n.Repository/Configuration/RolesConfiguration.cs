@@ -9,6 +9,7 @@ public class RolesConfiguration : IEntityTypeConfiguration<IdentityRole>
     public void Configure(EntityTypeBuilder<IdentityRole> builder)
     {
         IdentityRole[] roles = [
+            new () {Name = "parent",NormalizedName = "PARENT"},
             new () { Name = "doctor", NormalizedName = "DOCTOR" },
             new () { Name = "organizer", NormalizedName = "ORGANIZER" },
             new () { Name = "governorateAdmin", NormalizedName = "GOVERNORATEADMIN" },

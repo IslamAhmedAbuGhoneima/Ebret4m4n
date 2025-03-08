@@ -2,15 +2,11 @@
 
 public record ChildVaccinDto
 {
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public string Name { get; set; }
+    public string Name { get; init; }
 
-    public int DocesRequired { get; set; }
+    public bool IsTaken { get; init; }
 
-    public int DocesTaken { get; set; }
-
-    public bool IsTaken { get; set; }
-
-    public int ChildAge { get; set; }
+    public int ChildAge { get; init; }
 }

@@ -2,54 +2,82 @@
   {
     "id": 1,
     "name": "الميلاد",
-    "docesRequired": 1,
-    "childAge": 0
+    "childAge": 0,
+    "Antigens": [
+      "كبدي ب رضع"
+    ]
   },
   {
     "id": 2,
     "name": "الصفريه",
-    "docesRequired": 1,
-    "childAge": 0
+    "childAge": 0,
+    "Antigens": [
+      "سابين"
+    ]
   },
   {
     "id": 3,
     "name": "الدرن",
-    "docesRequired": 1,
-    "childAge": 0
+    "childAge": 0,
+    "Antigens": [
+      "بي سي جي"
+    ]
   },
   {
     "id": 4,
     "name": "الاولي",
-    "docesRequired": 3,
-    "childAge": 2
+    "childAge": 2,
+    "Antigens": [
+      "سابين",
+      "الخماسي",
+      "سولك"
+    ]
   },
   {
     "id": 5,
     "name": "الثانيه",
-    "docesRequired": 3,
-    "childAge": 4
-  },
-  {
-    "name": "الثالثه",
-    "docesRequired": 3,
-    "childAge": 6
+    "childAge": 4,
+    "Antigens": [
+      "سابين",
+      "الخماسي",
+      "سولك"
+    ]
   },
   {
     "id": 6,
-    "name": "الرابعه",
-    "docesRequired": 1,
-    "childAge": 9
+    "name": "الثالثه",
+    "childAge": 6,
+    "Antigens": [
+      "سابين",
+      "الخماسي",
+      "سولك"
+    ]
   },
   {
     "id": 7,
-    "name": "الخامسه",
-    "docesRequired": 2,
-    "childAge": 12
+    "name": "الرابعه",
+    "childAge": 9,
+    "Antigens": [
+      "سابين"
+    ]
   },
   {
     "id": 8,
+    "name": "الخامسه",
+    "childAge": 12,
+    "Antigens": [
+      "سابين",
+      "ام ام ار"
+    ]
+  },
+  {
+    "id": 9,
     "name": "المنشطه",
-    "docesRequired": 3,
-    "childAge": 18
+    "childAge": 18,
+    "Antigens": [
+      "سابين",
+      "ام ام ار",
+      "الثلاثي البكتيري"
+    ]
   }
 ]

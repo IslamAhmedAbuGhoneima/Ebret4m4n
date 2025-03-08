@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace Ebret4m4n.Entities.Models;
 
 public class Complaint
@@ -9,6 +8,8 @@ public class Complaint
     public Guid Id { get; set; }
 
     public string Message { get; set; } = null!;
+
+    public DateTime DateSubmitted { get; private set; } = DateTime.Now;
     #endregion
 
     #region Relations
@@ -16,5 +17,4 @@ public class Complaint
     public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; } 
     #endregion
-
 }

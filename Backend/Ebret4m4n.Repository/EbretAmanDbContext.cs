@@ -31,13 +31,15 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<HealthReportFile> HealthReportFiles { get; set; }
 
-    public DbSet<MedicalApplication> MedicalApplications { get; set; }
-
     public DbSet<Inventory> Inventories { get; set; }
 
     public DbSet<GovernorateAdminStaff> GovernorateAdminStaff { get; set; }
 
     public DbSet<CityAdminStaff> CityAdminStaff { get; set; }   
+
+    public DbSet<MainInventory> MainInventory { get; set; }
+
+    public DbSet<Order> Orders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

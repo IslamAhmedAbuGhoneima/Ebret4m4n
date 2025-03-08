@@ -19,4 +19,6 @@ public record ChildDto
     public string? PatientHistory { get; set; }
 
     public List<ChildVaccinDto>? Vaccines { get; set; }
+
+    public List<string>? FilePath { get; set; }
 }

@@ -14,10 +14,10 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
+using System.Data;
 using System.Text;
 using System.Net;
 using Mapster;
-using System.Data;
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -49,9 +49,13 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
             return BadRequest(new { Errors = errors });
         }
 
+        await userManager.AddToRoleAsync(user, model.Role);
+
         var userDto = user.Adapt<UserDataDto>();
 
-        return CreatedAtAction("UserProfile", new { id = user.Id }, userDto);
+        var response = new GeneralResponse<UserDataDto>(StatusCodes.Status200OK, userDto);
+
+        return CreatedAtAction("UserProfile", new { id = user.Id }, response);
     }
 
     [HttpPost("login")]
@@ -77,7 +81,9 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         }
         
         await userManager.ResetAccessFailedCountAsync(_user!);
-        var response = await GenerageToken(true);
+        var token = await GenerageToken(true);
+
+        var response = new GeneralResponse<TokenDto>(StatusCodes.Status200OK, token);
 
         return Ok(response);
     }
@@ -95,7 +101,8 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         _user = user;
 
-        var response = await GenerageToken(false);
+        var token = await GenerageToken(false);
+        var response = new GeneralResponse<TokenDto>(StatusCodes.Status200OK, token);
 
         return Ok(response);
     }
@@ -124,7 +131,9 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         await emailSender.SendEmailAsync(email, subject, body);
 
-        return Ok(new { Message = "If your email is registered, you will receive a password reset link." });
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "If your email is registered, you will receive a password reset link.");
+
+        return Ok(response);
     }
 
     [HttpPost("reset-password")]
@@ -147,7 +156,9 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         if(!result.Succeeded)
             throw new InValidTokenBadRequest();
 
-        return Ok(new { Message = "Password has been reset successfully." });
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "Password has been reset successfully.");
+
+        return Ok(response);
     }
 
     [Authorize]
@@ -174,7 +185,9 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         await emailSender.SendEmailAsync(newEmail, subject, body);
 
-        return Ok(new { Message = "You will receive email message for reste your email" });
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "You will receive email message for reste your email");
+
+        return Ok(response);
     }
 
     [HttpGet("email-change")]
@@ -196,7 +209,10 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
             throw new InValidTokenBadRequest();
 
         await signInManager.RefreshSignInAsync(_user);
-        return Ok(new { Message = "your Email Updated Successfully" });
+
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "your Email Updated Successfully");
+
+        return Ok(response);
     }
 
 
@@ -221,7 +237,10 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         var userDto = _user.Adapt<UserDataDto>();
 
-        return Ok(userDto);
+        var response = new GeneralResponse<UserDataDto>(StatusCodes.Status200OK, userDto);
+
+
+        return Ok(response);
     }
 
     #region Private actions
@@ -283,7 +302,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
             await userManager.IsInRoleAsync(_user, "organizer"))
         {
             var staffRecord = 
-                await unitOfWork.StaffRepository.FindAsync(s => s.UserId == _user.Id, false);
+                await unitOfWork.StaffRepo.FindAsync(s => s.UserId == _user.Id, false);
 
             if (staffRecord is null)
                 throw new NotFoundBadRequest("لم نتمكن من ايجاد الوحده الصحيه التابعه لهذا المستخدم");
@@ -302,7 +321,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         else if (await userManager.IsInRoleAsync(_user, "cityAdmin"))
         {
             var cityAdmin =
-                await unitOfWork.CityAdminStaffRepository.FindAsync(admin => admin.UserId == _user.Id, false);
+                await unitOfWork.CityAdminStaffRepo.FindAsync(admin => admin.UserId == _user.Id, false);
 
             claims.Add(new("governorate", cityAdmin.Governorate));
             claims.Add(new("city", cityAdmin.City));

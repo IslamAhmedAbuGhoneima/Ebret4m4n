@@ -8,10 +8,6 @@ public class MedicalStaffConfiguration : IEntityTypeConfiguration<MedicalStaff>
 {
     public void Configure(EntityTypeBuilder<MedicalStaff> builder)
     {
-        builder.Property(p => p.MedicalNumber)
-            .HasMaxLength(30)
-            .IsRequired();
-
         builder.Property(p => p.HealthCareCenterName)
             .IsRequired()
             .HasMaxLength(150);

@@ -1,6 +1,4 @@
-﻿using Ebret4m4n.Contracts;
-
-namespace Ebret4m4n.Contracts;
+﻿namespace Ebret4m4n.Contracts;
 
 public interface IUnitOfWork
 {
@@ -14,16 +12,19 @@ public interface IUnitOfWork
 
     IHealthCareCenterRepository HealthCareCenterRepo { get; }
 
-    IMedicalApplicationRepository MedicalApplicationRepo { get; }
+    IMedicalStaffRepository StaffRepo { get; }
 
-    IMedicalStaffRepository StaffRepository { get; }
     IComplaintRepo ComplaintRepo { get; }
 
     IGovernorateAdminStaffRepository GovernorateAdminRepo { get; }
-    ICityAdminStaffRepository CityAdminStaffRepository { get; }
+
+    ICityAdminStaffRepository CityAdminStaffRepo { get; }
+
     IInventoryRepositpry InventoryRepo { get; }
 
+    IOrderRepository OrderRepo { get; }
 
+    IMainInventoryRepository MainInventoryRepo { get; }
 
     Task<int> SaveAsync();
 }

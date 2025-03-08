@@ -14,4 +14,6 @@ public class CityAdminStaff
 
     [MaxLength(150)]
     public string City { get; set; } = null!;
+
+    public ICollection<MainInventory>? MainInventories { get; set; }
 }

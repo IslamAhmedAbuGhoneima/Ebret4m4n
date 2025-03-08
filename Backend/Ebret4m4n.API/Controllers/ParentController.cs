@@ -1,22 +1,23 @@
-﻿using Ebret4m4n.Contracts;
+﻿using Microsoft.AspNetCore.Authorization;
+using Ebret4m4n.Contracts;
 using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
+using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
-using Mapster;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Mapster;
 
 namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
+[Authorize(Roles = "parent")]
 [ApiController]
 public class ParentController
     (IUnitOfWork unitOfWork,UserManager<ApplicationUser> userManager) : ControllerBase
 {
-    [Authorize]
     [HttpGet("children-reservations")]
     public IActionResult ParentReservations()
     {
@@ -28,10 +29,11 @@ public class ParentController
 
         var userReservationsDto = appointments.Adapt<List<UserReservationDto>>();
 
-        return Ok(userReservationsDto);
+        var response = new GeneralResponse<List<UserReservationDto>>(StatusCodes.Status200OK, userReservationsDto);
+
+        return Ok(response);
     }
 
-    [Authorize]
     [HttpPost("appointment-book")]
     public async Task<IActionResult> AppointmentBook([FromBody] AddAppointmentDto model)
     {
@@ -62,10 +64,11 @@ public class ParentController
 
         var appointmentDto = (appointment, childName).Adapt<AppointmentDto>();
 
-        return Ok(appointmentDto);
+        var response = new GeneralResponse<AppointmentDto>(StatusCodes.Status200OK, appointmentDto);
+
+        return Ok(response);
     }
 
-    [Authorize]
     [HttpDelete("{id:guid}/appointment-cancle")]
     public async Task<IActionResult> AppointmentCancle(Guid id)
     {
@@ -75,40 +78,40 @@ public class ParentController
             throw new NotFoundBadRequest("لا يوجد موعد خاص بهذا المستخدم");
 
         unitOfWork.AppointmentRepo.Remove(appointment);
-        await unitOfWork.SaveAsync();
+        var result = await unitOfWork.SaveAsync();
 
-        return Ok(new { Message = "تم الغاء الموعد" });
+        if (result == 0)
+            throw new BadRequestException("لم يتم الغاء المعاد حاول مره اخري");
+
+        return NoContent();
     }
 
-    //[Authorize]
     [HttpGet("Submit-Complaint")]
     public async Task<IActionResult> SubmitComplaint()
     {
         var parentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         var healthCareCenter = await unitOfWork.HealthCareCenterRepo
-        .FindByCondition(hc => hc.Users.Any(u => u.Id == parentId), false, "Users")
-        .FirstOrDefaultAsync();
+        .FindAsync(hc => hc.Users.Any(u => u.Id == parentId), false, "Users");
+        
 
-        var x = userManager.Users.Include(c => c.HealthCareCenter).FirstOrDefault(c => c.Id == parentId);
+        var x = userManager.Users.Include(c => c.HealthCareCenter)
+            .FirstOrDefault(c => c.Id == parentId);
 
 
         return healthCareCenter != null ?
            Ok(healthCareCenter.HealthCareCenterName)
-           //Ok(x.HealthCareCenter.HealthCareCenterName)
          : NotFound("غير مسجل بوحدة صحية");
     }
 
-    //[Authorize]
     [HttpPost("Send-Complaint")]
-    public async Task<IActionResult> SendComplaint( string Complaint)
+    public async Task<IActionResult> SendComplaint(string message)
     {
+        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        Complaint complaint = new Complaint
+        var complaint = new Complaint
         {
-            Message = Complaint,
+            Message = message,
             UserId = parentId
         };
 

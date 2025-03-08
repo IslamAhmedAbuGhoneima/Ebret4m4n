@@ -11,9 +11,6 @@ public class MedicalStaff
     public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; }
 
-
-    public string MedicalNumber { get; set; } = null!;
-
     public string? HealthCareCenterName { get; set; }
 
     public string? HealthCareCenterGovernorate { get; set; }

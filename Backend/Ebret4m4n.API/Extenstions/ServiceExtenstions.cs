@@ -39,6 +39,8 @@ public static class ServiceExtenstions
 
             opts.Password.RequireNonAlphanumeric = false;
             opts.Password.RequiredLength = 8;
+            opts.Password.RequiredUniqueChars = 0;
+            opts.Password.RequireUppercase = false;
             
             opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
         

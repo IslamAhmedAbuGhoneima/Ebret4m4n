@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Ebret4m4n.Shared.DTOs.AuthenticationDtos;
+namespace Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
 
-public record RegisterDto
+public record AddCityAdminDto()
 {
     [Required(ErrorMessage = "يجب ادخال الاسم الاول")]
     [Length(3, 20, ErrorMessage = "يجب ان يكون طول الاسم من 3 الي 20 حرف")]
@@ -20,19 +20,11 @@ public record RegisterDto
     [MinLength(8, ErrorMessage = "لا يجب ان تقل كلمه المرور عن 8 احرف")]
     public string Password { get; init; } = null!;
 
-    [RegularExpression(@"^(01)(0|1|2)[0-9]{8}")]
-    [MinLength(11, ErrorMessage = "من فضلك ادخل رقم هاتف مكون من 11 رقم")]
-    public string PhoneNumber { get; init; } = null!;
-
     [Required(ErrorMessage = "من فضلك ادخل المحافظه التابع لها")]
     public string Governorate { get; init; } = null!;
 
-    public string? City { get; init; }
+    [Required(ErrorMessage = "من فضلك ادخل المركز التابع له")]
+    public string City { get; init; } = null!;
 
-    public string? Village { get; init; }
-
-    public string Role { get; init; } = "parent";
-
-    public Guid HealthCareCenterId { get; init; }
-
+    public string Role { get; init; } = "cityAdmin";
 }

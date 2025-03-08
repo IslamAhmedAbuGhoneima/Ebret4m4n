@@ -14,12 +14,6 @@ public class VaccineConfiguration : IEntityTypeConfiguration<Vaccine>
             .IsRequired()
             .HasMaxLength(50);
 
-        builder.Property(x => x.DocesRequired)
-            .IsRequired();
-
-        builder.Property(x => x.DocesTaken)
-            .IsRequired();
-
         builder.Property(x => x.ChildAge)
             .IsRequired();
 

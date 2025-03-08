@@ -35,5 +35,9 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         builder.Property(e => e.Email)
             .IsRequired()
             .HasMaxLength(50);
+
+        builder.HasOne(e => e.HealthCareCenter)
+            .WithMany(e => e.Users)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
