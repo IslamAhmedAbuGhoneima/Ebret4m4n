@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './standalone/pages/home/home.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { NotFoundComponent } from './standalone/components/not-found/not-found.component';
+import { ContactUsComponent } from './standalone/pages/contact-us/contact-us.component';
+import { VaccinationScheduleComponent } from './standalone/components/vaccination-schedule/vaccination-schedule.component';
 
 export const routes: Routes = [
   {
@@ -10,6 +12,8 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: '/home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
+      { path: 'contact-us', component: ContactUsComponent },
+      { path: 'vaccination-schedule', component: VaccinationScheduleComponent },
       {
         path: 'doctor',
         loadChildren: () =>
@@ -37,13 +41,13 @@ export const routes: Routes = [
       {
         path: 'healthcare-organizer',
         loadChildren: () =>
-          import('./features/healthcare-organizer/healthcare-organizer.module').then(
-            (m) => m.HeathCareOrganizerModule
-          ),
+          import(
+            './features/healthcare-organizer/healthcare-organizer.module'
+          ).then((m) => m.HeathCareOrganizerModule),
       },
     ],
-
-  }, {
+  },
+  {
     path: 'auth',
     loadChildren: () =>
       import('./features/auth/auth.module').then((m) => m.AuthModule),

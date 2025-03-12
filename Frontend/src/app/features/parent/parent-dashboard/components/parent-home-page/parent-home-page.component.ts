@@ -4,6 +4,8 @@ import { Component } from '@angular/core';
   selector: 'app-parent-home-page',
   standalone: false,
   templateUrl: './parent-home-page.component.html',
-  styleUrl: './parent-home-page.component.css',
+  styleUrl: './parent-home-page.component.css'
 })
-export class ParentHomePageComponent {}
+export class ParentHomePageComponent {
+
+}
