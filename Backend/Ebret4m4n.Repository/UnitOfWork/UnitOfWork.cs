@@ -5,20 +5,21 @@ namespace Ebret4m4n.Repository.UnitOfWork;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private readonly IChildRepository _childRepo;
-    private readonly IHealthyReportRepository _healthyReportRepo;
-    private readonly IVaccineRepository _vaccineRepo;
-    private readonly IAppointmentRepository _appointmentRepo;
-    private readonly IHealthCareCenterRepository _healthCareCenterRepo;
-    private readonly IMedicalStaffRepository _medicalStaffRepo;
-    private readonly IGovernorateAdminStaffRepository _governorateAdminRepo;
-    private readonly ICityAdminStaffRepository _cityAdminRepo;
-    private readonly IComplaintRepo _complaintRepo;
-    private readonly IInventoryRepositpry _inventoryRepo;
-    private readonly IOrderRepository _orderRepo;
-    private readonly IMainInventoryRepository _mainInventoryRepo;
+    readonly IChildRepository _childRepo;
+    readonly IHealthyReportRepository _healthyReportRepo;
+    readonly IVaccineRepository _vaccineRepo;
+    readonly IAppointmentRepository _appointmentRepo;
+    readonly IHealthCareCenterRepository _healthCareCenterRepo;
+    readonly IMedicalStaffRepository _medicalStaffRepo;
+    readonly IGovernorateAdminStaffRepository _governorateAdminRepo;
+    readonly ICityAdminStaffRepository _cityAdminRepo;
+    readonly IComplaintRepo _complaintRepo;
+    readonly IInventoryRepositpry _inventoryRepo;
+    readonly IOrderRepository _orderRepo;
+    readonly IMainInventoryRepository _mainInventoryRepo;
+    readonly IChatRepository _chatRepo;
 
-    private readonly EbretAmanDbContext _dbContext;
+    readonly EbretAmanDbContext _dbContext;
 
     public UnitOfWork(EbretAmanDbContext dbContext)
     {
@@ -35,6 +36,7 @@ public class UnitOfWork : IUnitOfWork
         _inventoryRepo = new InventoryRepository(_dbContext);
         _orderRepo = new OrderRepository(_dbContext);
         _mainInventoryRepo = new MainInventoryRepository(_dbContext);
+        _chatRepo = new ChatRepository(_dbContext);
     }
 
     public EbretAmanDbContext Context => _dbContext;
@@ -62,6 +64,8 @@ public class UnitOfWork : IUnitOfWork
     public IOrderRepository OrderRepo => _orderRepo;
 
     public IMainInventoryRepository MainInventoryRepo => _mainInventoryRepo;
+
+    public IChatRepository ChatRepo => _chatRepo;
 
     public async Task<int> SaveAsync()
        => await _dbContext.SaveChangesAsync();

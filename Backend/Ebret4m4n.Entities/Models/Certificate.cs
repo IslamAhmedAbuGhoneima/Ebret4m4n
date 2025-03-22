@@ -7,7 +7,7 @@ public class Certificate
     #region Properties
     public Guid Id { get; set; }
 
-    public DateTime date { get; set; }
+    public DateTime Date { get; set; }
     #endregion
 
     #region Relations

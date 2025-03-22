@@ -7,7 +7,7 @@ public class HealthReportFile
     #region Properties
     public string FilePath { get; set; } = null!;
 
-    public DateTime UploadedOn { get; set; }
+    public DateTime UploadedOn { get; private set; } = DateTime.UtcNow;
     #endregion
 
     #region Relations

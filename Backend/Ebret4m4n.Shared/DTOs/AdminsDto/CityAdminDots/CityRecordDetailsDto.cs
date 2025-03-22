@@ -8,5 +8,5 @@ public record CityRecordDetailsDto
 
     public string Email { get; init; } = null!;
 
-    public List<MainInventoryDto> VaccineInventory { get; init; } = [];
+    public List<MainInventoryDto> VaccineInventory { get; set; } = [];
 }

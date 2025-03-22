@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Ebret4m4n.Entities.Models;
 
 public class Appointment

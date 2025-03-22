@@ -26,5 +26,7 @@ public interface IUnitOfWork
 
     IMainInventoryRepository MainInventoryRepo { get; }
 
+    IChatRepository ChatRepo { get; }
+
     Task<int> SaveAsync();
 }

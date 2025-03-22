@@ -7,12 +7,6 @@
     <UserSecretsId>d5349d62-d087-4034-b5f4-a740a3886a6e</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Images\**" />
-    <Content Remove="Images\**" />
-    <EmbeddedResource Remove="Images\**" />
-    <None Remove="Images\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Mapster" Version="7.4.0" />
@@ -27,6 +21,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Ebret4m4n.Repository\Ebret4m4n.Repository.csproj" />
     <ProjectReference Include="..\Ebret4m4n.Shared\Ebret4m4n.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ChildReports\" />
   </ItemGroup>
 
 </Project>

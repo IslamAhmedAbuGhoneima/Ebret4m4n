@@ -17,9 +17,11 @@ public class MainInventory
 
     [ForeignKey("CityAdminStaff")]
     public string? CityAdminStaffId { get; set; }
+    [DeleteBehavior(DeleteBehavior.NoAction)]
     public CityAdminStaff? CityAdminStaff { get; set; }
 
     [ForeignKey("GovernorateAdminStaff")]
     public string? GovernorateAdminStaffId { get; set; }
+    [DeleteBehavior(DeleteBehavior.NoAction)]
     public GovernorateAdminStaff? GovernorateAdminStaff { get; set; }
 }

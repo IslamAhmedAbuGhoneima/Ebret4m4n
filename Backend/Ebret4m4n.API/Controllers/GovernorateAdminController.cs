@@ -1,16 +1,17 @@
 ﻿using Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
-using Microsoft.AspNetCore.Authorization;
-using Ebret4m4n.Entities.Exceptions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Ebret4m4n.Entities.Models;
-using Microsoft.AspNetCore.Mvc;
-using Ebret4m4n.Contracts;
-using Ebret4m4n.Shared.DTOs;
-using Mapster;
-using System.Security.Claims;
-using Ebret4m4n.Shared.DTOs.OrderDtos;
-using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;           
+using Ebret4m4n.Shared.DTOs.OrderDtos;              
+using Ebret4m4n.Entities.Exceptions;                
+using Microsoft.AspNetCore.Identity;                
+using Microsoft.EntityFrameworkCore;                
+using Ebret4m4n.Entities.Models;                    
+using Microsoft.AspNetCore.Mvc;                     
+using System.Security.Claims;                       
+using Ebret4m4n.API.Utilites;                       
+using Ebret4m4n.Shared.DTOs;                        
+using Ebret4m4n.Contracts;                          
+using Mapster;                                      
+                                                        
 
 namespace Ebret4m4n.API.Controllers;
 
@@ -37,14 +38,15 @@ public class GovernorateAdminController
         return Ok(response);
     }
 
-    // Review
     [HttpGet("city-details")]
     public async Task<IActionResult> CityInfo([FromQuery] string cityName)
     {
-        var cityAdminId =
-             (await unitOfWork.CityAdminStaffRepo.FindAsync(C => C.City == cityName, false, "MainInventories")).UserId;
+        var cityAdminStaff =
+             await unitOfWork.CityAdminStaffRepo.FindAsync(C => C.City == cityName, false, ["MainInventories"]);
 
-        if (cityAdminId is null)
+        var cityAdminId = cityAdminStaff.UserId;
+
+        if (cityAdminStaff is null)
             throw new NotFoundBadRequest("لا يوجد ادمن لهذه المدينه");
 
         var cityAdmin = await userManager.FindByIdAsync(cityAdminId);
@@ -52,7 +54,11 @@ public class GovernorateAdminController
         if (cityAdmin is null)
             throw new BadRequestException("لا يوجد مدير لهذه المدينه الرجاء اضافه مدير");
 
+        var cityMainInventoryDto = cityAdminStaff.MainInventories.Adapt<List<MainInventoryDto>>();
+
         var cityDetails = cityAdmin.Adapt<CityRecordDetailsDto>();
+        
+        cityDetails.VaccineInventory = cityMainInventoryDto;
 
         var response = new GeneralResponse<CityRecordDetailsDto>(StatusCodes.Status200OK, cityDetails);
 
@@ -62,17 +68,78 @@ public class GovernorateAdminController
     [HttpGet("city-admins")]
     public IActionResult CityAdmins()
     {
-        var governorate = User.FindFirst("governorate")!.Value;
+        var governorateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
         var cityAdmins =
-            unitOfWork.CityAdminStaffRepo.FindByCondition(admin => admin.Governorate == governorate, false, "User")
-            .Select(admin => admin.User.UserName)
+            unitOfWork.CityAdminStaffRepo.FindByCondition(admin => admin.GovernorateAdminId == governorateAdminId, false, "User")
+            .Select(admin => new CityAdminsDto(admin.UserId, string.Join(' ', admin.User.FirstName, admin.User.LastName)))
             .ToList();
+            
 
         if (cityAdmins is null)
             throw new NotFoundException("لا يوجد مستخدمين مراكز لهذه المحافظه يمكنك اضافه مستخدمين");
 
-        var response = new GeneralResponse<List<string>>(StatusCodes.Status200OK, cityAdmins);
+        var response = new GeneralResponse<List<CityAdminsDto>>(StatusCodes.Status200OK, cityAdmins);
+
+        return Ok(response);
+    }
+
+    [HttpGet("requested-city-orders")]
+    public IActionResult RequestedCityOrders()
+    {
+        var governorateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        var cityAdminsOrders =
+            unitOfWork.OrderRepo.FindByCondition(order => order.CityAdminStaff.GovernorateAdminId == governorateAdminId, false, ["GovernorateAdminStaff"])
+            .ToList();
+
+        var cityAdminsOrdersDto = cityAdminsOrders.Adapt<List<OrderDto>>();
+
+        var response = new GeneralResponse<List<OrderDto>>(StatusCodes.Status200OK, cityAdminsOrdersDto);
+
+        return Ok(response);
+    }
+
+    [HttpGet("governorate-orders")]
+    public IActionResult Orders()
+    {
+        var goveronrateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var orders =
+            unitOfWork.OrderRepo.FindByCondition(order => order.GovernorateAdminStaffId == goveronrateAdminId, false);
+
+        var ordersDto = orders.Adapt<List<OrderDto>>();
+
+        var response = new GeneralResponse<List<OrderDto>>(StatusCodes.Status200OK, ordersDto);
+
+        return Ok(response);
+    }
+
+    [HttpPut("{orderId:guid}/marke-received-order")]
+    public async Task<IActionResult> MarkeReceivedOrder(Guid orderId)
+    {
+        var governorateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        var order =
+            await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, true);
+
+        if (order is null)
+            throw new NotFoundBadRequest($"لم نتمكن من ايجاد هذ الطلب");
+
+        var governorateInventory = await unitOfWork.MainInventoryRepo.FindAsync(inv => inv.GovernorateAdminStaffId == governorateAdminId
+        && inv.Antigen == order.Antigen, true);
+
+        governorateInventory.Amount += order.Amount;
+        order.Status = OrderStatus.Recived;
+
+        unitOfWork.MainInventoryRepo.Update(governorateInventory);
+        unitOfWork.OrderRepo.Update(order);
+
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم حفظ البيانات حاول مره اخري");
+
+        var response = new GeneralResponse<string>(StatusCodes.Status204NoContent, "تم استلام اللقاح بنجاح :)");
 
         return Ok(response);
     }
@@ -83,6 +150,7 @@ public class GovernorateAdminController
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
+        var governorateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
         var user = model.Adapt<ApplicationUser>();
 
@@ -95,7 +163,7 @@ public class GovernorateAdminController
         
         var cityAdmin = model.Adapt<CityAdminStaff>();
         cityAdmin.UserId = user.Id;
-
+        cityAdmin.GovernorateAdminId = governorateAdminId;
 
         await unitOfWork.CityAdminStaffRepo.AddAsync(cityAdmin);
         var dbResult = await unitOfWork.SaveAsync();
@@ -108,27 +176,6 @@ public class GovernorateAdminController
         return Ok(response);
     }
 
-    [HttpDelete("{cityAdminId:guid}/remove-admin")]
-    public async Task<IActionResult> DeleteCityAdmin(Guid cityAdminId)
-    {
-        var adminId = cityAdminId.ToString();
-        var cityAdmin =
-            await unitOfWork.CityAdminStaffRepo.FindAsync(admin => admin.UserId == adminId, false);
-
-        if (cityAdmin == null)
-            throw new NotFoundException("لم يتم العثور علي هذا المستخدم");
-
-        unitOfWork.CityAdminStaffRepo.Remove(cityAdmin);
-        var result = await unitOfWork.SaveAsync();
-
-        if (result == 0)
-            throw new BadRequestException("لم يتم حذف هذا المستخدم حاول مره اخري");
-
-        var response = new GeneralResponse<string>(StatusCodes.Status204NoContent, "تم حذف هذا المستخدم");
-
-        return Ok(response);
-    }
-
     [HttpPost("governorate-inventory-create")]
     public async Task<IActionResult> EstablishInventory()
     {
@@ -137,21 +184,11 @@ public class GovernorateAdminController
         var governorateAdmin = 
             await unitOfWork.GovernorateAdminRepo.FindAsync(admin => admin.UserId == governorateAdminId, false);
 
-        var antigenFilePath = Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "Antigens.json");
-
-        if (!Path.Exists(antigenFilePath))
-            throw new NotFoundException("لم يتم العثور علي السمتضاتات الخاصه بالقاحات");
-
-        using var stream = new FileStream(antigenFilePath, FileMode.Open);
-
-        var antigens = JsonSerializer.Deserialize<List<string>>(stream);
-
-        if (antigens == null)
-            throw new BadRequestException("لم ايجاد اي مستضادات لقاح");
+        var antigens = Utility.InventoryAntigens();
 
         List<MainInventory> inventoryAntigens = [];
 
-        foreach(var antigen in antigens)
+        foreach (var antigen in antigens)
         {
             var mainInventory = new MainInventory
             {
@@ -162,7 +199,7 @@ public class GovernorateAdminController
             };
 
             inventoryAntigens.Add(mainInventory);
-        }
+        } 
 
         await unitOfWork.MainInventoryRepo.AddRangeAsync(inventoryAntigens);
         var result = await unitOfWork.SaveAsync();
@@ -187,8 +224,8 @@ public class GovernorateAdminController
         if (antigen == null)
             throw new BadRequestException("لا يوجد مستضادات بهذا الاسم");
 
-        var order = 
-            new Order() { Antigen = antigenName, Amount = amount,Status = OrderStatus.Pending, GovernorateAdminStaffId = governorateAdminId };
+        var order =
+            new Order() { Antigen = antigenName, Amount = amount, Status = OrderStatus.Pending, GovernorateAdminStaffId = governorateAdminId };
 
         await unitOfWork.OrderRepo.AddAsync(order);
         var result = await unitOfWork.SaveAsync();
@@ -201,40 +238,60 @@ public class GovernorateAdminController
         return Ok(response);
     }
 
-    [HttpGet("governorate-antigens-order-pending")]
-    public IActionResult PendingOrders()
+    [HttpPost("{orderId:guid}/send-vaccine-order")]
+    public async Task<IActionResult> SendVaccineOrder(Guid orderId)
     {
-        var pendingOrders = Orders(OrderStatus.Pending);
-        var response = new GeneralResponse<List<OrderDto>>(StatusCodes.Status200OK, pendingOrders);
+        var governorateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        var order =
+            await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, true);
+
+        if (order is null)
+            throw new NotFoundBadRequest("لم يتم ايجاد هذا الطلب");
+
+        var governorateInventory = await unitOfWork.MainInventoryRepo.FindAsync(inv => inv.GovernorateAdminStaffId == governorateAdminId &&
+        inv.Antigen == order.Antigen, true);
+
+
+        if (governorateInventory.Amount < order.Amount)
+            throw new BadRequestException("الكميه الموجوده لهذا اللقاح غير كافيه لارسال هذا الطلب");
+
+        governorateInventory.Amount -= order.Amount;
+        order.Status = OrderStatus.Processing;
+
+        unitOfWork.OrderRepo.Update(order);
+        unitOfWork.MainInventoryRepo.Update(governorateInventory);
+
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم حفظ البيانات");
+
+        // send notification to city admin that his order is proccessing
+
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم قبول الطلب بنجاح جاري الارسال");
+
         return Ok(response);
     }
 
-    [HttpGet("governorate-antigens-order-accepted")]
-    public IActionResult AcceptedOrders()
+    [HttpDelete("{cityAdminId:guid}/remove-admin")]
+    public async Task<IActionResult> DeleteCityAdmin(Guid cityAdminId)
     {
-        var acceptedOrders = Orders(OrderStatus.Accepted);
-        var response = new GeneralResponse<List<OrderDto>>(StatusCodes.Status200OK, acceptedOrders);
+        var adminId = cityAdminId.ToString();
+        var cityAdmin =
+            await unitOfWork.CityAdminStaffRepo.FindAsync(admin => admin.UserId == adminId, false);
+
+        if (cityAdmin == null)
+            throw new NotFoundException("لم يتم العثور علي هذا المستخدم");
+
+        unitOfWork.CityAdminStaffRepo.Remove(cityAdmin);
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم حذف هذا المستخدم حاول مره اخري");
+
+        var response = new GeneralResponse<string>(StatusCodes.Status204NoContent, "تم حذف هذا المستخدم");
+
         return Ok(response);
-    }
-
-    [HttpGet("governorate-antigens-order-recived")]
-    public IActionResult RecivedOrders()
-    {
-        var recivedOrders = Orders(OrderStatus.Recived);
-        var response = new GeneralResponse<List<OrderDto>>(StatusCodes.Status200OK, recivedOrders);
-        return Ok(response);
-    }
-
-
-    private List<OrderDto> Orders(OrderStatus status)
-    {
-        var goveronrateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var pendingOrders =
-            unitOfWork.OrderRepo.FindByCondition(order => order.GovernorateAdminStaffId == goveronrateAdminId &&
-            order.Status == status, false);
-
-        var ordersDto = pendingOrders.Adapt<List<OrderDto>>();
-
-        return ordersDto;
     }
 }

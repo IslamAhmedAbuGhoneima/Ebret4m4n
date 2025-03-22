@@ -6,7 +6,7 @@ namespace Ebret4m4n.Entities.Models;
 public enum OrderStatus : byte
 {
     Pending,
-    Accepted,
+    Processing,
     Recived
 }
 
@@ -18,7 +18,9 @@ public class Order
 
     public uint Amount { get; set; }
 
-    public OrderStatus Status { get; set; }
+    public OrderStatus Status { get; set; } = OrderStatus.Pending;
+
+    public DateTime DateRequested { get; private set; } = DateTime.UtcNow;
 
     #region Relations
 

@@ -9,7 +9,7 @@ public class Complaint
 
     public string Message { get; set; } = null!;
 
-    public DateTime DateSubmitted { get; private set; } = DateTime.Now;
+    public DateTime DateSubmitted { get; private set; } = DateTime.UtcNow;
     #endregion
 
     #region Relations

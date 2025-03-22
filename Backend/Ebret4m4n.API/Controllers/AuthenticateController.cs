@@ -120,7 +120,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         var token = await userManager.GeneratePasswordResetTokenAsync(_user);
 
-        var callbackUrl = Url.Action("ResetPassword", "Authenticate",
+        var callbackUrl = Url.Action("ResetPassword", "Authentication",
             new { userId = _user.Id, token = token }, protocol: HttpContext.Request.Scheme);
         
         string email = model.Email;

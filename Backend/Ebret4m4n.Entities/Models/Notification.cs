@@ -10,6 +10,10 @@ public class Notification
     public string Title { get; set; } = null!;
 
     public string Message { get; set; } = null!;
+
+    public DateTime RecievedAt { get; private set; } = DateTime.UtcNow;
+
+    public bool IsRead { get; set; } = false;
     #endregion
 
     #region Relations

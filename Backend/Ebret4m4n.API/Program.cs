@@ -1,4 +1,5 @@
 using Ebret4m4n.API.Extenstions;
+using Ebret4m4n.API.Hubs;
 using Ebret4m4n.API.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,7 @@ builder.Services.AddJwtConfiguration(builder.Configuration);
 builder.Services.AddEmailSettingsConfiguration(builder.Configuration);
 builder.Services.ConfigureTokenLifespan();
 
+builder.Services.AddSignalRConfiguration();
 
 // Register Mapster
 MapsterConfig.RegisterMappings();
@@ -49,5 +51,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chat");
+app.MapHub<NotificationHub>("/notification");
 
 app.Run();

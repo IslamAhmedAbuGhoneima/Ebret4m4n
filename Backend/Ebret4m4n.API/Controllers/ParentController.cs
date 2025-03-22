@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Ebret4m4n.Contracts;
+using Ebret4m4n.Shared.DTOs.SignalRDtos;
+using Ebret4m4n.Shared.DTOs.ParentDtos;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
-using Ebret4m4n.Shared.DTOs;
-using Ebret4m4n.Shared.DTOs.ParentDtos;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using Ebret4m4n.Shared.DTOs;
+using Ebret4m4n.Contracts;
 using Mapster;
 
 namespace Ebret4m4n.API.Controllers;
@@ -69,21 +70,19 @@ public class ParentController
         return Ok(response);
     }
 
-    [HttpDelete("{id:guid}/appointment-cancle")]
-    public async Task<IActionResult> AppointmentCancle(Guid id)
+    [HttpGet("{reciverId:guid}/user-messages")]
+    public IActionResult GetChatMessages(Guid reciverId)
     {
-        var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.Id == id, true);
+        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        if (appointment == null)
-            throw new NotFoundBadRequest("لا يوجد موعد خاص بهذا المستخدم");
+        var messages = unitOfWork.ChatRepo.FindByCondition(message => message.SenderId == parentId
+        && message.ReceiverId == reciverId.ToString(), false);
 
-        unitOfWork.AppointmentRepo.Remove(appointment);
-        var result = await unitOfWork.SaveAsync();
+        var messagesDto = messages.Adapt<List<ChatMessageDto>>();
 
-        if (result == 0)
-            throw new BadRequestException("لم يتم الغاء المعاد حاول مره اخري");
+        var response = new GeneralResponse<List<ChatMessageDto>>(StatusCodes.Status200OK, messagesDto);
 
-        return NoContent();
+        return Ok(response);
     }
 
     [HttpGet("Submit-Complaint")]
@@ -118,5 +117,22 @@ public class ParentController
         await unitOfWork.ComplaintRepo.AddAsync(complaint);
         await unitOfWork.SaveAsync();
         return Ok(complaint);
+    }
+
+    [HttpDelete("{id:guid}/appointment-cancle")]
+    public async Task<IActionResult> AppointmentCancle(Guid id)
+    {
+        var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.Id == id, true);
+
+        if (appointment == null)
+            throw new NotFoundBadRequest("لا يوجد موعد خاص بهذا المستخدم");
+
+        unitOfWork.AppointmentRepo.Remove(appointment);
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم الغاء المعاد حاول مره اخري");
+
+        return NoContent();
     }
 }

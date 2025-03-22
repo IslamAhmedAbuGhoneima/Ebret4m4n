@@ -1,21 +1,19 @@
-﻿using Ebret4m4n.API.ChildBaseVaccines;
-using Ebret4m4n.Entities.Exceptions;
+﻿using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using System.Text.Json;
-using Mapster;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.Shared.DTOs;
-
+using Ebret4m4n.API.Utilites;
+using Mapster;
 
 namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Roles ="parent")]
 [ApiController]
 public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 {
@@ -54,7 +52,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     }
 
     [HttpPost("child-add")]
-    public async Task<IActionResult> AddChild([FromBody]AddChildDto dto)
+    public async Task<IActionResult> AddChild([FromForm]AddChildDto dto)
     {
         if(!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
@@ -70,16 +68,15 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         var child = (dto,parentId).Adapt<Child>();
 
-        if(dto.healthReportFiles == null && dto.PatientHistory == null)
+        if(dto.ReportFiles == null && dto.PatientHistory == null)
         {
-            var vaccines = ReadVaccinesFromJsonFile(dto.vaccines, child.Id);
-
+            var vaccines = ReadVaccinesFromJsonFile(dto.Vaccines, child.Id);
             await unitOfWork.VaccineRepo.AddRangeAsync(vaccines);
         }
 
-        if (dto.healthReportFiles != null) 
+        if (dto.ReportFiles != null) 
         {
-            var childReports = SaveReportFiles(dto.healthReportFiles, dto.Id);
+            var childReports = SaveReportFiles(dto.ReportFiles, dto.Id);
             await unitOfWork.HealthyReportRepo.AddRangeAsync(childReports);
         }
 
@@ -146,51 +143,38 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
-
         
         var healthReports = new List<HealthReportFile>();
 
         foreach (var file in imageFiles)
         {
-            if (file.Length <= 5120)
+            if (file.Length <= 5_242_880) 
             {
                 var fileName = Guid.NewGuid().ToString();
                 var fileExtenstion = Path.GetExtension(file.FileName);
 
-                var reportPath = Path.Combine(path, fileName, fileExtenstion);
+                var reportPath = Path.Combine(path, $"{fileName}{fileExtenstion}");
 
-                using(var stream = new FileStream(path, FileMode.Create))
+                using(var stream = new FileStream(reportPath, FileMode.Create))
                 {
                     file.CopyTo(stream);
                 }
 
                 healthReports.Add(new HealthReportFile
                 {
-                    FilePath = Path.Combine($"/ChildReports/{fileName}{fileExtenstion}"),
+                    FilePath = $"/ChildReports/{fileName}{fileExtenstion}",
                     ChildId = childId
                 });
             }
             else
-                throw new FileLoadException("file size to large");
+                throw new FileLoadException("لا يمكن تحميل الملف بهذا الحجم");
         }
         return healthReports;
     }
 
     private List<Vaccine> ReadVaccinesFromJsonFile(List<string>? childVaccines, string childId)
     {
-        string path =
-                Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "vaccines.json");
-
-        if (!Path.Exists(path))
-            throw new FileNotFoundException("لم يتم استرجاع القاحات الرجاء التواصل مع الدعم الفني");
-
-        using var strem = new FileStream(path, FileMode.Open);
-        var baseVaccines = JsonSerializer.Deserialize<List<BaseVaccine>>(strem);
-
-        if(baseVaccines == null)
-            throw new BadRequestException("حدث خطا ما اثناء تسجيل الطفل الرجاء الاتصال بالدعم الفني للمساعده");
-
-        var vaccines = baseVaccines.Adapt<List<Vaccine>>();
+        var vaccines = Utility.ChildBaseVaccines();
 
         foreach (var vaccine in vaccines)
             vaccine.ChildId = childId;
@@ -200,6 +184,11 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
             foreach (var vaccineName in childVaccines)
             {
                 var vaccine = vaccines.FirstOrDefault(v => v.Name == vaccineName);
+
+                if (vaccine is null)
+                    throw new BadRequestException("لايوجد لقاح بهذا الاسم تاكد من ان اسماء اللقاحات المختاره صحيحه");
+
+                vaccine.IsTaken = true;
             }
         }
         return vaccines;

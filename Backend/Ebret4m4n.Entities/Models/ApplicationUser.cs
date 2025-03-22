@@ -24,7 +24,6 @@ public class ApplicationUser : IdentityUser
     public DateTime RefreshTokenExpiryTime { get; set; }
     #endregion
 
-
     #endregion
 
     #region Relations

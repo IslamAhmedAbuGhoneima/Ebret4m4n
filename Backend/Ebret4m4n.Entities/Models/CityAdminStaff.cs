@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ebret4m4n.Entities.Models;
@@ -14,6 +15,11 @@ public class CityAdminStaff
 
     [MaxLength(150)]
     public string City { get; set; } = null!;
+
+    [ForeignKey("GovernorateAdminStaff")]
+    public string? GovernorateAdminId { get; set; }
+    [DeleteBehavior(DeleteBehavior.NoAction)]
+    public GovernorateAdminStaff? GovernorateAdminStaff { get; set; }
 
     public ICollection<MainInventory>? MainInventories { get; set; }
 }

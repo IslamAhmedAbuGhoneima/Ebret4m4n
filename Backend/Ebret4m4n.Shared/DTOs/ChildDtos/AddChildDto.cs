@@ -25,7 +25,7 @@ public record AddChildDto
 
     public string? PatientHistory { get; init; }
 
-    public List<IFormFile>? healthReportFiles { get; init; }
+    public List<IFormFile>? ReportFiles { get; init; }
 
-    public List<string>? vaccines { get; init; }
+    public List<string>? Vaccines { get; init; }
 }

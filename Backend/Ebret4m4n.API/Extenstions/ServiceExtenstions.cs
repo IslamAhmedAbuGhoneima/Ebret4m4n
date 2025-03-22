@@ -26,6 +26,7 @@ public static class ServiceExtenstions
                 builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader()
+                    
             )
         );
 
@@ -92,4 +93,7 @@ public static class ServiceExtenstions
 
     public static void UnitOfWorkConfiguration(this IServiceCollection service)
         => service.AddScoped<IUnitOfWork, UnitOfWork>();
+
+    public static void AddSignalRConfiguration(this IServiceCollection service)
+        => service.AddSignalR(config => config.EnableDetailedErrors = true);
 }

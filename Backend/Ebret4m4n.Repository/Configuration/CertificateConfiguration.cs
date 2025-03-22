@@ -10,7 +10,7 @@ public class CertificateConfiguration : IEntityTypeConfiguration<Certificate>
     public void Configure(EntityTypeBuilder<Certificate> builder)
     {
        
-        builder.Property(p => p.date)
+        builder.Property(p => p.Date)
             .IsRequired();
 
         builder.HasIndex(p => p.ChildId);
