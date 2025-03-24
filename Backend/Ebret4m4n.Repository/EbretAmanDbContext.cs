@@ -40,6 +40,7 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<MainInventory> MainInventory { get; set; }
 
     public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderItem> orderItems { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

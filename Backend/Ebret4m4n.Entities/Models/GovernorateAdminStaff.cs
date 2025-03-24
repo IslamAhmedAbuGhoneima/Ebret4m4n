@@ -13,7 +13,9 @@ public class GovernorateAdminStaff
     public string Governorate { get; set; } = null!;
 
     public ICollection<CityAdminStaff> CityAdminStaffs { get; set; } = [];
+	public ICollection<Order> Orders { get; set; }
 
-    public ICollection<MainInventory>? MainInventories { get; set; } = [];
+
+	public ICollection<MainInventory>? MainInventories { get; set; } = [];
 
 }

@@ -13,14 +13,10 @@ public enum OrderStatus : byte
 public class Order
 {
     public Guid Id { get; set; }
-
-    public string Antigen { get; set; } = null!;
-
-    public uint Amount { get; set; }
-
-    public OrderStatus Status { get; set; } = OrderStatus.Pending;
+	public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
     public DateTime DateRequested { get; private set; } = DateTime.UtcNow;
+    public DateTime? DateApproved { get; set; }
 
     #region Relations
 
@@ -37,5 +33,7 @@ public class Order
     public string? GovernorateAdminStaffId { get; set; }
     public GovernorateAdminStaff? GovernorateAdminStaff { get; set; }
 
-    #endregion
+	public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+	#endregion
 }

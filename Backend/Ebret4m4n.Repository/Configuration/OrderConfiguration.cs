@@ -11,7 +11,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(O => O.Status)
             .HasConversion<string>();
 
-        builder.Property(O => O.Antigen)
-            .HasMaxLength(50);
+        
     }
 }

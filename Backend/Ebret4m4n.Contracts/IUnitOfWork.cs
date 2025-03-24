@@ -23,8 +23,10 @@ public interface IUnitOfWork
     IInventoryRepositpry InventoryRepo { get; }
 
     IOrderRepository OrderRepo { get; }
+    IOrderItemRepository OrderItemRepo { get; }
 
     IMainInventoryRepository MainInventoryRepo { get; }
+    IMedicalStaffRepository MedicalStaffRepo { get; }
 
     IChatRepository ChatRepo { get; }
 

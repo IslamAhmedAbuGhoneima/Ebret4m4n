@@ -7,6 +7,8 @@ namespace Ebret4m4n.Entities.Models;
 [PrimaryKey("InventoryLocation", "Antigen")]
 public class MainInventory
 {
+
+
     [MaxLength(150)]
     public string InventoryLocation { get; set; } = null!;
 

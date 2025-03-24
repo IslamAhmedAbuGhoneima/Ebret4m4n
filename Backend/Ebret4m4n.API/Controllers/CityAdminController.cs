@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Mapster;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Identity;
+using Ebret4m4n.Shared.DTOs.OrderDtos;
+using System.Security.Claims;
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -151,9 +153,181 @@ public class CityAdminController
         return Ok();
     }
 
-    [HttpPost("{vaccineId:guid}/send-vaccine")]
-    public IActionResult SendVaccine(Guid vaccineId , int amount)
+    [HttpPost("create-order")]
+    public async Task<IActionResult> CreateOrder([FromBody] List<OrderDto> orderItems)
     {
+
+        var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+
+        if (orderItems == null)
+            return BadRequest("الطلب لا يحتوى على اى عناصر");
+
+        Order order = new Order
+        {
+            Status = OrderStatus.Pending,
+            CityAdminStaffId = AdminId,
+           
+        };
+
+        foreach (var item in orderItems)
+        {
+            OrderItem orderr = new OrderItem
+            {
+                orderId = order.Id,
+                Antigen = item.Antigen,
+                Amount = item.Amount,
+            };
+            await unitOfWork.OrderItemRepo.AddAsync(orderr);
+            order.OrderItems.Add(orderr);
+        }
+
+        await unitOfWork.OrderRepo.AddAsync(order);
+        unitOfWork.SaveAsync();
+
         return Ok();
-    } 
+    }
+
+
+    [HttpPost("confirm-order")]
+    public async Task<IActionResult> ConfirmOrder(Guid OrderId)
+    {
+
+		var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+        var Order = await unitOfWork.OrderRepo.FindAsync(e => e.Id == OrderId, false, ["OrderItems"]);
+        var Inventory = unitOfWork.MainInventoryRepo.FindByCondition(e => e.CityAdminStaffId == AdminId, false);
+          
+        foreach (var item in Order.OrderItems)
+        {
+            var ItemDb=Inventory.FirstOrDefault(e=>e.Antigen == item.Antigen);
+			if(ItemDb.Amount<item.Amount)
+            {
+
+            }
+			
+        }
+
+        Order.Status = OrderStatus.Processing;
+        Order.DateApproved= DateTime.UtcNow;
+
+        return Ok("تم قبول الطلب");
+
+	}
+
+    [HttpPost("get-order")]
+    public async Task<IActionResult> GetOrder(Guid OrderId)
+    {
+		var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        if (AdminId == null)
+        {
+            return BadRequest("لا يوجد ادمن لهذا المركز");
+        }
+		var Order = await unitOfWork.OrderRepo.FindAsync(e => e.Id == OrderId, false, ["OrderItems"]);
+        if(Order == null)
+        {
+            return BadRequest("لم يتم العثور على الطلب ");
+        }
+
+        var OrganizerId=Order.MedicalStaffId;
+        var Organizer = await unitOfWork.MedicalStaffRepo.FindAsync(e => e.UserId == OrganizerId,false);
+
+        OrderDetailsDto OrderDetailsDto = new OrderDetailsDto()
+        {
+            HealthCareCenterName = Organizer.HealthCareCenterName,
+            HealthCareCenterGovernorate = Organizer.HealthCareCenterGovernorate,
+            HealthCareCenterCity = Organizer.HealthCareCenterCity,
+            HealthCareCenterVillage = Organizer.HealthCareCenterVillage
+        };
+
+        foreach(var item in Order.OrderItems)
+        {
+			OrderDetailsDto.OrderItems.Add(item);
+
+		}
+
+        return Ok(OrderDetailsDto);
+
+
+	}
+    [HttpGet("get-all-oeders-sent")]
+    public async Task<IActionResult> GetAllOrdersSent()
+    {
+		var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+		if (AdminId == null)
+		{
+			return BadRequest("لا يوجد ادمن لهذا المركز");
+		}
+
+        var Orders=  unitOfWork.OrderRepo.FindByCondition(e=>e.CityAdminStaffId == AdminId,false, "OrderItems");
+
+        if (Orders == null)
+        {
+            return BadRequest("لا يوجد طلبات مرسلة من هذا المركز");
+        }
+
+        IList<MyOrderDetailsDto> MyorderDetailsDtos = new List<MyOrderDetailsDto>();
+
+        foreach (var item in Orders) 
+        {
+            MyOrderDetailsDto orderDetailsDto = new MyOrderDetailsDto()
+            {
+                Status = item.Status,
+                DateApproved = item.DateApproved,
+                DateRequested = item.DateRequested,
+            };
+            foreach(var item2 in item.OrderItems)
+            {
+				orderDetailsDto.OrderItems.Add(item2);
+
+			}
+            MyorderDetailsDtos.Add(orderDetailsDto);
+
+		}
+        return Ok(MyorderDetailsDtos);
+	}
+
+
+
+    [HttpGet]
+    public async Task<IActionResult>GetAllOrdersRecived()
+    {
+		var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+		if (AdminId == null)
+		{
+			return BadRequest("لا يوجد ادمن لهذا المركز");
+		}
+
+        var Admin = await unitOfWork.MedicalStaffRepo.FindAsync(e => e.UserId == AdminId, false);
+
+        var CityAdmin = Admin.HealthCareCenterCity;
+
+        var Orders = unitOfWork.OrderRepo.FindByCondition(e => e.MedicalStaffId != null && e.MedicalStaff.HealthCareCenterCity==CityAdmin, false);
+		var Organizer = await unitOfWork.MedicalStaffRepo.FindAsync(e => e.HealthCareCenterCity==CityAdmin, false);
+
+
+		List<OrderDetailsDto> orderDetailsDtos = new List<OrderDetailsDto>();
+        foreach(var order in  Orders)
+        {
+            var orderi = new OrderDetailsDto()
+            {
+                HealthCareCenterName = Organizer.HealthCareCenterCity,
+                HealthCareCenterCity = Organizer.HealthCareCenterCity,
+                HealthCareCenterGovernorate = Organizer.HealthCareCenterGovernorate,
+                HealthCareCenterVillage = Organizer.HealthCareCenterVillage
+            };
+
+			foreach (var item in order.OrderItems)
+			{
+				orderi.OrderItems.Add(item);
+
+			}
+            orderDetailsDtos.Add(orderi);
+		}
+	
+        return Ok(orderDetailsDtos);
+	}
+
+
+
 }

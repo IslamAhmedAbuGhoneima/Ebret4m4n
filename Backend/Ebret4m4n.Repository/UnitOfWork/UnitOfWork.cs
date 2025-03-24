@@ -17,7 +17,9 @@ public class UnitOfWork : IUnitOfWork
     readonly IInventoryRepositpry _inventoryRepo;
     readonly IOrderRepository _orderRepo;
     readonly IMainInventoryRepository _mainInventoryRepo;
+    readonly IMedicalStaffRepository _mediicalStaffRepo;
     readonly IChatRepository _chatRepo;
+    readonly IOrderItemRepository _orderItemRepo;
 
     readonly EbretAmanDbContext _dbContext;
 
@@ -37,6 +39,8 @@ public class UnitOfWork : IUnitOfWork
         _orderRepo = new OrderRepository(_dbContext);
         _mainInventoryRepo = new MainInventoryRepository(_dbContext);
         _chatRepo = new ChatRepository(_dbContext);
+        _orderItemRepo = new OrderItemRepository(_dbContext);
+        _medicalStaffRepo = new MedicalStaffRepository(_dbContext);
     }
 
     public EbretAmanDbContext Context => _dbContext;
@@ -62,9 +66,11 @@ public class UnitOfWork : IUnitOfWork
     public IInventoryRepositpry InventoryRepo => _inventoryRepo;
 
     public IOrderRepository OrderRepo => _orderRepo;
+    public IOrderItemRepository OrderItemRepo => _orderItemRepo;
 
     public IMainInventoryRepository MainInventoryRepo => _mainInventoryRepo;
 
+    public IMedicalStaffRepository mMdicalStaffRepository => _medicalStaffRepo;
     public IChatRepository ChatRepo => _chatRepo;
 
     public async Task<int> SaveAsync()

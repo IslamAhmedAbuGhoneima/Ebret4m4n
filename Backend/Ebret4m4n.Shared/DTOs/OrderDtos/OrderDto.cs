@@ -1,3 +1,7 @@
 ﻿namespace Ebret4m4n.Shared.DTOs.OrderDtos;
 
-public record OrderDto(Guid Id,string Antigen, uint Amount, string Status,DateTime DateRequested);
+public record OrderDto
+{
+	public string Antigen {  get; set; }
+	public uint Amount { get; set; }
+}

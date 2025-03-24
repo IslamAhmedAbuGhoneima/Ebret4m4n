@@ -27,6 +27,8 @@ public class MedicalStaff
 
     // key of HealthCare he work in
     public Guid? HCCenterId { get; set; }
+	public ICollection<Order> Orders { get; set; }
 
-    #endregion
+
+	#endregion
 }
