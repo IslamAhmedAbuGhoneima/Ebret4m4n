@@ -28,12 +28,10 @@ public class Order
     public string? CityAdminStaffId { get; set; }
     public CityAdminStaff? CityAdminStaff { get; set; }
 
-
     [ForeignKey("GovernorateAdminStaff")]
     public string? GovernorateAdminStaffId { get; set; }
     public GovernorateAdminStaff? GovernorateAdminStaff { get; set; }
 
-	public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-
+	public ICollection<OrderItem> OrderItems { get; set; } = [];
 	#endregion
 }

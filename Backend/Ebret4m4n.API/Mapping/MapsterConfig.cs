@@ -3,10 +3,12 @@ using Ebret4m4n.API.ChildBaseVaccines;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
-using Mapster;
-using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
+using Mapster;
+using Ebret4m4n.Shared.DTOs.OrderDtos;
+using Ebret4m4n.Shared.DTOs.MedicalStaffDtos;
+
 
 namespace Ebret4m4n.API.Mapping;
 
@@ -15,15 +17,15 @@ public static class MapsterConfig
     public static void RegisterMappings()
     {
         TypeAdapterConfig<RegisterDto, ApplicationUser>.NewConfig()
-            .Map(dest => dest.UserName, src => $"{src.FirstName} {src.LastName}");
+            .Map(dest => dest.UserName, src => src.Email);
 
         TypeAdapterConfig<AddCityAdminDto, ApplicationUser>.NewConfig()
-            .Map(dest => dest.UserName, src => $"{src.FirstName} {src.LastName}");
+            .Map(dest => dest.UserName, src => src.Email);
 
 
         TypeAdapterConfig<MedicalStaffDto, ApplicationUser>.NewConfig()
-            .Map(dest => dest.UserName, src => $"{src.FirstName} {src.LastName}");
-            
+            .Map(dest => dest.UserName, src => src.Email);
+
 
         TypeAdapterConfig<(AddChildDto childDtod, string parentId), Child>
             .NewConfig()
@@ -65,7 +67,7 @@ public static class MapsterConfig
             src => Math.Floor((src.Date - DateTime.Today).TotalDays))
             .Map(dest => dest, src => src);
 
-        TypeAdapterConfig<(ApplicationUser user, HealthCareCenter hcCenter,string MedicalNumber), MedicalStaff>.NewConfig()
+        TypeAdapterConfig<(ApplicationUser user, HealthCareCenter hcCenter, string MedicalNumber), MedicalStaff>.NewConfig()
             .Map(dest => dest.UserId, src => src.user.Id)
             .Map(dest => dest.HealthCareCenterGovernorate, src => src.hcCenter.Governorate)
             .Map(dest => dest.HealthCareCenterCity, src => src.hcCenter.City)
@@ -84,5 +86,15 @@ public static class MapsterConfig
         TypeAdapterConfig<(Complaint complaint, HealthCareCenter hcCenter), ComplaintDto>.NewConfig()
             .Map(dest => dest.HCLocation, src => $"{src.hcCenter.Governorate},{src.hcCenter.City},{src.hcCenter.Village}")
             .Map(dest => dest, src => src.hcCenter);
+
+
+        TypeAdapterConfig<Order, CityOrderDetails>.NewConfig()
+            .Map(dest => dest.City, src => src.CityAdminStaff.City)
+            .Map(dest => dest, src => src);
+
+        TypeAdapterConfig<Order, HealthCareOrdersDto>.NewConfig()
+            .Map(dest => dest.HealthCareCenterName, src => src.MedicalStaff.HealthCareCenterName)
+            .Map(dest => dest, src => src);
+
     }
 }

@@ -1,6 +1,8 @@
+using Ebret4m4n.Repository.Configuration.DataSeed;
 using Ebret4m4n.API.Extenstions;
 using Ebret4m4n.API.Hubs;
 using Ebret4m4n.API.Mapping;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,5 +56,12 @@ app.MapControllers();
 
 app.MapHub<ChatHub>("/chat");
 app.MapHub<NotificationHub>("/notification");
+
+// Ensure the database is created and seed data
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await SeedData.CreateAdminUser(services, builder.Configuration);
+}
 
 app.Run();

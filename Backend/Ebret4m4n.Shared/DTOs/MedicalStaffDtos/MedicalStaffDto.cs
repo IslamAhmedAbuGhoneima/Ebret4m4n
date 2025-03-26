@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Ebret4m4n.Shared.DTOs;
+namespace Ebret4m4n.Shared.DTOs.MedicalStaffDtos;
 
 public record MedicalStaffDto
 {

@@ -7,10 +7,8 @@ namespace Ebret4m4n.Repository.Configuration;
 public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
-    {
+    {        
         builder.Property(O => O.Status)
             .HasConversion<string>();
-
-        
     }
 }

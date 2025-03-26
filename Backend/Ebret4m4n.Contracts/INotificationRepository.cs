@@ -2,6 +2,6 @@
 
 namespace Ebret4m4n.Contracts;
 
-public interface IOrderItemRepository : IBaseRepository<OrderItem>
+public interface INotificationRepository : IBaseRepository<Notification>
 {
 }

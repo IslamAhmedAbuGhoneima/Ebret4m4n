@@ -43,4 +43,16 @@ public class Utility
 
         return vaccines;
     }
+
+    public static Notification CreateNotification(string title, string message, string userId)
+    {
+        var notification = new Notification
+        {
+            Title = title,
+            Message = message,
+            UserId = userId
+        };
+
+        return notification;
+    }
 }

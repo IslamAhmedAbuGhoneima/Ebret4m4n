@@ -1,5 +1,6 @@
 ﻿using Ebret4m4n.Contracts;
 using Ebret4m4n.Repository.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Ebret4m4n.Repository.UnitOfWork;
 
@@ -17,11 +18,13 @@ public class UnitOfWork : IUnitOfWork
     readonly IInventoryRepositpry _inventoryRepo;
     readonly IOrderRepository _orderRepo;
     readonly IMainInventoryRepository _mainInventoryRepo;
-    readonly IMedicalStaffRepository _mediicalStaffRepo;
     readonly IChatRepository _chatRepo;
     readonly IOrderItemRepository _orderItemRepo;
+    readonly INotificationRepository _notificationRepo;
 
     readonly EbretAmanDbContext _dbContext;
+    private IDbContextTransaction? _transaction;
+
 
     public UnitOfWork(EbretAmanDbContext dbContext)
     {
@@ -41,9 +44,8 @@ public class UnitOfWork : IUnitOfWork
         _chatRepo = new ChatRepository(_dbContext);
         _orderItemRepo = new OrderItemRepository(_dbContext);
         _medicalStaffRepo = new MedicalStaffRepository(_dbContext);
+        _notificationRepo = new NotificationRepository(_dbContext);
     }
-
-    public EbretAmanDbContext Context => _dbContext;
 
     public IChildRepository ChildRepo => _childRepo;
 
@@ -66,12 +68,35 @@ public class UnitOfWork : IUnitOfWork
     public IInventoryRepositpry InventoryRepo => _inventoryRepo;
 
     public IOrderRepository OrderRepo => _orderRepo;
+
     public IOrderItemRepository OrderItemRepo => _orderItemRepo;
 
     public IMainInventoryRepository MainInventoryRepo => _mainInventoryRepo;
 
-    public IMedicalStaffRepository mMdicalStaffRepository => _medicalStaffRepo;
     public IChatRepository ChatRepo => _chatRepo;
+
+    public INotificationRepository NotificationRepo => _notificationRepo;
+
+    public async Task BeginTransactionAsync()
+        => _transaction = await _dbContext.Database.BeginTransactionAsync();
+
+    public async Task CommitTransactionAsync()
+    {
+        if(_transaction is not null)
+        {
+            await _transaction.CommitAsync();
+            await _transaction.DisposeAsync();
+        }
+    }
+
+    public async Task RollbackTransactionAsync()
+    {
+        if (_transaction is not null)
+        {
+            await _transaction.RollbackAsync();
+            await _transaction.DisposeAsync();
+        }
+    }
 
     public async Task<int> SaveAsync()
        => await _dbContext.SaveChangesAsync();

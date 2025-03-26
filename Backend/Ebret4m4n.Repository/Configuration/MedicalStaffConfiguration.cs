@@ -29,5 +29,13 @@ public class MedicalStaffConfiguration : IEntityTypeConfiguration<MedicalStaff>
         builder.Property(p => p.SecondDay)
             .HasConversion<string>()
             .IsRequired();
+
+        builder.Property(p => p.StaffRole)
+            .HasConversion<string>()
+            .IsRequired();
+
+        builder.HasOne(p => p.CityAdminStaff)
+            .WithMany()
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -3,6 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ebret4m4n.Entities.Models;
 
+public enum StaffRole
+{
+    Doctor,
+    Organizer,
+}
+
 public class MedicalStaff 
 {
     #region Properties
@@ -19,7 +25,7 @@ public class MedicalStaff
 
     public string? HealthCareCenterVillage { get; set; }
 
-    public string StaffRole { get; set; } = null!;
+    public StaffRole StaffRole { get; set; } 
 
     public DayOfWeek FirstDay { get; set; }
 
@@ -29,6 +35,8 @@ public class MedicalStaff
     public Guid? HCCenterId { get; set; }
 	public ICollection<Order> Orders { get; set; }
 
-
+    [ForeignKey("CityAdminStaff")]
+    public string CityAdminStaffId { get; set; } = null!;
+    public CityAdminStaff CityAdminStaff { get; set; }
 	#endregion
 }

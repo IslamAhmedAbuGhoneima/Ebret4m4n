@@ -19,7 +19,8 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
         builder.Property(e => e.UserName)
             .HasMaxLength(250)
-            .IsRequired(false);
+            .IsRequired(false)
+            .HasDefaultValue(null);
 
 
         builder.Property(e => e.Governorate)

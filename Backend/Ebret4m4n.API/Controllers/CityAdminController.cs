@@ -1,15 +1,22 @@
-﻿using Ebret4m4n.Contracts;
-using Ebret4m4n.Entities.Exceptions;
-using Ebret4m4n.Shared.DTOs;
+﻿using Ebret4m4n.Shared.DTOs.MedicalStaffDtos;
+using Ebret4m4n.Shared.DTOs.InventoriesDtos;
+using Ebret4m4n.Shared.DTOs.HealthCareDtos;
 using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+using Ebret4m4n.Shared.DTOs.SignalRDtos;
+using Ebret4m4n.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Mapster;
-using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Identity;
-using Ebret4m4n.Shared.DTOs.OrderDtos;
+using Microsoft.AspNetCore.SignalR;
+using Ebret4m4n.Entities.Models;
+using Microsoft.AspNetCore.Mvc;
+using Ebret4m4n.API.Utilites;
 using System.Security.Claims;
+using Ebret4m4n.Shared.DTOs;
+using Ebret4m4n.Contracts;
+using Ebret4m4n.API.Hubs;
+using Mapster;
+
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -18,7 +25,9 @@ namespace Ebret4m4n.API.Controllers;
 [Authorize(Roles = "cityAdmin")]
 [ApiController]
 public class CityAdminController
-    (IUnitOfWork unitOfWork,UserManager<ApplicationUser> userManager) : ControllerBase
+    (IUnitOfWork unitOfWork, 
+    UserManager<ApplicationUser> userManager,
+    IHubContext<NotificationHub> hubContext) : ControllerBase
 {
 
     [HttpGet("healthcareCenter-village")]
@@ -28,48 +37,57 @@ public class CityAdminController
 
         var healthCareCenters = await unitOfWork.HealthCareCenterRepo
             .FindByCondition(hc => hc.City == city, false)
-            .Select(hc => hc.Village)
+            .Select(hc => new HealthCaresListDto(hc.HealthCareCenterId,hc.HealthCareCenterName))
             .ToListAsync();
 
-        return Ok(healthCareCenters);
+        if (healthCareCenters is null)
+            throw new BadRequestException("لم يتم اضافه اي وحدات صحيه بعد لهذا المركز");
+
+        var response = new GeneralResponse<List<HealthCaresListDto>>(StatusCodes.Status200OK, healthCareCenters);
+
+        return Ok(response);
     }
 
     [HttpGet("{id:guid}/healthCareCenter")]
     public async Task<IActionResult> HealthCareDetails(Guid id)
     {
-        
         var healthCareCenter = await unitOfWork.HealthCareCenterRepo
-            .FindAsync(hc => hc.HealthCareCenterId == id, false);
+            .FindAsync(hc => hc.HealthCareCenterId == id, false, ["Inventories"]);
 
         if (healthCareCenter is null)
-            return NotFound();
-        // oraginzer info
-        //الاسم - email-city-position
+            throw new NotFoundBadRequest("لا توجد وحده صحيه بهذا الرقم");
 
-        //var organizer = unitOfWork.MedicalApplicationRepo
-        //    .FindByCondition(m => m.HealthCareName == healthCareCenter.HealthCareCenterName
-        //   && m.ApplicantPosition == ApplicantPosition.Organizer, false).FirstOrDefault();
+        var healthCareStaff =
+            unitOfWork.StaffRepo.FindByCondition(staff => staff.HCCenterId == healthCareCenter.HealthCareCenterId, false, ["User"])
+            .ToList();
 
+        var organizerName =
+            healthCareStaff.Where(hc => hc.StaffRole == StaffRole.Organizer)
+            .Select(org => $"{org.User.FirstName} {org.User.LastName}")
+            .FirstOrDefault();
 
-        //Doctor info
+        var doctorName = healthCareStaff.Where(hc => hc.StaffRole == StaffRole.Doctor)
+            .Select(doc => $"{doc.User.FirstName} {doc.User.LastName}")
+            .FirstOrDefault();
 
-        //var doctor = unitOfWork.MedicalApplicationRepo
-        //    .FindByCondition(m => m.HealthCareName == healthCareCenter.HealthCareCenterName
-        //    && m.ApplicantPosition == ApplicantPosition.Doctor, false).FirstOrDefault();
+        var healthCareDetails = healthCareCenter.Adapt<HealthCareDetailsDto>();
 
-        // inventory info
+        healthCareDetails.OrganizerName = organizerName;
+        healthCareDetails.DoctorName = doctorName;
+        healthCareDetails.Inventories = healthCareCenter.Inventories.Adapt<List<InventoryDto>>();
 
-        //var inventory = UnitOfWork.InventoryRepo
-        //    .FindByCondition(i => i.HealthCareCenterId == id, false).FirstOrDefault();
-        return Ok();
+        var response = new GeneralResponse<HealthCareDetailsDto>(StatusCodes.Status200OK, healthCareDetails); ;
+
+        return Ok(response);
     }
-
 
     [HttpPost("medical-postion-add")]
     public async Task<IActionResult> AddMedicalPostion(MedicalStaffDto model)
     {
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
+
+        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
         var healthCare =
             await unitOfWork.HealthCareCenterRepo.FindAsync(hc => hc.HealthCareCenterId == model.HealthCareCenterId, false);
@@ -89,6 +107,7 @@ public class CityAdminController
         var medicalStaff = (model, healthCare).Adapt<MedicalStaff>();
 
         medicalStaff.UserId = user.Id;
+        medicalStaff.CityAdminStaffId = adminId;
             
         await unitOfWork.StaffRepo.AddAsync(medicalStaff);
         var dbResult = await unitOfWork.SaveAsync();
@@ -100,6 +119,25 @@ public class CityAdminController
 
         return Ok(response);
     }
+
+    [HttpPost("healthCare-add")]
+    public async Task<IActionResult> AddHealthCareCenter(AddHealthCareDto model)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity, "الرجاء التاكد ان جميع المدخلات صحيحه"));
+
+        var healthCare = model.Adapt<HealthCareCenter>();
+
+        await unitOfWork.HealthCareCenterRepo.AddAsync(healthCare);
+
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم حفظ الوحده الصحيه");
+
+        return CreatedAtAction("HealthCareDetails", new { Id = healthCare.HealthCareCenterId });
+    }
+
 
     [HttpGet("complaints")]
     public async Task<IActionResult> Complaints()
@@ -148,186 +186,62 @@ public class CityAdminController
         if (complaint is null)
             throw new NotFoundException("هذه الشكوي غير موجوده او تم حذفها");
 
-        // send email or notfication to user
+        var notification = Utility.CreateNotification("الشكاوي", "تم حل الشكوي الخاص بك الرجاء التوجه للوحد الصحيه لاستكمال", complaint.UserId);
 
-        return Ok();
+        var result = await SaveNotification(notification);
+
+        if (!result)
+            throw new BadRequestException("لم يتم حفظ رساله التنبيه الرجاء المحاوله مره اخري");
+
+        var notificationDto = notification.Adapt<NotificationDto>();
+
+        await hubContext.Clients.User(complaint.UserId).SendAsync("NotificationMessage", notificationDto);
+
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم ارسال التنيه بنجاح");
+
+        return Ok(response);
     }
 
-    [HttpPost("create-order")]
-    public async Task<IActionResult> CreateOrder([FromBody] List<OrderDto> orderItems)
+    [HttpGet("organizers")]
+    public IActionResult Organizers()
     {
+        var organizers = GetMedicalStaff(StaffRole.Organizer);
 
-        var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        var organizersDto = organizers.Adapt<List<MedicalStaffDetailsDto>>();
 
+        var response = new GeneralResponse<List<MedicalStaffDetailsDto>>(StatusCodes.Status200OK, organizersDto);
 
-        if (orderItems == null)
-            return BadRequest("الطلب لا يحتوى على اى عناصر");
-
-        Order order = new Order
-        {
-            Status = OrderStatus.Pending,
-            CityAdminStaffId = AdminId,
-           
-        };
-
-        foreach (var item in orderItems)
-        {
-            OrderItem orderr = new OrderItem
-            {
-                orderId = order.Id,
-                Antigen = item.Antigen,
-                Amount = item.Amount,
-            };
-            await unitOfWork.OrderItemRepo.AddAsync(orderr);
-            order.OrderItems.Add(orderr);
-        }
-
-        await unitOfWork.OrderRepo.AddAsync(order);
-        unitOfWork.SaveAsync();
-
-        return Ok();
+        return Ok(organizersDto);
     }
 
-
-    [HttpPost("confirm-order")]
-    public async Task<IActionResult> ConfirmOrder(Guid OrderId)
+    [HttpGet("doctors")]
+    public IActionResult Doctors()
     {
+        var doctors = GetMedicalStaff(StaffRole.Doctor);
 
-		var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        var doctorsDto = doctors.Adapt<List<MedicalStaffDetailsDto>>();
 
-        var Order = await unitOfWork.OrderRepo.FindAsync(e => e.Id == OrderId, false, ["OrderItems"]);
-        var Inventory = unitOfWork.MainInventoryRepo.FindByCondition(e => e.CityAdminStaffId == AdminId, false);
-          
-        foreach (var item in Order.OrderItems)
-        {
-            var ItemDb=Inventory.FirstOrDefault(e=>e.Antigen == item.Antigen);
-			if(ItemDb.Amount<item.Amount)
-            {
+        var response = new GeneralResponse<List<MedicalStaffDetailsDto>>(StatusCodes.Status200OK, doctorsDto);
 
-            }
-			
-        }
+        return Ok(doctorsDto);
+    }
 
-        Order.Status = OrderStatus.Processing;
-        Order.DateApproved= DateTime.UtcNow;
-
-        return Ok("تم قبول الطلب");
-
-	}
-
-    [HttpPost("get-order")]
-    public async Task<IActionResult> GetOrder(Guid OrderId)
+    private List<MedicalStaff> GetMedicalStaff(StaffRole role)
     {
-		var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-        if (AdminId == null)
-        {
-            return BadRequest("لا يوجد ادمن لهذا المركز");
-        }
-		var Order = await unitOfWork.OrderRepo.FindAsync(e => e.Id == OrderId, false, ["OrderItems"]);
-        if(Order == null)
-        {
-            return BadRequest("لم يتم العثور على الطلب ");
-        }
+        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        var OrganizerId=Order.MedicalStaffId;
-        var Organizer = await unitOfWork.MedicalStaffRepo.FindAsync(e => e.UserId == OrganizerId,false);
+        var staff =
+            unitOfWork.StaffRepo.FindByCondition(organizer => organizer.CityAdminStaffId == adminId
+            && organizer.StaffRole == role, false, ["User"])
+            .ToList() ?? [];
 
-        OrderDetailsDto OrderDetailsDto = new OrderDetailsDto()
-        {
-            HealthCareCenterName = Organizer.HealthCareCenterName,
-            HealthCareCenterGovernorate = Organizer.HealthCareCenterGovernorate,
-            HealthCareCenterCity = Organizer.HealthCareCenterCity,
-            HealthCareCenterVillage = Organizer.HealthCareCenterVillage
-        };
+        return staff;
+    }
 
-        foreach(var item in Order.OrderItems)
-        {
-			OrderDetailsDto.OrderItems.Add(item);
-
-		}
-
-        return Ok(OrderDetailsDto);
-
-
-	}
-    [HttpGet("get-all-oeders-sent")]
-    public async Task<IActionResult> GetAllOrdersSent()
+    private async Task<bool> SaveNotification(Notification notification)
     {
-		var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-		if (AdminId == null)
-		{
-			return BadRequest("لا يوجد ادمن لهذا المركز");
-		}
+        await unitOfWork.NotificationRepo.AddAsync(notification);
 
-        var Orders=  unitOfWork.OrderRepo.FindByCondition(e=>e.CityAdminStaffId == AdminId,false, "OrderItems");
-
-        if (Orders == null)
-        {
-            return BadRequest("لا يوجد طلبات مرسلة من هذا المركز");
-        }
-
-        IList<MyOrderDetailsDto> MyorderDetailsDtos = new List<MyOrderDetailsDto>();
-
-        foreach (var item in Orders) 
-        {
-            MyOrderDetailsDto orderDetailsDto = new MyOrderDetailsDto()
-            {
-                Status = item.Status,
-                DateApproved = item.DateApproved,
-                DateRequested = item.DateRequested,
-            };
-            foreach(var item2 in item.OrderItems)
-            {
-				orderDetailsDto.OrderItems.Add(item2);
-
-			}
-            MyorderDetailsDtos.Add(orderDetailsDto);
-
-		}
-        return Ok(MyorderDetailsDtos);
-	}
-
-
-
-    [HttpGet]
-    public async Task<IActionResult>GetAllOrdersRecived()
-    {
-		var AdminId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-		if (AdminId == null)
-		{
-			return BadRequest("لا يوجد ادمن لهذا المركز");
-		}
-
-        var Admin = await unitOfWork.MedicalStaffRepo.FindAsync(e => e.UserId == AdminId, false);
-
-        var CityAdmin = Admin.HealthCareCenterCity;
-
-        var Orders = unitOfWork.OrderRepo.FindByCondition(e => e.MedicalStaffId != null && e.MedicalStaff.HealthCareCenterCity==CityAdmin, false);
-		var Organizer = await unitOfWork.MedicalStaffRepo.FindAsync(e => e.HealthCareCenterCity==CityAdmin, false);
-
-
-		List<OrderDetailsDto> orderDetailsDtos = new List<OrderDetailsDto>();
-        foreach(var order in  Orders)
-        {
-            var orderi = new OrderDetailsDto()
-            {
-                HealthCareCenterName = Organizer.HealthCareCenterCity,
-                HealthCareCenterCity = Organizer.HealthCareCenterCity,
-                HealthCareCenterGovernorate = Organizer.HealthCareCenterGovernorate,
-                HealthCareCenterVillage = Organizer.HealthCareCenterVillage
-            };
-
-			foreach (var item in order.OrderItems)
-			{
-				orderi.OrderItems.Add(item);
-
-			}
-            orderDetailsDtos.Add(orderi);
-		}
-	
-        return Ok(orderDetailsDtos);
-	}
-
-
-
+        return await unitOfWork.SaveAsync() > 0;
+    }
 }
