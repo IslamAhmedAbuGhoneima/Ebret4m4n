@@ -38,7 +38,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
         var children = 
-            await unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, false).ToListAsync();
+            await unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, false, ["Vaccines"]).ToListAsync();
 
         if (children is null)
             throw new NotFoundBadRequest("you don not have any child");
@@ -70,13 +70,13 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         if(dto.ReportFiles == null && dto.PatientHistory == null)
         {
-            var vaccines = ReadVaccinesFromJsonFile(dto.Vaccines, child.Id);
+            var vaccines = Utility.ReadVaccinesFromJsonFile(dto.Vaccines, child.Id);
             await unitOfWork.VaccineRepo.AddRangeAsync(vaccines);
         }
 
         if (dto.ReportFiles != null) 
         {
-            var childReports = SaveReportFiles(dto.ReportFiles, dto.Id);
+            var childReports = Utility.SaveReportFiles(dto.ReportFiles, dto.Id);
             await unitOfWork.HealthyReportRepo.AddRangeAsync(childReports);
         }
 
@@ -107,7 +107,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         if(dto.ImageFiles is not null)
         {
-            var childHealthFiles = SaveReportFiles(dto.ImageFiles, id);
+            var childHealthFiles = Utility.SaveReportFiles(dto.ImageFiles, id);
             await unitOfWork.HealthyReportRepo.AddRangeAsync(childHealthFiles);
         }
 
@@ -135,62 +135,5 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         return NoContent();
     }
-
-
-    private List<HealthReportFile>? SaveReportFiles(List<IFormFile> imageFiles, string childId)
-    {
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "ChildReports");
-
-        if (!Directory.Exists(path))
-            Directory.CreateDirectory(path);
-        
-        var healthReports = new List<HealthReportFile>();
-
-        foreach (var file in imageFiles)
-        {
-            if (file.Length <= 5_242_880) 
-            {
-                var fileName = Guid.NewGuid().ToString();
-                var fileExtenstion = Path.GetExtension(file.FileName);
-
-                var reportPath = Path.Combine(path, $"{fileName}{fileExtenstion}");
-
-                using(var stream = new FileStream(reportPath, FileMode.Create))
-                {
-                    file.CopyTo(stream);
-                }
-
-                healthReports.Add(new HealthReportFile
-                {
-                    FilePath = $"/ChildReports/{fileName}{fileExtenstion}",
-                    ChildId = childId
-                });
-            }
-            else
-                throw new FileLoadException("لا يمكن تحميل الملف بهذا الحجم");
-        }
-        return healthReports;
-    }
-
-    private List<Vaccine> ReadVaccinesFromJsonFile(List<string>? childVaccines, string childId)
-    {
-        var vaccines = Utility.ChildBaseVaccines();
-
-        foreach (var vaccine in vaccines)
-            vaccine.ChildId = childId;
-
-        if(childVaccines is not null)
-        {
-            foreach (var vaccineName in childVaccines)
-            {
-                var vaccine = vaccines.FirstOrDefault(v => v.Name == vaccineName);
-
-                if (vaccine is null)
-                    throw new BadRequestException("لايوجد لقاح بهذا الاسم تاكد من ان اسماء اللقاحات المختاره صحيحه");
-
-                vaccine.IsTaken = true;
-            }
-        }
-        return vaccines;
-    }
+    
 }

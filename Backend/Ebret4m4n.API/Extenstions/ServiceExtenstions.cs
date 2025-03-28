@@ -1,15 +1,17 @@
-﻿using Ebret4m4n.Contracts;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Ebret4m4n.Entities.ConfigurationModels;
-using Ebret4m4n.Entities.Models;
-using Ebret4m4n.Repository;
 using Ebret4m4n.Repository.Configuration;
 using Ebret4m4n.Repository.Repositories;
 using Ebret4m4n.Repository.UnitOfWork;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Ebret4m4n.Entities.Models;
+using Ebret4m4n.Repository;
+using Ebret4m4n.Contracts;
 using System.Text;
+using Hangfire;
+using Ebret4m4n.API.BackgroundService;
 
 namespace Ebret4m4n.API.Extenstions;
 
@@ -96,4 +98,15 @@ public static class ServiceExtenstions
 
     public static void AddSignalRConfiguration(this IServiceCollection service)
         => service.AddSignalR(config => config.EnableDetailedErrors = true);
+
+    public static void AddHangfireConfiguration(this IServiceCollection service, IConfiguration configuration)
+    {
+        service.AddHangfire(config =>
+            config.UseSqlServerStorage(configuration.GetConnectionString("hangfireConnection")));
+
+        service.AddHangfireServer();
+    }
+
+    public static void AddReservationReminderService(this IServiceCollection service)
+        => service.AddScoped<ReservationReminderService>();
 }

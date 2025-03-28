@@ -9,16 +9,19 @@ public class Chat
 
     public DateTime SentAt { get; private set; } = DateTime.UtcNow;
 
-    public string Message { get; set; } = null!;
+    public string? Message { get; set; } 
+
+    // for uploadFiles
+    public string? File { get; set; }
     #endregion
 
     #region Relations
     [ForeignKey("Receiver")]
-    public string? ReceiverId { get; set; }
+    public string ReceiverId { get; set; } = null!;
     public ApplicationUser? Receiver { get; set; }
 
     [ForeignKey("Sender")]
-    public string? SenderId { get; set; } 
+    public string SenderId { get; set; } = null!;
     public ApplicationUser? Sender { get; set; }
     #endregion
 }

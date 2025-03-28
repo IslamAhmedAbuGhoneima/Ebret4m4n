@@ -10,6 +10,8 @@ using System.Security.Claims;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Mapster;
+using System.Threading.Tasks;
+using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 
 namespace Ebret4m4n.API.Controllers;
 
@@ -26,7 +28,7 @@ public class ParentController
 
         var appointments =
             unitOfWork.AppointmentRepo.FindByCondition(
-                a => a.UserId == userId , false, ["Child", "Vaccine"]);
+                a => a.UserId == userId , false, ["Child"]);
 
         var userReservationsDto = appointments.Adapt<List<UserReservationDto>>();
 
@@ -38,6 +40,18 @@ public class ParentController
     [HttpPost("appointment-book")]
     public async Task<IActionResult> AppointmentBook([FromBody] AddAppointmentDto model)
     {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity, "تاكد ان جميع مدخلات الحجز صحيحه"));
+
+        if (model.Date <= DateTime.UtcNow)
+            throw new BadRequestException("لا يمكن حجز هذ الموعد");
+
+        var appointmentExists =
+            await unitOfWork.AppointmentRepo.ExistsAsync(appointment => appointment.VaccineName == model.VaccineName && appointment.ChildId == model.ChildId);
+
+        if (appointmentExists)
+            throw new BadRequestException("تم حجز معاد لهذا اللقاح من قبل");
+
         var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
         var user = await userManager.Users
@@ -50,7 +64,7 @@ public class ParentController
             throw new BadRequestException($"you do not have children with {model.ChildId} to reserve an appointment");
 
         if (user?.HealthCareCenterId == null)
-            throw new NotFoundBadRequest("the current user dose not belonge to any healthy care center ");
+            throw new NotFoundBadRequest("هذا المستخدم لا ينتمي الي اي وحده صحيه");
 
         var appointment = (model, user.HealthCareCenter, parentId).Adapt<Appointment>();
 
@@ -58,7 +72,7 @@ public class ParentController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("Your reservation was not saved, please try again");
+            throw new BadRequestException("لم يتم حفظ الحجز الخاص بك الرجاء المحاوله مره اخري");
 
 
         string childName = user.Children.FirstOrDefault()!.Name;
@@ -68,6 +82,51 @@ public class ParentController
         var response = new GeneralResponse<AppointmentDto>(StatusCodes.Status200OK, appointmentDto);
 
         return Ok(response);
+    }
+
+    [HttpPut("{childId}/appointment-reschedule")]
+    public async Task<IActionResult> RescheduleAppointment([FromRoute] string childId, AppointmentRescheduleDto model)
+    {
+        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        if (model.Date <= DateTime.UtcNow)
+            throw new BadRequestException("لا يمكن اضافه هذا المعاد");
+
+        var appointment = 
+            await unitOfWork.AppointmentRepo.FindAsync(appointment => appointment.ChildId == childId && appointment.UserId == parentId, true);
+
+        if (appointment is null)
+            throw new NotFoundBadRequest("لم يتم ايجاد اي حجز لهذا الطفل");
+
+        appointment.Date = model.Date;
+
+        unitOfWork.AppointmentRepo.Update(appointment);
+
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم اعاده جدوله هذا الحجز");
+
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اعاده الجدوله بنجاح");
+
+        return StatusCode(StatusCodes.Status204NoContent, response);
+    }
+
+    [HttpDelete("{id:guid}/appointment-cancle")]
+    public async Task<IActionResult> AppointmentCancle(Guid id)
+    {
+        var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.Id == id, false);
+
+        if (appointment == null)
+            throw new NotFoundBadRequest("لا يوجد موعد خاص بهذا المستخدم");
+
+        unitOfWork.AppointmentRepo.Remove(appointment);
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم الغاء المعاد حاول مره اخري");
+
+        return NoContent();
     }
 
     [HttpGet("{reciverId:guid}/user-messages")]
@@ -85,54 +144,23 @@ public class ParentController
         return Ok(response);
     }
 
-    [HttpGet("Submit-Complaint")]
-    public async Task<IActionResult> SubmitComplaint()
-    {
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        var healthCareCenter = await unitOfWork.HealthCareCenterRepo
-        .FindAsync(hc => hc.Users.Any(u => u.Id == parentId), false, "Users");
-        
-
-        var x = userManager.Users.Include(c => c.HealthCareCenter)
-            .FirstOrDefault(c => c.Id == parentId);
-
-
-        return healthCareCenter != null ?
-           Ok(healthCareCenter.HealthCareCenterName)
-         : NotFound("غير مسجل بوحدة صحية");
-    }
-
-    [HttpPost("Send-Complaint")]
-    public async Task<IActionResult> SendComplaint(string message)
+    [HttpPost("complaint-submit")]
+    public async Task<IActionResult> SubmitComplaint(ComplaintMessageDto model)
     {
         var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-        var complaint = new Complaint
-        {
-            Message = message,
-            UserId = parentId
-        };
+        var complaint = model.Adapt<Complaint>();
+        complaint.UserId = parentId;
 
         await unitOfWork.ComplaintRepo.AddAsync(complaint);
-        await unitOfWork.SaveAsync();
-        return Ok(complaint);
-    }
 
-    [HttpDelete("{id:guid}/appointment-cancle")]
-    public async Task<IActionResult> AppointmentCancle(Guid id)
-    {
-        var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.Id == id, true);
-
-        if (appointment == null)
-            throw new NotFoundBadRequest("لا يوجد موعد خاص بهذا المستخدم");
-
-        unitOfWork.AppointmentRepo.Remove(appointment);
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم الغاء المعاد حاول مره اخري");
+            throw new BadRequestException("لم يتم ارسال الشكوي الخاص بك الرجاء المحاوله مره اخري");
 
-        return NoContent();
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "شكرا لتعونك معنا سيتم حل الشكوي الخاص بك في اقرب وقت");
+
+        return Ok(response);
     }
 }

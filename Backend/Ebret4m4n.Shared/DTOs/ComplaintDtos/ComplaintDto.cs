@@ -1,10 +1,12 @@
 ﻿namespace Ebret4m4n.Shared.DTOs.ComplaintDtos;
 
-public record ComplaintDto(string Message,
+public record ComplaintDto(
+    Guid Id,
+    string Message,
     string UserName,
     string Email,
     string PhoneNumber,
     string HealthCareCenterName,
-    DayOfWeek FirstDay,
-    DayOfWeek SecondDay,
+    string FirstDay,
+    string SecondDay,
     string HCLocation);

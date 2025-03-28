@@ -7,6 +7,8 @@ public class Appointment
     #region Properties
     public Guid Id { get; set; }
 
+    public string VaccineName { get; set; } = null!;
+
     public DateTime Date { get; set; }
 
     public string Day => Date.ToString("dddd");
@@ -22,11 +24,6 @@ public class Appointment
     [ForeignKey("User")]
     public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; } = null!;
-
-    // new Relation
-    [ForeignKey("Vaccine")]
-    public Guid VaccineId { get; set; } 
-    public Vaccine Vaccine {  get; set; }
 
     [ForeignKey("HealthCareCenter")]
     public Guid HealthCareCenterId { get; set; }

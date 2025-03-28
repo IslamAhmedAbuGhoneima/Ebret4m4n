@@ -5,10 +5,9 @@ using Ebret4m4n.Shared.DTOs.ChildDtos;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
 using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
-using Mapster;
 using Ebret4m4n.Shared.DTOs.OrderDtos;
 using Ebret4m4n.Shared.DTOs.MedicalStaffDtos;
-
+using Mapster;
 
 namespace Ebret4m4n.API.Mapping;
 
@@ -62,7 +61,6 @@ public static class MapsterConfig
 
         TypeAdapterConfig<Appointment, UserReservationDto>.NewConfig()
             .Map(dest => dest.ChildName, src => src.Child.Name)
-            .Map(dest => dest.VaccineName, src => src.Vaccine.Name)
             .Map(dest => dest.RestOfDaysToAppointment,
             src => Math.Floor((src.Date - DateTime.Today).TotalDays))
             .Map(dest => dest, src => src);
@@ -84,8 +82,11 @@ public static class MapsterConfig
             .Map(dest => dest, src => src.hcCenter);
 
         TypeAdapterConfig<(Complaint complaint, HealthCareCenter hcCenter), ComplaintDto>.NewConfig()
+            .Map(dest => dest.UserName, src => $"{src.complaint.User.FirstName} {src.complaint.User.LastName}")
             .Map(dest => dest.HCLocation, src => $"{src.hcCenter.Governorate},{src.hcCenter.City},{src.hcCenter.Village}")
-            .Map(dest => dest, src => src.hcCenter);
+            .Map(dest => dest, src => src.hcCenter)
+            .Map(dest => dest, src => src.complaint)
+            .Map(dest => dest, src => src.complaint.User);
 
 
         TypeAdapterConfig<Order, CityOrderDetails>.NewConfig()
@@ -96,5 +97,7 @@ public static class MapsterConfig
             .Map(dest => dest.HealthCareCenterName, src => src.MedicalStaff.HealthCareCenterName)
             .Map(dest => dest, src => src);
 
+        TypeAdapterConfig<Complaint, ComplaintsDto>.NewConfig()
+            .Map(dest => dest.UserName, src => $"{src.User.FirstName} {src.User.LastName}");
     }
 }

@@ -1,7 +1,9 @@
 using Ebret4m4n.Repository.Configuration.DataSeed;
+using Ebret4m4n.API.BackgroundService;
 using Ebret4m4n.API.Extenstions;
-using Ebret4m4n.API.Hubs;
 using Ebret4m4n.API.Mapping;
+using Ebret4m4n.API.Hubs;
+using Hangfire;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,6 +26,10 @@ builder.Services.AddEmailSettingsConfiguration(builder.Configuration);
 builder.Services.ConfigureTokenLifespan();
 
 builder.Services.AddSignalRConfiguration();
+
+builder.Services.AddHangfireConfiguration(builder.Configuration);
+
+builder.Services.AddReservationReminderService();
 
 // Register Mapster
 MapsterConfig.RegisterMappings();
@@ -54,6 +60,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseHangfireDashboard();
+
 app.MapHub<ChatHub>("/chat");
 app.MapHub<NotificationHub>("/notification");
 
@@ -63,5 +71,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     await SeedData.CreateAdminUser(services, builder.Configuration);
 }
+
+app.NotificationMessagJob();
 
 app.Run();

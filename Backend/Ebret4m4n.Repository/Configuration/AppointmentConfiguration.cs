@@ -17,6 +17,9 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
             .IsRequired()
             .HasMaxLength(450);
 
+        builder.Property(p => p.VaccineName)
+            .HasMaxLength(150);
+
         builder.HasIndex(p => p.UserId);
 
         builder.HasIndex(p => p.ChildId);

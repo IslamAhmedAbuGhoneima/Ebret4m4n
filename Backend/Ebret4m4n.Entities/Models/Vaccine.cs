@@ -18,8 +18,6 @@ public class Vaccine
     #region Relations
     [ForeignKey("Child")]
     public string ChildId { get; set; } = null!;
-    public Child Child { get; set; }
-
-    public ICollection<SideEffect> SideEffects { get; set; } = []; 
+    public Child Child { get; set; } 
     #endregion
 }

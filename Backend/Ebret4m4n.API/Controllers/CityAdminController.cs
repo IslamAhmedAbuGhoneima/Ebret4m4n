@@ -145,8 +145,8 @@ public class CityAdminController
         var city = User.FindFirst("city")!.Value;
 
         var complaints = await unitOfWork.ComplaintRepo
-            .FindByCondition(c => c.User.City == city, false, "User")
-            .Select(C => new ComplaintsDto(C.User.UserName, C.DateSubmitted))
+            .FindByCondition(c => c.User.City == city && c.IsResolved == false, false, "User")
+            .Select(C => C.Adapt<ComplaintsDto>())
             .ToListAsync();
             
 
@@ -177,7 +177,7 @@ public class CityAdminController
         return Ok(response);
     }
 
-    [HttpPost("{complaintId:guid}/handle-complaint")]
+    [HttpPut("{complaintId:guid}/handle-complaint")]
     public async Task<IActionResult> HandleComplaint(Guid complaintId)
     {
         var complaint =
@@ -188,15 +188,20 @@ public class CityAdminController
 
         var notification = Utility.CreateNotification("الشكاوي", "تم حل الشكوي الخاص بك الرجاء التوجه للوحد الصحيه لاستكمال", complaint.UserId);
 
-        var result = await SaveNotification(notification);
+        complaint.IsResolved = true;
 
-        if (!result)
+        unitOfWork.ComplaintRepo.Update(complaint);
+
+        await SaveNotification(notification);
+
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0) 
             throw new BadRequestException("لم يتم حفظ رساله التنبيه الرجاء المحاوله مره اخري");
 
         var notificationDto = notification.Adapt<NotificationDto>();
 
         await hubContext.Clients.User(complaint.UserId).SendAsync("NotificationMessage", notificationDto);
-
         var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم ارسال التنيه بنجاح");
 
         return Ok(response);
@@ -238,10 +243,6 @@ public class CityAdminController
         return staff;
     }
 
-    private async Task<bool> SaveNotification(Notification notification)
-    {
-        await unitOfWork.NotificationRepo.AddAsync(notification);
-
-        return await unitOfWork.SaveAsync() > 0;
-    }
+    private async Task SaveNotification(Notification notification)
+        => await unitOfWork.NotificationRepo.AddAsync(notification);
 }

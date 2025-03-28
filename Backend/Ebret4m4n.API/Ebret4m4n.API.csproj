@@ -9,6 +9,7 @@
 
 
   <ItemGroup>
+    <PackageReference Include="Hangfire" Version="1.8.18" />
     <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.12">
@@ -21,10 +22,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Ebret4m4n.Repository\Ebret4m4n.Repository.csproj" />
     <ProjectReference Include="..\Ebret4m4n.Shared\Ebret4m4n.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ChildReports\" />
   </ItemGroup>
 
 </Project>

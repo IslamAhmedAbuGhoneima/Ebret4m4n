@@ -9,6 +9,8 @@ public class Complaint
 
     public string Message { get; set; } = null!;
 
+    public bool IsResolved { get; set; }
+
     public DateTime DateSubmitted { get; private set; } = DateTime.UtcNow;
     #endregion
 

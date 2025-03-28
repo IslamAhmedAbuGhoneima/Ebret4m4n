@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
+using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
-using Ebret4m4n.Entities.Exceptions;
-using Ebret4m4n.API.ChildBaseVaccines;
-using System.Text.Json;
-using Ebret4m4n.Entities.Models;
 using Mapster;
 
 namespace Ebret4m4n.API.Controllers;
@@ -79,19 +77,7 @@ public class DoctorController
     [HttpPost("{childId}/add-normal-vaccine")]
     public async Task<IActionResult> AddNormalVacinnes(string childId)
     {
-        string path =
-                Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "vaccines.json");
-
-        if (!Path.Exists(path))
-            throw new FileNotFoundException("لم يتم استرجاع القاحات الرجاء التواصل مع الدعم الفني");
-
-        using var strem = new FileStream(path, FileMode.Open);
-        var baseVaccines = JsonSerializer.Deserialize<List<BaseVaccine>>(strem);
-
-        if (baseVaccines == null)
-            throw new BadRequestException("حدث خطا ما اثناء تسجيل الطفل الرجاء الاتصال بالدعم الفني للمساعده");
-
-        var vaccines = baseVaccines.Adapt<List<Vaccine>>();
+        var vaccines = Utility.ReadVaccinesFromJsonFile(null, childId);
 
         foreach (var vaccine in vaccines)
             vaccine.ChildId = childId;

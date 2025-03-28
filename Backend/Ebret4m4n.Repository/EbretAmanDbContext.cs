@@ -19,8 +19,6 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Notification> Notifications { get; set; }
 
-    public DbSet<SideEffect> SideEffects { get; set; }
-
     public DbSet<Vaccine> Vaccines { get; set; }
 
     public DbSet<Complaint> Complaints { get; set; }

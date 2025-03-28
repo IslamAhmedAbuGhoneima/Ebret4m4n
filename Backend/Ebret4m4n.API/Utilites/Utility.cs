@@ -55,4 +55,84 @@ public class Utility
 
         return notification;
     }
+
+    public static List<Vaccine> ReadVaccinesFromJsonFile(List<string>? childVaccines, string childId)
+    {
+        var vaccines = ChildBaseVaccines();
+
+        foreach (var vaccine in vaccines)
+            vaccine.ChildId = childId;
+
+        if (childVaccines is not null)
+        {
+            foreach (var vaccineName in childVaccines)
+            {
+                var vaccine = vaccines.FirstOrDefault(v => v.Name == vaccineName);
+
+                if (vaccine is null)
+                    throw new BadRequestException("لايوجد لقاح بهذا الاسم تاكد من ان اسماء اللقاحات المختاره صحيحه");
+
+                vaccine.IsTaken = true;
+            }
+        }
+        return vaccines;
+    }
+
+    public static List<HealthReportFile>? SaveReportFiles(List<IFormFile> imageFiles, string childId)
+    {
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Files", "ChildReports");
+
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+
+        List<HealthReportFile> healthReports = [];
+
+        foreach (var file in imageFiles)
+        {
+            if (file.Length <= 5_242_880)
+            {
+                var fileName = Guid.NewGuid().ToString();
+                var fileExtenstion = Path.GetExtension(file.FileName);
+
+                var reportPath = Path.Combine(path, $"{fileName}{fileExtenstion}");
+
+                using (var stream = new FileStream(reportPath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+                healthReports.Add(new HealthReportFile
+                {
+                    FilePath = $"/Files/ChildReports/{fileName}{fileExtenstion}",
+                    ChildId = childId
+                });
+            }
+            else
+                throw new FileLoadException("لا يمكن تحميل الملف بهذا الحجم");
+        }
+        return healthReports;
+    }
+
+    public static string UploadChatFile(IFormFile file)
+    {
+        string path = Path.Combine(Directory.GetCurrentDirectory(), "Files", "ChatFiles");
+
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
+
+        if (file.Length > 5_242_880)
+            throw new BadRequestException("لايمكن رفع ملف بهذا الحجم");
+
+        var fileName = Guid.NewGuid().ToString();
+        var fileExtension = Path.GetExtension(file.FileName);
+
+        var filePath = Path.Combine(path, $"{fileName}{fileExtension}");
+
+        using (var strem = new FileStream(filePath, FileMode.Create))
+        {
+            file.CopyTo(strem);
+        }
+
+        return $"/Files/ChatFiles/{fileName}{fileExtension}";
+    }
 }
