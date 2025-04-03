@@ -16,14 +16,12 @@ using Mapster;
 namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(Roles = "governorateAdmin,cityAdmin,organizer")]
 [ApiController]
 public class OrderController
     (IUnitOfWork unitOfWork,
     UserManager<ApplicationUser> userManager,
     IHubContext<NotificationHub> hubContext): ControllerBase
 {
-
     [HttpGet("orders")]
     [Authorize(Roles = "governorateAdmin,cityAdmin,organizer")]
     public IActionResult Orders()
@@ -46,6 +44,7 @@ public class OrderController
     }
 
     [HttpGet("{orderId:guid}/order-details")]
+    [Authorize(Roles = "admin,governorateAdmin,cityAdmin,organizer")]
     public IActionResult OrderDetails(Guid orderId)
     {
         var orderItems =
@@ -63,6 +62,7 @@ public class OrderController
     }
 
     [HttpPost("request-order")]
+    [Authorize(Roles = "governorateAdmin,cityAdmin,organizer")]
     public async Task<IActionResult> RequestOrder(List<OrderItemsDto> model)
     {
         if (!ModelState.IsValid)
@@ -109,6 +109,7 @@ public class OrderController
     }
 
     [HttpPut("{orderId:guid}/marke-received-order")]
+    [Authorize(Roles = "governorateAdmin,cityAdmin,organizer")]
     public async Task<IActionResult> MarkeReceivedOrder(Guid orderId)
     {
         var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -224,7 +225,7 @@ public class OrderController
         }
     }
 
-    [HttpGet("healthcare-orders")]
+    [HttpGet("requested-healthcare-orders")]
     [Authorize(Roles = "cityAdmin")]
     public IActionResult RequestedHealthCareOrders()
     {
@@ -258,7 +259,21 @@ public class OrderController
         return Ok(response);
     }
 
-    
+    [HttpGet("requested-governorate-orders")]
+    [Authorize(Roles = "admin")]
+    public IActionResult GovernorateOrders()
+    {
+        var governorateOrders =
+            unitOfWork.OrderRepo.FindByCondition(order => order.GovernorateAdminStaffId != null, false, ["GovernorateAdminStaff"])
+            .ToList() ?? [];
+
+        var governorateOrdersDto = governorateOrders.Adapt<List<GovernorateOrderDto>>();
+
+        var response = new GeneralResponse<List<GovernorateOrderDto>>(StatusCodes.Status200OK, governorateOrdersDto);
+
+        return Ok(response);
+    }
+
 
     private async Task<Notification> Notification(string adminRole, Order order)
     {
@@ -292,7 +307,6 @@ public class OrderController
 
     private async Task SendNotification(string userId, NotificationDto notification)
     => await hubContext.Clients.User(userId).SendAsync("NotificationMessage", notification);
-
 
     private Dictionary<string, MainInventory> GetInventory(string adminRole, string adminId)
     {

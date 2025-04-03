@@ -24,4 +24,5 @@ public class CityAdminStaff
     public ICollection<Order> Orders { get; set; } = [];
     public ICollection<MainInventory>? MainInventories { get; set; } = [];
     public ICollection<MedicalStaff> MedicalStaff { get; set; } = [];
+    public ICollection<HealthCareCenter> HealthCareCenters { get; set; } = [];
 }

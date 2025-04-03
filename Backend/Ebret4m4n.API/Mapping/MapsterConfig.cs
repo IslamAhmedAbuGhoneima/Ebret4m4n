@@ -1,13 +1,16 @@
-﻿using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
-using Ebret4m4n.API.ChildBaseVaccines;
-using Ebret4m4n.Entities.Models;
-using Ebret4m4n.Shared.DTOs.ChildDtos;
-using Ebret4m4n.Shared.DTOs.ParentDtos;
-using Ebret4m4n.Shared.DTOs.ComplaintDtos;
+﻿using Ebret4m4n.Shared.DTOs.AdminsDto.GovernorateAdminDtos;
 using Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
-using Ebret4m4n.Shared.DTOs.OrderDtos;
+using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 using Ebret4m4n.Shared.DTOs.MedicalStaffDtos;
+using Ebret4m4n.Shared.DTOs.HealthCareDtos;
+using Ebret4m4n.Shared.DTOs.ComplaintDtos;
+using Ebret4m4n.Shared.DTOs.ParentDtos;
+using Ebret4m4n.API.ChildBaseVaccines;
+using Ebret4m4n.Shared.DTOs.OrderDtos;
+using Ebret4m4n.Shared.DTOs.ChildDtos;
+using Ebret4m4n.Entities.Models;
 using Mapster;
+
 
 namespace Ebret4m4n.API.Mapping;
 
@@ -22,7 +25,10 @@ public static class MapsterConfig
             .Map(dest => dest.UserName, src => src.Email);
 
 
-        TypeAdapterConfig<MedicalStaffDto, ApplicationUser>.NewConfig()
+        TypeAdapterConfig<AddMedicalStaffDto, ApplicationUser>.NewConfig()
+            .Map(dest => dest.UserName, src => src.Email);
+
+        TypeAdapterConfig<AddGovernorateAdminDto, ApplicationUser>.NewConfig()
             .Map(dest => dest.UserName, src => src.Email);
 
 
@@ -73,7 +79,7 @@ public static class MapsterConfig
             .Map(dest => dest.HCCenterId, src => src.hcCenter.HealthCareCenterId)
             .Map(dest => dest, src => src.hcCenter);
 
-        TypeAdapterConfig<(MedicalStaffDto staffDto, HealthCareCenter hcCenter), MedicalStaff>.NewConfig()
+        TypeAdapterConfig<(AddMedicalStaffDto staffDto, HealthCareCenter hcCenter), MedicalStaff>.NewConfig()
             .Map(dest => dest.HealthCareCenterGovernorate, src => src.hcCenter.Governorate)
             .Map(dest => dest.HealthCareCenterCity, src => src.hcCenter.City)
             .Map(dest => dest.HealthCareCenterVillage, src => src.hcCenter.Village)
@@ -89,6 +95,12 @@ public static class MapsterConfig
             .Map(dest => dest, src => src.complaint.User);
 
 
+        TypeAdapterConfig<GovernorateAdminStaff, GovernorateAdminsDto>.NewConfig()
+            .Map(dest => dest, src => src.User);
+
+        TypeAdapterConfig<CityAdminStaff, CityAdminsDto>.NewConfig()
+            .Map(dest => dest, src => src.User);
+
         TypeAdapterConfig<Order, CityOrderDetails>.NewConfig()
             .Map(dest => dest.City, src => src.CityAdminStaff.City)
             .Map(dest => dest, src => src);
@@ -97,7 +109,23 @@ public static class MapsterConfig
             .Map(dest => dest.HealthCareCenterName, src => src.MedicalStaff.HealthCareCenterName)
             .Map(dest => dest, src => src);
 
+        TypeAdapterConfig<Order, GovernorateOrderDto>.NewConfig()
+            .Map(dest => dest.Governorate, src => src.GovernorateAdminStaff.Governorate)
+            .Map(dest => dest, src => src);
+
         TypeAdapterConfig<Complaint, ComplaintsDto>.NewConfig()
             .Map(dest => dest.UserName, src => $"{src.User.FirstName} {src.User.LastName}");
+
+        TypeAdapterConfig<CityAdminStaff, CityRecordDetailsDto>.NewConfig()
+            .Map(dest => dest, src => src.User);
+
+
+        TypeAdapterConfig<GovernorateAdminStaff, GovernorateDetailsDto>.NewConfig()
+            .Map(dest => dest.Cities, src => src.CityAdminStaffs.Select(city => city.City))
+            .Map(dest => dest.CityCounts, src => src.CityAdminStaffs.Count)
+            .Map(dest => dest, src => src.User);
+
+        TypeAdapterConfig<HealthCareCenter, HealthCareDetailsDto>.NewConfig()
+            .MapToConstructor(true);
     }
 }

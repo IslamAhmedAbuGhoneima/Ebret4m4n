@@ -1,4 +1,7 @@
-﻿namespace Ebret4m4n.Entities.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Ebret4m4n.Entities.Models;
 
 public class HealthCareCenter 
 {
@@ -21,6 +24,11 @@ public class HealthCareCenter
     public string? City { get; set; }
 
     public string? Village { get; set; }
+
+    [ForeignKey("CityAdmin")]
+    public string CityAdminId { get; set; } = null!;
+    [DeleteBehavior(DeleteBehavior.NoAction)]
+    public CityAdminStaff CityAdmin { get; set; } = null!;
     #endregion
 
     #region Relations

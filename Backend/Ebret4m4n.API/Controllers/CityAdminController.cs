@@ -5,7 +5,6 @@ using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.SignalRDtos;
 using Ebret4m4n.Entities.Exceptions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.Entities.Models;
@@ -22,7 +21,6 @@ using Mapster;
 namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(Roles = "cityAdmin")]
 [ApiController]
 public class CityAdminController
     (IUnitOfWork unitOfWork, 
@@ -31,14 +29,27 @@ public class CityAdminController
 {
 
     [HttpGet("healthcareCenter-village")]
-    public async Task<IActionResult> GetHealthCareInVillageAsync()
+    [Authorize(Roles = "cityAdmin,admin")]
+    public IActionResult GetHealthCareInVillage([FromQuery] string? city)
     {
-        var city = User.FindFirst("city")!.Value;
+        string adminCity = string.Empty;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
-        var healthCareCenters = await unitOfWork.HealthCareCenterRepo
-            .FindByCondition(hc => hc.City == city, false)
-            .Select(hc => new HealthCaresListDto(hc.HealthCareCenterId,hc.HealthCareCenterName))
-            .ToListAsync();
+        if (adminRole == "admin" && city == null)
+            throw new BadRequestException("من فضلك ادخل اسم المدينه لتحميل الوحدات الصحيه الخاصه بها");
+
+        if (adminRole == "cityAdmin")
+            adminCity = User.FindFirst("city")!.Value;
+
+        var targetCity = adminRole == "admin" ? city : adminCity;
+
+        if (city is not null && adminCity != city && adminRole != "admin")
+            throw new BadRequestException("لا يمكنك عرض وحدات صحيه من مدينه اخري");
+
+        var healthCareCenters = unitOfWork.HealthCareCenterRepo
+            .FindByCondition(hc => hc.City == targetCity, false)
+            .Select(hc => new HealthCaresListDto(hc.HealthCareCenterId, hc.HealthCareCenterName))
+            .ToList();
 
         if (healthCareCenters is null)
             throw new BadRequestException("لم يتم اضافه اي وحدات صحيه بعد لهذا المركز");
@@ -49,6 +60,7 @@ public class CityAdminController
     }
 
     [HttpGet("{id:guid}/healthCareCenter")]
+    [Authorize(Roles = "cityAdmin,admin")]
     public async Task<IActionResult> HealthCareDetails(Guid id)
     {
         var healthCareCenter = await unitOfWork.HealthCareCenterRepo
@@ -71,7 +83,6 @@ public class CityAdminController
             .FirstOrDefault();
 
         var healthCareDetails = healthCareCenter.Adapt<HealthCareDetailsDto>();
-
         healthCareDetails.OrganizerName = organizerName;
         healthCareDetails.DoctorName = doctorName;
         healthCareDetails.Inventories = healthCareCenter.Inventories.Adapt<List<InventoryDto>>();
@@ -82,7 +93,8 @@ public class CityAdminController
     }
 
     [HttpPost("medical-postion-add")]
-    public async Task<IActionResult> AddMedicalPostion(MedicalStaffDto model)
+    [Authorize(Roles = "cityAdmin")]
+    public async Task<IActionResult> AddMedicalPostion(AddMedicalStaffDto model)
     {
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
@@ -121,12 +133,16 @@ public class CityAdminController
     }
 
     [HttpPost("healthCare-add")]
+    [Authorize(Roles = "cityAdmin")]
     public async Task<IActionResult> AddHealthCareCenter(AddHealthCareDto model)
     {
         if (!ModelState.IsValid)
             return UnprocessableEntity(new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity, "الرجاء التاكد ان جميع المدخلات صحيحه"));
 
+        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
         var healthCare = model.Adapt<HealthCareCenter>();
+        healthCare.CityAdminId = adminId;
 
         await unitOfWork.HealthCareCenterRepo.AddAsync(healthCare);
 
@@ -135,19 +151,21 @@ public class CityAdminController
         if (result == 0)
             throw new BadRequestException("لم يتم حفظ الوحده الصحيه");
 
-        return CreatedAtAction("HealthCareDetails", new { Id = healthCare.HealthCareCenterId });
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم انشاء الوحده الصحيه بنجاح");
+
+        return Ok(response);
     }
 
-
     [HttpGet("complaints")]
-    public async Task<IActionResult> Complaints()
+    [Authorize(Roles = "cityAdmin")]
+    public IActionResult Complaints()
     {
         var city = User.FindFirst("city")!.Value;
 
-        var complaints = await unitOfWork.ComplaintRepo
+        var complaints = unitOfWork.ComplaintRepo
             .FindByCondition(c => c.User.City == city && c.IsResolved == false, false, "User")
             .Select(C => C.Adapt<ComplaintsDto>())
-            .ToListAsync();
+            .ToList();
             
 
         if (complaints is null)
@@ -159,6 +177,7 @@ public class CityAdminController
     }
 
     [HttpGet("{id:guid}/complaint")]
+    [Authorize(Roles = "cityAdmin")]
     public async Task<IActionResult> Complaint(Guid id)
     {
         var complaint =
@@ -178,6 +197,7 @@ public class CityAdminController
     }
 
     [HttpPut("{complaintId:guid}/handle-complaint")]
+    [Authorize(Roles = "cityAdmin")]
     public async Task<IActionResult> HandleComplaint(Guid complaintId)
     {
         var complaint =
@@ -208,6 +228,7 @@ public class CityAdminController
     }
 
     [HttpGet("organizers")]
+    [Authorize(Roles = "cityAdmin")]
     public IActionResult Organizers()
     {
         var organizers = GetMedicalStaff(StaffRole.Organizer);
@@ -220,6 +241,7 @@ public class CityAdminController
     }
 
     [HttpGet("doctors")]
+    [Authorize(Roles = "cityAdmin")]
     public IActionResult Doctors()
     {
         var doctors = GetMedicalStaff(StaffRole.Doctor);

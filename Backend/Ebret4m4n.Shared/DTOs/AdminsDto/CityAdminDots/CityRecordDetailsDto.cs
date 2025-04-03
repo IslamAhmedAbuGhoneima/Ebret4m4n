@@ -1,4 +1,6 @@
-﻿namespace Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
+﻿using Ebret4m4n.Shared.DTOs.InventoriesDtos;
+
+namespace Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
 
 public record CityRecordDetailsDto
 {
@@ -8,5 +10,5 @@ public record CityRecordDetailsDto
 
     public string Email { get; init; } = null!;
 
-    public List<MainInventoryDto> VaccineInventory { get; set; } = [];
+    public List<InventoryDto> MainInventories { get; init; } = [];
 }
