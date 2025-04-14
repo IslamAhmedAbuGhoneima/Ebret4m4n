@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Ebret4m4n.Shared.DTOs.HealthCareDtos;
+using Ebret4m4n.Shared.DTOs.ComplaintDtos;
+using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.SignalRDtos;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +12,7 @@ using System.Security.Claims;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Mapster;
-using System.Threading.Tasks;
-using Ebret4m4n.Shared.DTOs.ComplaintDtos;
+
 
 namespace Ebret4m4n.API.Controllers;
 
@@ -19,8 +20,9 @@ namespace Ebret4m4n.API.Controllers;
 [Authorize(Roles = "parent")]
 [ApiController]
 public class ParentController
-    (IUnitOfWork unitOfWork,UserManager<ApplicationUser> userManager) : ControllerBase
+    (IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager) : ControllerBase
 {
+
     [HttpGet("children-reservations")]
     public IActionResult ParentReservations()
     {
@@ -28,11 +30,45 @@ public class ParentController
 
         var appointments =
             unitOfWork.AppointmentRepo.FindByCondition(
-                a => a.UserId == userId , false, ["Child"]);
+                a => a.UserId == userId && a.Date >= DateTime.UtcNow.Date, false, ["Child"]);
 
         var userReservationsDto = appointments.Adapt<List<UserReservationDto>>();
 
         var response = new GeneralResponse<List<UserReservationDto>>(StatusCodes.Status200OK, userReservationsDto);
+
+        return Ok(response);
+    }
+
+    [HttpGet("{id:guid}/appointment-details")]
+    public async Task<IActionResult> AppointmentDetails(Guid id)
+    {
+        var appointment = await unitOfWork.AppointmentRepo.FindAsync(app => app.Id == id, false);
+
+        if (appointment is null)
+            throw new NotFoundBadRequest("لا يوجد حجز بهذا المعاد");
+
+        var appointmentDto = appointment.Adapt<AppointmentDto>();
+
+        var response = new GeneralResponse<AppointmentDto>(StatusCodes.Status200OK, appointmentDto);
+
+        return Ok(response);
+    }
+
+    [HttpGet("healthcare-details")]
+    public async Task<IActionResult> HealthCareDetails()
+    {
+        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+        var user = await userManager.Users
+            .Include(U => U.HealthCareCenter)
+            .FirstOrDefaultAsync(U => U.Id == parentId);
+
+        if (user?.HealthCareCenter is null)
+            throw new NotFoundBadRequest("هذا المستخدم لا ينتمي الي اي وحده صحيه");
+
+        var healthCareDetailsDto = user.HealthCareCenter.Adapt<HealthCareDetailsDto>();
+
+        var response = new GeneralResponse<HealthCareDetailsDto>(StatusCodes.Status200OK, healthCareDetailsDto);
 
         return Ok(response);
     }
@@ -127,21 +163,6 @@ public class ParentController
             throw new BadRequestException("لم يتم الغاء المعاد حاول مره اخري");
 
         return NoContent();
-    }
-
-    [HttpGet("{reciverId:guid}/user-messages")]
-    public IActionResult GetChatMessages(Guid reciverId)
-    {
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        var messages = unitOfWork.ChatRepo.FindByCondition(message => message.SenderId == parentId
-        && message.ReceiverId == reciverId.ToString(), false);
-
-        var messagesDto = messages.Adapt<List<ChatMessageDto>>();
-
-        var response = new GeneralResponse<List<ChatMessageDto>>(StatusCodes.Status200OK, messagesDto);
-
-        return Ok(response);
     }
 
     [HttpPost("complaint-submit")]

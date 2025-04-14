@@ -109,7 +109,7 @@ public class OrderController
     }
 
     [HttpPut("{orderId:guid}/marke-received-order")]
-    [Authorize(Roles = "governorateAdmin,cityAdmin,organizer")]
+    [Authorize(Roles = "governorateAdmin,cityAdmin")]
     public async Task<IActionResult> MarkeReceivedOrder(Guid orderId)
     {
         var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -272,6 +272,44 @@ public class OrderController
         var response = new GeneralResponse<List<GovernorateOrderDto>>(StatusCodes.Status200OK, governorateOrdersDto);
 
         return Ok(response);
+    }
+
+    [HttpPost("{orderId:guid}/accept-governorate-order-request")]
+    [Authorize(Roles = "admin")]
+    public async Task<IActionResult> AcceptOrderRequest(Guid orderId)
+    {
+        var order = await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, false);
+
+        await unitOfWork.BeginTransactionAsync();
+
+        try
+        {
+            order.Status = OrderStatus.Processing;
+
+            var notification = Utility.CreateNotification("طلب جديد", "تم قبول طلب القاحات الخاص بك", order.GovernorateAdminStaffId!);
+
+            await unitOfWork.NotificationRepo.AddAsync(notification);
+            unitOfWork.OrderRepo.Update(order);
+
+
+            var result = await unitOfWork.SaveAsync();
+
+            if (result == 0)
+                throw new BadRequestException("لم يتم حفظ البيانات");
+
+            await hubContext.Clients.User(order.GovernorateAdminStaffId!).SendAsync("NotificationMessage");
+
+            await unitOfWork.CommitTransactionAsync();
+
+            var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم قبول الطلب بنجاح");
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            return StatusCode(StatusCodes.Status500InternalServerError, new GeneralResponse<string>(StatusCodes.Status500InternalServerError, $"حدث خطا ما اثناء تسجيل البينات: {ex.Message}"));
+        }
     }
 
 

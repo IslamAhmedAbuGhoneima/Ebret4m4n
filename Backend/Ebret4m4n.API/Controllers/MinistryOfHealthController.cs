@@ -5,10 +5,7 @@ using Ebret4m4n.Shared.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Entities.Exceptions;
-using Microsoft.AspNetCore.SignalR;
-using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Contracts;
-using Ebret4m4n.API.Hubs;
 using Mapster;
 
 
@@ -19,8 +16,7 @@ namespace Ebret4m4n.API.Controllers;
 [ApiController]
 public class MinistryOfHealthController
     (IUnitOfWork unitOfWork,
-    UserManager<ApplicationUser> userManager,
-    IHubContext<NotificationHub> hubContext) : ControllerBase
+    UserManager<ApplicationUser> userManager) : ControllerBase
 {
     [HttpGet("governorates")]
     public IActionResult GetGovernorates()
@@ -103,42 +99,5 @@ public class MinistryOfHealthController
         var response = new GeneralResponse<List<GovernorateAdminsDto>>(StatusCodes.Status200OK, admins);
 
         return Ok(response);
-    }
-
-    [HttpPost("{orderId:guid}/accept-order-request")]
-    public async Task<IActionResult> AcceptOrderRequest(Guid orderId)
-    {
-        var order = await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, false);
-        
-        await unitOfWork.BeginTransactionAsync();
-
-        try
-        {
-            order.Status = OrderStatus.Processing;
-
-            var notification = Utility.CreateNotification("طلب جديد", "تم قبول طلب القاحات الخاص بك", order.GovernorateAdminStaffId!);
-
-            await unitOfWork.NotificationRepo.AddAsync(notification);
-            unitOfWork.OrderRepo.Update(order);
-
-
-            var result = await unitOfWork.SaveAsync();
-
-            if (result == 0)
-                throw new BadRequestException("لم يتم حفظ البيانات");
-
-            await hubContext.Clients.User(order.GovernorateAdminStaffId!).SendAsync("NotificationMessage");
-
-            await unitOfWork.CommitTransactionAsync();
-
-            var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم قبول الطلب بنجاح");
-
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            await unitOfWork.RollbackTransactionAsync();
-            return StatusCode(StatusCodes.Status500InternalServerError, new GeneralResponse<string>(StatusCodes.Status500InternalServerError, $"حدث خطا ما اثناء تسجيل البينات: {ex.Message}"));
-        }
     }
 }

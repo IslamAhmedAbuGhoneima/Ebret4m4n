@@ -34,6 +34,8 @@ builder.Services.AddReservationReminderService();
 // Register Mapster
 MapsterConfig.RegisterMappings();
 
+// Rate Limiter
+builder.Services.AddRateLimiter();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -52,8 +54,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
 app.UseCors("CorsPolicy");
+
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();

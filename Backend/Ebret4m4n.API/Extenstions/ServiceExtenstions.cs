@@ -2,16 +2,18 @@
 using Ebret4m4n.Entities.ConfigurationModels;
 using Ebret4m4n.Repository.Configuration;
 using Ebret4m4n.Repository.Repositories;
+using Ebret4m4n.API.BackgroundService;
 using Ebret4m4n.Repository.UnitOfWork;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.RateLimiting;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Repository;
 using Ebret4m4n.Contracts;
 using System.Text;
 using Hangfire;
-using Ebret4m4n.API.BackgroundService;
+
 
 namespace Ebret4m4n.API.Extenstions;
 
@@ -25,12 +27,10 @@ public static class ServiceExtenstions
     public static void ConfigureCors(this IServiceCollection service) =>
         service.AddCors(opts =>
             opts.AddPolicy("CorsPolicy", builder =>
-                builder.AllowAnyOrigin()
+                builder.WithOrigins("http://localhost:4200")
                     .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    
-            )
-        );
+                    .AllowAnyHeader()   
+            ));
 
     public static void ConfigureAddIdentity(this IServiceCollection service) =>
         service.AddIdentity<ApplicationUser, IdentityRole>(opts =>
@@ -109,4 +109,25 @@ public static class ServiceExtenstions
 
     public static void AddReservationReminderService(this IServiceCollection service)
         => service.AddScoped<ReservationReminderService>();
+
+    public static void AddRateLimiter(this IServiceCollection service)
+        => service.AddRateLimiter(options =>
+        {
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                RateLimitPartition.GetFixedWindowLimiter("global", _ => new FixedWindowRateLimiterOptions
+                {
+                    Window = TimeSpan.FromSeconds(30),
+                    PermitLimit = 5,
+                    QueueLimit = 0,
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                }) 
+            );
+
+            options.OnRejected = async (context, token) =>
+            {
+                context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+                context.HttpContext.Response.ContentType = "text/plain";
+                await context.HttpContext.Response.WriteAsync("Rate limit exceeded. Try again later.", token);
+            };
+        });
 }

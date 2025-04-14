@@ -10,6 +10,7 @@ using Ebret4m4n.Shared.DTOs.OrderDtos;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
 using Ebret4m4n.Entities.Models;
 using Mapster;
+using Ebret4m4n.Shared.DTOs.ChatDtos;
 
 
 namespace Ebret4m4n.API.Mapping;
@@ -127,5 +128,9 @@ public static class MapsterConfig
 
         TypeAdapterConfig<HealthCareCenter, HealthCareDetailsDto>.NewConfig()
             .MapToConstructor(true);
+
+        TypeAdapterConfig<Chat, ChatUsersListDto>.NewConfig()
+            .Map(dest => dest, src => src.Sender);
+
     }
 }

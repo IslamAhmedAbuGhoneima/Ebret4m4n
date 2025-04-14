@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Contracts;
-using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.API.Utilites;
+using Mapster;
 
 namespace Ebret4m4n.API.Hubs;
 
@@ -22,7 +22,7 @@ public class ChatHub
 
         await unitOfWork.SaveAsync();
 
-        var chatDto = chat.Adapt<ChatMessageDto>();
+        var chatDto = chat.Adapt<ChatMessageDetailsDto>();
 
         await Clients.Users(chat.SenderId!, chat.ReceiverId!).SendAsync("ReceiveMessage", chatDto);
     }
