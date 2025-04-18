@@ -2,7 +2,9 @@
 using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
 using System.Text.Json;
+using Stripe.Checkout;
 using Mapster;
+using Stripe;
 
 namespace Ebret4m4n.API.Utilites;
 
@@ -25,7 +27,7 @@ public class Utility
         return antigens;
     }
 
-    public static List<Vaccine> ChildBaseVaccines()
+    public static List<BaseVaccine> ReadBaseVaccineFromJson()
     {
         string path =
                 Path.Combine(Directory.GetCurrentDirectory(), "ChildBaseVaccines", "vaccines.json");
@@ -38,6 +40,13 @@ public class Utility
 
         if (baseVaccines == null)
             throw new BadRequestException("حدث خطا ما اثناء تسجيل الطفل الرجاء الاتصال بالدعم الفني للمساعده");
+
+        return baseVaccines;
+    }
+
+    public static List<Vaccine> ChildBaseVaccines()
+    {
+        var baseVaccines = ReadBaseVaccineFromJson();
 
         var vaccines = baseVaccines.Adapt<List<Vaccine>>();
 
@@ -56,7 +65,7 @@ public class Utility
         return notification;
     }
 
-    public static List<Vaccine> ReadVaccinesFromJsonFile(List<string>? childVaccines, string childId)
+    public static List<Vaccine> ChildVaccines(List<string>? childVaccines, string childId)
     {
         var vaccines = ChildBaseVaccines();
 
@@ -134,5 +143,44 @@ public class Utility
         }
 
         return $"/Files/ChatFiles/{fileName}{fileExtension}";
+    }
+
+    public static async Task<Session> CreateSessionPayment(string parentId, string parentEmail, string childId, string childName)
+    {
+        var options = new SessionCreateOptions
+        {
+            Currency = "usd",
+            Mode = "payment",
+            ClientReferenceId = parentId,
+            LineItems = new List<SessionLineItemOptions>
+            {
+                new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        Currency = "usd",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = $"تسجيل واضافه جدول التطعيمات للطفل {childName}",
+                        },
+                        UnitAmount = 5000,
+                    },
+                    Quantity = 1,
+                },
+            },
+            Metadata = new Dictionary<string, string>
+            {
+                { "childId", childId },
+                { "childName", childName },
+                { "parentEmail", parentEmail}
+            },
+            SuccessUrl = "http://localhost:4200/payment/success",
+            CancelUrl = "http://localhost:4200/payment/cancel"
+        };
+
+        var service = new SessionService();
+        var session = await service.CreateAsync(options);
+
+        return session;
     }
 }

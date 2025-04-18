@@ -13,7 +13,7 @@ namespace Ebret4m4n.API.Controllers;
 [Authorize(Roles ="doctor")]
 [ApiController]
 public class DoctorController
-    (IUnitOfWork unitOfWork): ControllerBase
+    (IUnitOfWork unitOfWork,IEmailSender emailSender): ControllerBase
 {
     [HttpGet("children-disease")]
     public IActionResult GetChildrenWithDisease()
@@ -23,7 +23,8 @@ public class DoctorController
         var children =
              unitOfWork.ChildRepo.FindByCondition(
                 c => c.PatientHistory != null &&
-                c.User.HealthCareCenterId.ToString() == doctorHcCenterId, false, ["User"]).ToList();
+                (c.Transaction != null && c.Transaction.Paid == true) &&
+                c.User.HealthCareCenterId.ToString() == doctorHcCenterId, false, ["User", "Transaction"]).ToList();
 
 
         var childrenDto = children.Adapt<List<ChildDto>>();
@@ -49,12 +50,17 @@ public class DoctorController
     public async Task<IActionResult> SuspendChildVaccine(string childId)
     {
         var child = 
-            await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false);
+            await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false, ["User"]);
 
-        child.IsNoramal = false;
+        child.IsNormal = false;
 
         unitOfWork.ChildRepo.Update(child);
-        await unitOfWork.SaveAsync();
+        int result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم تاجيل اللقاحات لهذا الطفل حاول مره اخري");
+
+        await emailSender.SendEmailAsync(child.User.Email!, "تاجيل التطعيمات", $"<p>بناء علي التحاليل المقدمه تم تاجيل التطعيم لطفلك : {child.Name}</p>");
 
         var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم تاجيل اللقاحات لهذا الطفل");
 
@@ -64,7 +70,7 @@ public class DoctorController
     [HttpGet("children-suspended")]
     public IActionResult SuspendedChildren()
     {
-        var children = unitOfWork.ChildRepo.FindByCondition(children => children.IsNoramal == false, false)
+        var children = unitOfWork.ChildRepo.FindByCondition(children => children.IsNormal == false, false)
             .Select(children => children.Name).ToList();
 
         if (children is null)
@@ -77,7 +83,7 @@ public class DoctorController
     [HttpPost("{childId}/add-normal-vaccine")]
     public async Task<IActionResult> AddNormalVacinnes(string childId)
     {
-        var vaccines = Utility.ReadVaccinesFromJsonFile(null, childId);
+        var vaccines = Utility.ChildVaccines(null, childId);
 
         foreach (var vaccine in vaccines)
             vaccine.ChildId = childId;

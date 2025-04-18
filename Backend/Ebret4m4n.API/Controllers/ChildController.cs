@@ -20,10 +20,13 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     [HttpGet("{id}/child")]
     public async Task<IActionResult> GetChild(string id)
     {
-        var child = await unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false, ["Vaccines"]);
+        var child = await unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false, ["Vaccines", "Transaction"]);
 
         if (child is null)
-            throw new NotFoundBadRequest($"Child with {id} Not found");
+            throw new NotFoundBadRequest($"لا يوجد طفل مسجل بهذا الرقم : {id}");
+
+        if(child.Transaction is null || !child.Transaction.Paid)
+            throw new BadRequestException("لم يتم دفع رسوم تسجيل الطفل");
 
         var childDto = child.Adapt<ChildDto>();
 
@@ -44,9 +47,9 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
             throw new NotFoundBadRequest("you don not have any child");
 
 
-        var childrenDtos = children.Adapt<List<ChildDto>>();
+        var childrenDtos = children.Adapt<List<ChildrenDto>>();
 
-        var response = new GeneralResponse<List<ChildDto>>(StatusCodes.Status200OK, childrenDtos);
+        var response = new GeneralResponse<List<ChildrenDto>>(StatusCodes.Status200OK, childrenDtos);
 
         return Ok(response);
     }
@@ -70,7 +73,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         if(dto.ReportFiles == null && dto.PatientHistory == null)
         {
-            var vaccines = Utility.ReadVaccinesFromJsonFile(dto.Vaccines, child.Id);
+            var vaccines = Utility.ChildVaccines(dto.Vaccines, child.Id);
             await unitOfWork.VaccineRepo.AddRangeAsync(vaccines);
         }
 
@@ -79,7 +82,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
             var childReports = Utility.SaveReportFiles(dto.ReportFiles, dto.Id);
             await unitOfWork.HealthyReportRepo.AddRangeAsync(childReports);
         }
-
+        
         await unitOfWork.ChildRepo.AddAsync(child);
 
         var result = await unitOfWork.SaveAsync();

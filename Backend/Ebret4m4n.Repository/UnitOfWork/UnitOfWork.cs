@@ -21,6 +21,7 @@ public class UnitOfWork : IUnitOfWork
     readonly IChatRepository _chatRepo;
     readonly IOrderItemRepository _orderItemRepo;
     readonly INotificationRepository _notificationRepo;
+    readonly ITransactionRepository _transactionRepo;
 
     readonly EbretAmanDbContext _dbContext;
     private IDbContextTransaction? _transaction;
@@ -45,6 +46,7 @@ public class UnitOfWork : IUnitOfWork
         _orderItemRepo = new OrderItemRepository(_dbContext);
         _medicalStaffRepo = new MedicalStaffRepository(_dbContext);
         _notificationRepo = new NotificationRepository(_dbContext);
+        _transactionRepo = new TransactionRepository(_dbContext);
     }
 
     public IChildRepository ChildRepo => _childRepo;
@@ -76,6 +78,8 @@ public class UnitOfWork : IUnitOfWork
     public IChatRepository ChatRepo => _chatRepo;
 
     public INotificationRepository NotificationRepo => _notificationRepo;
+
+    public ITransactionRepository TransactionRepo => _transactionRepo;
 
     public async Task BeginTransactionAsync()
         => _transaction = await _dbContext.Database.BeginTransactionAsync();

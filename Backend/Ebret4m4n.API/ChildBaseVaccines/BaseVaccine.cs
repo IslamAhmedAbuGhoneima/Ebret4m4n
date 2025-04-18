@@ -7,4 +7,6 @@ public class BaseVaccine
     public string name { get; set; } = null!;
 
     public int childAge { get; set; }
+
+    public List<string> antigens { get; set; } = [];
 }

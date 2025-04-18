@@ -4,6 +4,8 @@ using Ebret4m4n.API.Extenstions;
 using Ebret4m4n.API.Mapping;
 using Ebret4m4n.API.Hubs;
 using Hangfire;
+using Stripe;
+using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,9 +39,14 @@ MapsterConfig.RegisterMappings();
 // Rate Limiter
 builder.Services.AddRateLimiter();
 
+// Stripe Settings
+builder.Services.AddStripeConfiguration(builder.Configuration);
+StripeConfiguration.ApiKey = builder.Configuration["StripeSettings:secretKey"];
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerConfiguration();
 
 var app = builder.Build();
 
@@ -56,14 +63,14 @@ app.UseHttpsRedirection();
 
 app.UseCors("CorsPolicy");
 
+app.UseHangfireDashboard();
+
 app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
-app.UseHangfireDashboard();
 
 app.MapHub<ChatHub>("/chat");
 app.MapHub<NotificationHub>("/notification");

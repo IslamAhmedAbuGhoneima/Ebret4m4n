@@ -13,6 +13,7 @@ using Ebret4m4n.Repository;
 using Ebret4m4n.Contracts;
 using System.Text;
 using Hangfire;
+using Microsoft.OpenApi.Models;
 
 
 namespace Ebret4m4n.API.Extenstions;
@@ -29,14 +30,14 @@ public static class ServiceExtenstions
             opts.AddPolicy("CorsPolicy", builder =>
                 builder.WithOrigins("http://localhost:4200")
                     .AllowAnyMethod()
-                    .AllowAnyHeader()   
+                    .AllowAnyHeader()
             ));
 
     public static void ConfigureAddIdentity(this IServiceCollection service) =>
         service.AddIdentity<ApplicationUser, IdentityRole>(opts =>
         {
             opts.User.RequireUniqueEmail = true;
-            opts.User.AllowedUserNameCharacters = 
+            opts.User.AllowedUserNameCharacters =
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._@ " +
             "ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهوىي";
 
@@ -44,9 +45,9 @@ public static class ServiceExtenstions
             opts.Password.RequiredLength = 8;
             opts.Password.RequiredUniqueChars = 0;
             opts.Password.RequireUppercase = false;
-            
+
             opts.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
-        
+
             opts.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultProvider;
         })
         .AddEntityFrameworkStores<EbretAmanDbContext>()
@@ -116,11 +117,11 @@ public static class ServiceExtenstions
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
                 RateLimitPartition.GetFixedWindowLimiter("global", _ => new FixedWindowRateLimiterOptions
                 {
-                    Window = TimeSpan.FromSeconds(30),
-                    PermitLimit = 5,
+                    Window = TimeSpan.FromMinutes(1),
+                    PermitLimit = 100,
                     QueueLimit = 0,
                     QueueProcessingOrder = QueueProcessingOrder.OldestFirst
-                }) 
+                })
             );
 
             options.OnRejected = async (context, token) =>
@@ -130,4 +131,36 @@ public static class ServiceExtenstions
                 await context.HttpContext.Response.WriteAsync("Rate limit exceeded. Try again later.", token);
             };
         });
+
+    public static void AddStripeConfiguration(this IServiceCollection service, IConfiguration configuration)
+        => service.Configure<StripeSettings>(configuration.GetSection("StripeSettings"));
+
+    public static void AddSwaggerConfiguration(this IServiceCollection service)
+    {
+        service.AddSwaggerGen(c =>
+        {
+            // 1. Define the “Bearer” scheme
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Enter ‘Bearer’ [space] and then your valid JWT token.\n\nExample: \"Bearer eyJhbGciOiJI…\""
+            });
+
+            // 2. Require the “Bearer” scheme for all endpoints
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement {
+            {
+                new OpenApiSecurityScheme {
+                    Reference = new OpenApiReference {
+                        Type = ReferenceType.SecurityScheme,
+                        Id   = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }});
+        });
+    }
 }

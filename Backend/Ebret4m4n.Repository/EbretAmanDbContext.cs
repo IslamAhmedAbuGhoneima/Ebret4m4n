@@ -41,6 +41,8 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<OrderItem> OrderItems { get; set; }
 
+    public DbSet<Transaction> Transactions { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.ApplyConfigurationsFromAssembly(typeof(RolesConfiguration).Assembly);

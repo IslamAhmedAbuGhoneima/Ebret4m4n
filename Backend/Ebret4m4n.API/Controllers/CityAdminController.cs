@@ -25,7 +25,8 @@ namespace Ebret4m4n.API.Controllers;
 public class CityAdminController
     (IUnitOfWork unitOfWork, 
     UserManager<ApplicationUser> userManager,
-    IHubContext<NotificationHub> hubContext) : ControllerBase
+    IHubContext<NotificationHub> hubContext,
+    IEmailSender emailSender) : ControllerBase
 {
 
     [HttpGet("healthcareCenter-village")]
@@ -222,6 +223,9 @@ public class CityAdminController
         var notificationDto = notification.Adapt<NotificationDto>();
 
         await hubContext.Clients.User(complaint.UserId).SendAsync("NotificationMessage", notificationDto);
+
+        await emailSender.SendEmailAsync(complaint.User.Email!, "تنبيه", "<p>تم حل الشكوي الخاص بك الرجاء التوجه للوحد الصحيه لاستكمال التطعيمات لاطفالك</p>");
+
         var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم ارسال التنيه بنجاح");
 
         return Ok(response);

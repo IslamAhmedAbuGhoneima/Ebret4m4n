@@ -2,15 +2,18 @@
 using Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
 using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 using Ebret4m4n.Shared.DTOs.MedicalStaffDtos;
+using Ebret4m4n.Shared.DTOs.AppointmentDtos;
 using Ebret4m4n.Shared.DTOs.HealthCareDtos;
 using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
 using Ebret4m4n.API.ChildBaseVaccines;
 using Ebret4m4n.Shared.DTOs.OrderDtos;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
-using Ebret4m4n.Entities.Models;
-using Mapster;
 using Ebret4m4n.Shared.DTOs.ChatDtos;
+using Ebret4m4n.Entities.Models;
+using Stripe.Checkout;
+using Mapster;
+
 
 
 namespace Ebret4m4n.API.Mapping;
@@ -132,5 +135,14 @@ public static class MapsterConfig
         TypeAdapterConfig<Chat, ChatUsersListDto>.NewConfig()
             .Map(dest => dest, src => src.Sender);
 
+        TypeAdapterConfig<Appointment, ComingChildrenDto>.NewConfig()
+            .Map(dest => dest.ParentName, src => src.User.FirstName)
+            .Map(dest => dest.ChildName, src => src.Child.Name);
+
+        TypeAdapterConfig<(Session session, string parentId, string childId), Transaction>.NewConfig()
+            .Map(dest => dest.Amount, src => src.session.AmountTotal)
+            .Map(dest => dest.ChildId, src => src.childId)
+            .Map(dest => dest.ParentId, src => src.parentId)
+            .Map(dest => dest.SessionId, src => src.session.Id);
     }
 }

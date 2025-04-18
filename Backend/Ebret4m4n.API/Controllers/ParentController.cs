@@ -1,7 +1,6 @@
 ﻿using Ebret4m4n.Shared.DTOs.HealthCareDtos;
 using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Microsoft.AspNetCore.Authorization;
-using Ebret4m4n.Shared.DTOs.SignalRDtos;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -30,7 +29,8 @@ public class ParentController
 
         var appointments =
             unitOfWork.AppointmentRepo.FindByCondition(
-                a => a.UserId == userId && a.Date >= DateTime.UtcNow.Date, false, ["Child"]);
+                a => a.UserId == userId && a.Date >= DateTime.UtcNow.Date, false, ["Child"])
+            .ToList() ?? [];
 
         var userReservationsDto = appointments.Adapt<List<UserReservationDto>>();
 

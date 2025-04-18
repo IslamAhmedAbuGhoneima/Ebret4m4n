@@ -168,9 +168,9 @@ public class OrderController
 
     }
 
-    [HttpPost("{orderId:guid}/send-vaccine-order")]
+    [HttpPost("{orderId:guid}/accept-vaccine-order")]
     [Authorize(Roles = "governorateAdmin,cityAdmin")]
-    public async Task<IActionResult> SendVaccineOrder(Guid orderId)
+    public async Task<IActionResult> AcceptVaccineOrder(Guid orderId)
     {
         var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
         var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
@@ -197,8 +197,9 @@ public class OrderController
             order.Status = OrderStatus.Processing;
             unitOfWork.OrderRepo.Update(order);
 
+
             var notification =
-                 Utility.CreateNotification("اللقاحات", "تم قبول طلب القاحات الخاص بك", order.CityAdminStaffId);
+                 Utility.CreateNotification("اللقاحات", "تم قبول طلب القاحات الخاص بك", adminRole == "governorateAdmin" ? order.CityAdminStaffId! : order.MedicalStaffId!);
 
             await unitOfWork.NotificationRepo.AddAsync(notification);
 
@@ -209,7 +210,7 @@ public class OrderController
 
             var notificationDto = notification.Adapt<NotificationDto>();
 
-            // await hubContext.Clients.User(order.CityAdminStaffId).SendAsync("NotificationMessage", notificationDto);
+            await hubContext.Clients.User(notification.UserId).SendAsync("NotificationMessage", notificationDto);
 
             await unitOfWork.CommitTransactionAsync();
 
@@ -310,6 +311,59 @@ public class OrderController
             await unitOfWork.RollbackTransactionAsync();
             return StatusCode(StatusCodes.Status500InternalServerError, new GeneralResponse<string>(StatusCodes.Status500InternalServerError, $"حدث خطا ما اثناء تسجيل البينات: {ex.Message}"));
         }
+    }
+
+    [HttpPost("{orderId:guid}/orgnizer-recived-order")]
+    [Authorize(Roles = "organizer")]
+    public async Task<IActionResult> OrgnizerRecivedOrder(Guid orderId)
+    {
+        var orgnizerHcId = User.FindFirst("healthCareId")!.Value;
+
+        await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            var order = await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, true, ["OrderItems"]);
+
+            if (order is null)
+                throw new NotFoundBadRequest("لم يتم العثور على الطلب");
+
+            var inventory = unitOfWork.InventoryRepo.FindByCondition(inv => inv.HealthCareCenterId.ToString() == orgnizerHcId, true)
+                .ToList();
+
+            var orderItems = order.OrderItems.ToList();
+
+            foreach (var antigine in orderItems)
+            {
+                var inventoryItem = inventory.FirstOrDefault(inv => inv.Antigen == antigine.Antigen);
+
+                if (inventoryItem is null)
+                    throw new BadRequestException("لم يتم العثور على العنصر في المخزن");
+
+                inventoryItem.Amount += antigine.Amount;
+
+                unitOfWork.InventoryRepo.Update(inventoryItem);
+            }
+
+            order.Status = OrderStatus.Recived;
+
+            unitOfWork.OrderRepo.Update(order);
+
+            var result = await unitOfWork.SaveAsync();
+
+            if (result == 0)
+                throw new BadRequestException("لم يتم حفظ البيانات");
+
+            await unitOfWork.CommitTransactionAsync();
+        }
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync();
+
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                new GeneralResponse<string>(StatusCodes.Status500InternalServerError, "حدث خطا ما اثناء تسجيل البينات"));
+        }
+
+        return NoContent();
     }
 
 

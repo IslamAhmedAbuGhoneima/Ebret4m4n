@@ -3,7 +3,7 @@
     "id": 1,
     "name": "الميلاد",
     "childAge": 0,
-    "Antigens": [
+    "antigens": [
       "كبدي ب رضع"
     ]
   },
@@ -11,7 +11,7 @@
     "id": 2,
     "name": "الصفريه",
     "childAge": 0,
-    "Antigens": [
+    "antigens": [
       "سابين"
     ]
   },
@@ -19,7 +19,7 @@
     "id": 3,
     "name": "الدرن",
     "childAge": 0,
-    "Antigens": [
+    "antigens": [
       "بي سي جي"
     ]
   },
@@ -27,7 +27,7 @@
     "id": 4,
     "name": "الاولي",
     "childAge": 2,
-    "Antigens": [
+    "antigens": [
       "سابين",
       "الخماسي",
       "سولك"
@@ -37,7 +37,7 @@
     "id": 5,
     "name": "الثانيه",
     "childAge": 4,
-    "Antigens": [
+    "antigens": [
       "سابين",
       "الخماسي",
       "سولك"
@@ -47,7 +47,7 @@
     "id": 6,
     "name": "الثالثه",
     "childAge": 6,
-    "Antigens": [
+    "antigens": [
       "سابين",
       "الخماسي",
       "سولك"
@@ -57,7 +57,7 @@
     "id": 7,
     "name": "الرابعه",
     "childAge": 9,
-    "Antigens": [
+    "antigens": [
       "سابين"
     ]
   },
@@ -65,7 +65,7 @@
     "id": 8,
     "name": "الخامسه",
     "childAge": 12,
-    "Antigens": [
+    "antigens": [
       "سابين",
       "ام ام ار"
     ]
@@ -74,7 +74,7 @@
     "id": 9,
     "name": "المنشطه",
     "childAge": 18,
-    "Antigens": [
+    "antigens": [
       "سابين",
       "ام ام ار",
       "الثلاثي البكتيري"

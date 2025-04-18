@@ -12,12 +12,12 @@ using Mapster;
 namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(Roles = "governorateAdmin,cityAdmin")]
 [ApiController]
 public class InventoryController
     (IUnitOfWork unitOfWork): ControllerBase
 {
-    [HttpPost("inventory-create")]
+    [HttpPost("admins-create-inventory")]
+    [Authorize(Roles = "governorateAdmin,cityAdmin")]
     public async Task<IActionResult> EstablishInventory()
     {
         var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -76,7 +76,8 @@ public class InventoryController
     }
 
     [HttpGet("inventory")]
-    public IActionResult Inventory()
+    [Authorize(Roles = "governorateAdmin,cityAdmin")]
+    public IActionResult GetAdminsInventory()
     {
         var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
         var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
@@ -92,6 +93,59 @@ public class InventoryController
         var invenrotyDto = inventory.Adapt<List<InventoryDto>>();
 
         var response = new GeneralResponse<List<InventoryDto>>(StatusCodes.Status200OK, invenrotyDto);
+
+        return Ok(response);
+    }
+
+    [HttpPost("organizer-create-inventory")]
+    [Authorize(Roles = "organizer")]
+    public async Task<IActionResult> EstablishOrgnizerInventory()
+    {
+        var organizerHCId = User.FindFirst("healthCareId")!.Value;
+
+        var antigens = Utility.InventoryAntigens();
+
+        List<Inventory> inventoryAntigens = [];
+
+        foreach(var antigen in antigens)
+        {
+            var inventory = new Inventory
+            {
+                Antigen = antigen,
+                Amount = 0,
+                HealthCareCenterId = Guid.Parse(organizerHCId)
+            };
+            inventoryAntigens.Add(inventory);
+        }
+
+        await unitOfWork.InventoryRepo.AddRangeAsync(inventoryAntigens);
+
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            throw new BadRequestException("لم يتم حفظ بيانات المخزن الرجاء المحاوله مره اخري");
+
+        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم انشاء المخزن بنجاح");
+
+        return Ok(response);
+    }
+
+    [HttpGet("get_orgnizer_inventory")]
+    [Authorize(Roles = "organizer")]
+    public IActionResult GetOrganizerInventory()
+    {
+        var organizerHCId = User.FindFirst("healthCareId")!.Value;
+
+        var inventory =
+             unitOfWork.InventoryRepo.FindByCondition(inv => inv.HealthCareCenterId.ToString() == organizerHCId, false)
+             .ToList() ?? [];
+
+        if (inventory == null)
+            throw new NotFoundBadRequest("لم يتم انشاء مخزن ل هذه الوحدة");
+
+        var inventoryDto = inventory.Adapt<List<InventoryDto>>();
+
+        var response = new GeneralResponse<List<InventoryDto>>(StatusCodes.Status200OK, inventoryDto);
 
         return Ok(response);
     }

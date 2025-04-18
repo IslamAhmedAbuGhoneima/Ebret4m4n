@@ -32,6 +32,8 @@ public interface IUnitOfWork
 
     INotificationRepository NotificationRepo { get; }
 
+    ITransactionRepository TransactionRepo { get; }
+
     Task<int> SaveAsync();
 
     Task BeginTransactionAsync();

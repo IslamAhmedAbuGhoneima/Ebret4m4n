@@ -2,6 +2,6 @@
 
 namespace Ebret4m4n.Contracts;
 
-public interface IVaccineRepository : IBaseRepository<Vaccine>
+public interface ITransactionRepository : IBaseRepository<Transaction>
 {
 }

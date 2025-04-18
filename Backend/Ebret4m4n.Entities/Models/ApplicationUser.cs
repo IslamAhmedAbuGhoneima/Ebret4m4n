@@ -38,5 +38,7 @@ public class ApplicationUser : IdentityUser
     public ICollection<Notification>? Notifications { get; set; } = [];
 
     public ICollection<Appointment>? Appointments { get; set; } = []; 
+
+    public ICollection<Transaction>? Transactions { get; set; } = [];
     #endregion
 }

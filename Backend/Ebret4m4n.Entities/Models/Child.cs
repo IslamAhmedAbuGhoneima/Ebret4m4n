@@ -18,7 +18,7 @@ public class Child
 
     public char Gender { get; set; }
 
-    public bool IsNoramal { get; set; } = true;
+    public bool IsNormal { get; set; } = true;
 
     public string? PatientHistory {  get; set; }
     
@@ -28,6 +28,8 @@ public class Child
     [ForeignKey("User")]
     public string UserId { get; set; } = null!;
     public ApplicationUser User { get; set; }
+
+    public Transaction Transaction { get; set; } = null!;
 
     public ICollection<Vaccine>? Vaccines { get; set; } = [];
 
