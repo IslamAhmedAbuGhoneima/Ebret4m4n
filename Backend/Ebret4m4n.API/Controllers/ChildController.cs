@@ -58,7 +58,8 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     public async Task<IActionResult> AddChild([FromForm]AddChildDto dto)
     {
         if(!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+            return UnprocessableEntity(
+                new GeneralResponse<object>(StatusCodes.Status400BadRequest,ModelState));
 
         var checkUniqNameIdentifier =
             await unitOfWork.ChildRepo.FindAsync(C => C.Id == dto.Id, false);
@@ -123,7 +124,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("{childId:alpha}/child-remove")]
+    [HttpDelete("{childId}/child-remove")]
     public async Task<IActionResult> RemoveChild(string childId)
     {
         var child = await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false);
@@ -138,5 +139,4 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         return NoContent();
     }
-    
 }

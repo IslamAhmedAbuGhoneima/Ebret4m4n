@@ -54,25 +54,6 @@ public class ParentController
         return Ok(response);
     }
 
-    [HttpGet("healthcare-details")]
-    public async Task<IActionResult> HealthCareDetails()
-    {
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
-        var user = await userManager.Users
-            .Include(U => U.HealthCareCenter)
-            .FirstOrDefaultAsync(U => U.Id == parentId);
-
-        if (user?.HealthCareCenter is null)
-            throw new NotFoundBadRequest("هذا المستخدم لا ينتمي الي اي وحده صحيه");
-
-        var healthCareDetailsDto = user.HealthCareCenter.Adapt<HealthCareDetailsDto>();
-
-        var response = new GeneralResponse<HealthCareDetailsDto>(StatusCodes.Status200OK, healthCareDetailsDto);
-
-        return Ok(response);
-    }
-
     [HttpPost("appointment-book")]
     public async Task<IActionResult> AppointmentBook([FromBody] AddAppointmentDto model)
     {

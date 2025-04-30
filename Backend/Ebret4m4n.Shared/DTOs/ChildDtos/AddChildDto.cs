@@ -15,7 +15,7 @@ public record AddChildDto
     [Required(ErrorMessage = "يجب ادخال تاريخ ميلاد الطفل")]
     public DateTime BirthDate { get; init; }
 
-    [Required]
+    [Required(ErrorMessage = "يجب ادخال وزن للطفل")]
     [Range(1, 15, ErrorMessage = "يجب ان يكون وزن الطفل اكثر من 1كجم")]
     public double Weight { get; init; }
 

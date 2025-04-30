@@ -61,8 +61,9 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto model)
     {
-        if(!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(
+                new GeneralResponse<string>(StatusCodes.Status400BadRequest, "الرجاء التاكد من ادخال الايميل وكلمه المرور"));
 
         _user = await userManager.FindByEmailAsync(model.Email);
 
@@ -111,7 +112,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     public async Task<IActionResult> ForgetPassword([FromBody] ForgotPasswordDto model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+            return UnprocessableEntity(new GeneralResponse<object>(StatusCodes.Status400BadRequest, ModelState));
 
         _user = await userManager.FindByEmailAsync(model.Email);
 
@@ -140,7 +141,8 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto model)
     {
         if(!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+            return UnprocessableEntity(
+                new GeneralResponse<object>(StatusCodes.Status400BadRequest, ModelState));
 
         _user = await userManager.FindByIdAsync(model.UserId);
 
@@ -194,7 +196,8 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailDto model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+            return UnprocessableEntity(
+                new GeneralResponse<object>(StatusCodes.Status400BadRequest, ModelState));
 
         _user = await userManager.FindByIdAsync(model.UserId);
         if (_user is null)
@@ -214,7 +217,6 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         return Ok(response);
     }
-
 
     [HttpGet("{id:guid}/user-profile")]
     public async Task<IActionResult> UserProfile(Guid id)
