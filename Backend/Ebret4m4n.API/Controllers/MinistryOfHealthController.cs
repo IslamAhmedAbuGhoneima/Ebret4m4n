@@ -25,7 +25,7 @@ public class MinistryOfHealthController
             .Select(gov => gov.Governorate)
             .ToList();
 
-        var response = new GeneralResponse<List<string>>(StatusCodes.Status200OK, governorates);
+        var response = GeneralResponse<List<string>>.SuccessResponse(governorates);
 
         return Ok(response);
     }
@@ -38,7 +38,7 @@ public class MinistryOfHealthController
 
         var governorateDetails = governorate.Adapt<GovernorateDetailsDto>();
 
-        var response = new GeneralResponse<GovernorateDetailsDto>(StatusCodes.Status200OK, governorateDetails);
+        var response = GeneralResponse<GovernorateDetailsDto>.SuccessResponse(governorateDetails);
 
         return Ok(response);
     }
@@ -48,7 +48,7 @@ public class MinistryOfHealthController
     {
         if(!ModelState.IsValid)
             return UnprocessableEntity(
-                new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity,"تاكد من ان جميع البيانات المدخله صحيحه"));
+                GeneralResponse<string>.FailureResponse("تاكد من ان جميع البيانات المدخله صحيحه"));
 
 
         await unitOfWork.BeginTransactionAsync();
@@ -76,7 +76,7 @@ public class MinistryOfHealthController
             if (dbResult == 0)
                 throw new BadRequestException("لم يتم حفظ البيانات");
 
-            var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اضافه هذا الادمن بنجاح");
+            var response = GeneralResponse<string>.SuccessResponse("تم اضافه هذا الادمن بنجاح");
 
             await unitOfWork.CommitTransactionAsync();
 
@@ -85,7 +85,7 @@ public class MinistryOfHealthController
         catch (Exception ex)
         {
             await unitOfWork.RollbackTransactionAsync();
-            return StatusCode(StatusCodes.Status500InternalServerError,new GeneralResponse<string>(StatusCodes.Status500InternalServerError,$"{ex.Message} :حدث خطا ما اثناء تسجيل البينات"));
+            return StatusCode(StatusCodes.Status500InternalServerError, GeneralResponse<string>.FailureResponse($"{ex.Message} :حدث خطا ما اثناء تسجيل البينات"));
         }
     }
 
@@ -96,7 +96,7 @@ public class MinistryOfHealthController
             .Select(admin => admin.Adapt<GovernorateAdminsDto>())
             .ToList() ?? [];
 
-        var response = new GeneralResponse<List<GovernorateAdminsDto>>(StatusCodes.Status200OK, admins);
+        var response = GeneralResponse<List<GovernorateAdminsDto>>.SuccessResponse(admins);
 
         return Ok(response);
     }

@@ -6,7 +6,6 @@ using Ebret4m4n.Contracts;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Mapster;
 
 namespace Ebret4m4n.API.Controllers;
@@ -20,8 +19,8 @@ public class InventoryController
     [Authorize(Roles = "governorateAdmin,cityAdmin")]
     public async Task<IActionResult> EstablishInventory()
     {
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
+        var adminRole = User.FindFirst("role")!.Value;
         CityAdminStaff? cityAdmin = null;
         GovernorateAdminStaff? governorateAdmin = null;
 
@@ -70,7 +69,7 @@ public class InventoryController
 
         var inventoryDto = inventoryAntigens.Adapt<List<InventoryDto>>();
 
-        var response = new GeneralResponse<List<InventoryDto>>(StatusCodes.Status200OK, inventoryDto);
+        var response = GeneralResponse<List<InventoryDto>>.SuccessResponse(inventoryDto);
 
         return Ok(response);
     }
@@ -79,8 +78,8 @@ public class InventoryController
     [Authorize(Roles = "governorateAdmin,cityAdmin")]
     public IActionResult GetAdminsInventory()
     {
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
+        var adminRole = User.FindFirst("role")!.Value;
 
 
         var inventory = adminRole == "cityAdmin" ?
@@ -92,7 +91,7 @@ public class InventoryController
 
         var invenrotyDto = inventory.Adapt<List<InventoryDto>>();
 
-        var response = new GeneralResponse<List<InventoryDto>>(StatusCodes.Status200OK, invenrotyDto);
+        var response = GeneralResponse<List<InventoryDto>>.SuccessResponse(invenrotyDto);
 
         return Ok(response);
     }
@@ -125,7 +124,7 @@ public class InventoryController
         if (result == 0)
             throw new BadRequestException("لم يتم حفظ بيانات المخزن الرجاء المحاوله مره اخري");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم انشاء المخزن بنجاح");
+        var response = GeneralResponse<string>.SuccessResponse("تم انشاء المخزن بنجاح");
 
         return Ok(response);
     }
@@ -145,7 +144,7 @@ public class InventoryController
 
         var inventoryDto = inventory.Adapt<List<InventoryDto>>();
 
-        var response = new GeneralResponse<List<InventoryDto>>(StatusCodes.Status200OK, inventoryDto);
+        var response = GeneralResponse<List<InventoryDto>>.SuccessResponse(inventoryDto);
 
         return Ok(response);
     }

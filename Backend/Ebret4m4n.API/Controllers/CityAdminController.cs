@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.API.Utilites;
-using System.Security.Claims;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.API.Hubs;
@@ -34,7 +33,7 @@ public class CityAdminController
     public IActionResult GetHealthCareInVillage([FromQuery] string? city)
     {
         string adminCity = string.Empty;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
+        var adminRole = User.FindFirst("role")!.Value;
 
         if (adminRole == "admin" && city == null)
             throw new BadRequestException("من فضلك ادخل اسم المدينه لتحميل الوحدات الصحيه الخاصه بها");
@@ -55,7 +54,7 @@ public class CityAdminController
         if (healthCareCenters is null)
             throw new BadRequestException("لم يتم اضافه اي وحدات صحيه بعد لهذا المركز");
 
-        var response = new GeneralResponse<List<HealthCaresListDto>>(StatusCodes.Status200OK, healthCareCenters);
+        var response = GeneralResponse<List<HealthCaresListDto>>.SuccessResponse(healthCareCenters);
 
         return Ok(response);
     }
@@ -88,7 +87,7 @@ public class CityAdminController
         healthCareDetails.DoctorName = doctorName;
         healthCareDetails.Inventories = healthCareCenter.Inventories.Adapt<List<InventoryDto>>();
 
-        var response = new GeneralResponse<HealthCareDetailsDto>(StatusCodes.Status200OK, healthCareDetails); ;
+        var response = GeneralResponse<HealthCareDetailsDto>.SuccessResponse(healthCareDetails); ;
 
         return Ok(response);
     }
@@ -100,7 +99,7 @@ public class CityAdminController
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
 
         var healthCare =
             await unitOfWork.HealthCareCenterRepo.FindAsync(hc => hc.HealthCareCenterId == model.HealthCareCenterId, false);
@@ -128,7 +127,7 @@ public class CityAdminController
         if (dbResult == 0)
             throw new BadRequestException("لم يتم حفظ الباينات اللرجاء المحاوله مره اخري");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اضافه هذا المستخدم بنجاح");
+        var response = GeneralResponse<string>.SuccessResponse("تم اضافه هذا المستخدم بنجاح");
 
         return Ok(response);
     }
@@ -138,9 +137,9 @@ public class CityAdminController
     public async Task<IActionResult> AddHealthCareCenter(AddHealthCareDto model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity, "الرجاء التاكد ان جميع المدخلات صحيحه"));
+            return UnprocessableEntity( GeneralResponse<string>.FailureResponse("الرجاء التاكد ان جميع المدخلات صحيحه"));
 
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
 
         var healthCare = model.Adapt<HealthCareCenter>();
         healthCare.CityAdminId = adminId;
@@ -152,7 +151,7 @@ public class CityAdminController
         if (result == 0)
             throw new BadRequestException("لم يتم حفظ الوحده الصحيه");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم انشاء الوحده الصحيه بنجاح");
+        var response = GeneralResponse<string>.SuccessResponse("تم انشاء الوحده الصحيه بنجاح");
 
         return Ok(response);
     }
@@ -172,7 +171,7 @@ public class CityAdminController
         if (complaints is null)
             throw new NotFoundBadRequest("لا توجد شكاوي مسجله");
 
-        var response = new GeneralResponse<List<ComplaintsDto>> (StatusCodes.Status200OK, complaints);
+        var response = GeneralResponse<List<ComplaintsDto>>.SuccessResponse(complaints);
 
         return Ok(response);
     }
@@ -192,7 +191,7 @@ public class CityAdminController
 
         var complaintDto = (complaint, healthCare).Adapt<ComplaintDto>();
 
-        var response = new GeneralResponse<ComplaintDto>(StatusCodes.Status200OK, complaintDto);
+        var response = GeneralResponse<ComplaintDto>.SuccessResponse(complaintDto);
 
         return Ok(response);
     }
@@ -226,7 +225,7 @@ public class CityAdminController
 
         await emailSender.SendEmailAsync(complaint.User.Email!, "تنبيه", "<p>تم حل الشكوي الخاص بك الرجاء التوجه للوحد الصحيه لاستكمال التطعيمات لاطفالك</p>");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم ارسال التنيه بنجاح");
+        var response = GeneralResponse<string>.SuccessResponse("تم ارسال التنيه بنجاح");
 
         return Ok(response);
     }
@@ -239,7 +238,7 @@ public class CityAdminController
 
         var organizersDto = organizers.Adapt<List<MedicalStaffDetailsDto>>();
 
-        var response = new GeneralResponse<List<MedicalStaffDetailsDto>>(StatusCodes.Status200OK, organizersDto);
+        var response = GeneralResponse<List<MedicalStaffDetailsDto>>.SuccessResponse(organizersDto);
 
         return Ok(organizersDto);
     }
@@ -252,14 +251,14 @@ public class CityAdminController
 
         var doctorsDto = doctors.Adapt<List<MedicalStaffDetailsDto>>();
 
-        var response = new GeneralResponse<List<MedicalStaffDetailsDto>>(StatusCodes.Status200OK, doctorsDto);
+        var response = GeneralResponse<List<MedicalStaffDetailsDto>>.SuccessResponse(doctorsDto);
 
         return Ok(doctorsDto);
     }
 
     private List<MedicalStaff> GetMedicalStaff(StaffRole role)
     {
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
 
         var staff =
             unitOfWork.StaffRepo.FindByCondition(organizer => organizer.CityAdminStaffId == adminId

@@ -53,7 +53,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         var userDto = user.Adapt<UserDataDto>();
 
-        var response = new GeneralResponse<UserDataDto>(StatusCodes.Status200OK, userDto);
+        var response = GeneralResponse<UserDataDto>.SuccessResponse(userDto);
 
         return CreatedAtAction("UserProfile", new { id = user.Id }, response);
     }
@@ -63,11 +63,11 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     {
         if (!ModelState.IsValid)
             return UnprocessableEntity(
-                new GeneralResponse<string>(StatusCodes.Status400BadRequest, "الرجاء التاكد من ادخال الايميل وكلمه المرور"));
+                 GeneralResponse<string>.FailureResponse("الرجاء التاكد من ادخال الايميل وكلمه المرور"));
 
         _user = await userManager.FindByEmailAsync(model.Email);
 
-        if(_user is null)
+        if (_user is null)
             throw new LoginBadRequest();
 
         bool checkPassword = await userManager.CheckPasswordAsync(_user, model.Password);
@@ -80,11 +80,11 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
             await userManager.AccessFailedAsync(_user!);
             throw new LoginBadRequest();
         }
-        
+
         await userManager.ResetAccessFailedCountAsync(_user!);
         var token = await GenerageToken(true);
 
-        var response = new GeneralResponse<TokenDto>(StatusCodes.Status200OK, token);
+        var response = GeneralResponse<TokenDto>.SuccessResponse(token);
 
         return Ok(response);
     }
@@ -103,7 +103,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         _user = user;
 
         var token = await GenerageToken(false);
-        var response = new GeneralResponse<TokenDto>(StatusCodes.Status200OK, token);
+        var response = GeneralResponse<TokenDto>.SuccessResponse(token);
 
         return Ok(response);
     }
@@ -112,7 +112,9 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     public async Task<IActionResult> ForgetPassword([FromBody] ForgotPasswordDto model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(new GeneralResponse<object>(StatusCodes.Status400BadRequest, ModelState));
+            return UnprocessableEntity(
+                 GeneralResponse<object>.FailureResponse(ModelState)
+            );
 
         _user = await userManager.FindByEmailAsync(model.Email);
 
@@ -132,7 +134,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         await emailSender.SendEmailAsync(email, subject, body);
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "If your email is registered, you will receive a password reset link.");
+        var response = GeneralResponse<string>.SuccessResponse("سيتم ارسال رساله اعاده تعيين كلمه سر لهذا البريد الالكتروني");
 
         return Ok(response);
     }
@@ -142,7 +144,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     {
         if(!ModelState.IsValid)
             return UnprocessableEntity(
-                new GeneralResponse<object>(StatusCodes.Status400BadRequest, ModelState));
+                 GeneralResponse<object>.FailureResponse(ModelState));
 
         _user = await userManager.FindByIdAsync(model.UserId);
 
@@ -158,7 +160,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         if(!result.Succeeded)
             throw new InValidTokenBadRequest();
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "Password has been reset successfully.");
+        var response = GeneralResponse<string>.SuccessResponse("تم اعاده تعيين كلمه المرور بنجاح");
 
         return Ok(response);
     }
@@ -187,7 +189,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         await emailSender.SendEmailAsync(newEmail, subject, body);
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "You will receive email message for reste your email");
+        var response = GeneralResponse<string>.SuccessResponse("سوف يتم استلام رساله علي هذا البريد");
 
         return Ok(response);
     }
@@ -197,7 +199,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     {
         if (!ModelState.IsValid)
             return UnprocessableEntity(
-                new GeneralResponse<object>(StatusCodes.Status400BadRequest, ModelState));
+                 GeneralResponse<object>.FailureResponse(ModelState));
 
         _user = await userManager.FindByIdAsync(model.UserId);
         if (_user is null)
@@ -213,7 +215,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         await signInManager.RefreshSignInAsync(_user);
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "your Email Updated Successfully");
+        var response = GeneralResponse<string>.SuccessResponse("تم اعاد تعيين البريد الالكتروني بنجاح");
 
         return Ok(response);
     }
@@ -239,8 +241,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         var userDto = _user.Adapt<UserDataDto>();
 
-        var response = new GeneralResponse<UserDataDto>(StatusCodes.Status200OK, userDto);
-
+        var response = GeneralResponse<UserDataDto>.SuccessResponse(userDto);
 
         return Ok(response);
     }
@@ -290,15 +291,15 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     {
         List<Claim> claims = [
             new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-            new(ClaimTypes.NameIdentifier,_user!.Id),
-            new(ClaimTypes.Name,_user.UserName!),
-            new(ClaimTypes.Email,_user.Email!),
+            new("id",_user!.Id),
+            new("name",_user.UserName!),
+            new("email",_user.Email!),
         ];
 
         var userRoles = await userManager.GetRolesAsync(_user);
 
         foreach (var role in userRoles)
-            claims.Add(new(ClaimTypes.Role, role));
+            claims.Add(new("role", role));
 
         if (await userManager.IsInRoleAsync(_user, "doctor") ||
             await userManager.IsInRoleAsync(_user, "organizer"))

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
@@ -26,8 +25,8 @@ public class OrderController
     [Authorize(Roles = "governorateAdmin,cityAdmin,organizer")]
     public IActionResult Orders()
     {
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
+        var adminRole = User.FindFirst("role")!.Value;
 
         var orders =
             adminRole == "governorateAdmin" ?
@@ -38,7 +37,7 @@ public class OrderController
 
         var ordersDto = orders.Adapt<List<MyOrderDetailsDto>>();
 
-        var response = new GeneralResponse<List<MyOrderDetailsDto>>(StatusCodes.Status200OK, ordersDto);
+        var response = GeneralResponse<List<MyOrderDetailsDto>>.SuccessResponse(ordersDto);
 
         return Ok(response);
     }
@@ -56,7 +55,7 @@ public class OrderController
 
         var orderItemsDto = orderItems.Adapt<List<OrderItemsDto>>();
 
-        var response = new GeneralResponse<List<OrderItemsDto>>(StatusCodes.Status200OK, orderItemsDto);
+        var response = GeneralResponse<List<OrderItemsDto>>.SuccessResponse(orderItemsDto);
 
         return Ok(response);
     }
@@ -66,10 +65,10 @@ public class OrderController
     public async Task<IActionResult> RequestOrder(List<OrderItemsDto> model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity, "الرجاء التاكد من المدخلات"));
+            return UnprocessableEntity(GeneralResponse<string>.FailureResponse("الرجاء التاكد من المدخلات"));
 
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
+        var adminRole = User.FindFirst("role")!.Value;
 
         await unitOfWork.BeginTransactionAsync();
 
@@ -96,14 +95,14 @@ public class OrderController
 
             await unitOfWork.CommitTransactionAsync();
 
-            var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم حفظ الطلب بنجاح");
+            var response = GeneralResponse<string>.SuccessResponse("تم حفظ الطلب بنجاح");
 
             return Ok(response);
         }
         catch (Exception ex)
         {
             await unitOfWork.RollbackTransactionAsync();
-            var response = new GeneralResponse<string>(StatusCodes.Status500InternalServerError, $"{ex.Message}:حدث خطأ أثناء حفظ الطلب");
+            var response =  GeneralResponse<string>.FailureResponse($"{ex.Message}:حدث خطأ أثناء حفظ الطلب");
             return StatusCode(StatusCodes.Status500InternalServerError, response);
         }
     }
@@ -112,8 +111,8 @@ public class OrderController
     [Authorize(Roles = "governorateAdmin,cityAdmin")]
     public async Task<IActionResult> MarkeReceivedOrder(Guid orderId)
     {
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
+        var adminRole = User.FindFirst("role")!.Value;
 
         await unitOfWork.BeginTransactionAsync();
 
@@ -163,7 +162,7 @@ public class OrderController
         {
             await unitOfWork.RollbackTransactionAsync();
             return StatusCode(StatusCodes.Status500InternalServerError,
-            new GeneralResponse<string>(StatusCodes.Status500InternalServerError, $"{ex.Message} :حدث خطأ أثناء معالجة الطلب"));
+             GeneralResponse<string>.FailureResponse($"{ex.Message} :حدث خطأ أثناء معالجة الطلب"));
         }
 
     }
@@ -172,8 +171,8 @@ public class OrderController
     [Authorize(Roles = "governorateAdmin,cityAdmin")]
     public async Task<IActionResult> AcceptVaccineOrder(Guid orderId)
     {
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
+        var adminRole = User.FindFirst("role")!.Value;
 
         await unitOfWork.BeginTransactionAsync();
 
@@ -214,7 +213,7 @@ public class OrderController
 
             await unitOfWork.CommitTransactionAsync();
 
-            var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم قبول الطلب بنجاح جاري الارسال");
+            var response = GeneralResponse<string>.SuccessResponse("تم قبول الطلب بنجاح جاري الارسال");
 
             return Ok(response);
         }
@@ -222,7 +221,7 @@ public class OrderController
         {
             await unitOfWork.RollbackTransactionAsync();
             return StatusCode(StatusCodes.Status500InternalServerError,
-                new GeneralResponse<string>(StatusCodes.Status500InternalServerError, $"{ex.Message}:حدث خطأ أثناء ارسال الطلب"));
+                 GeneralResponse<string>.FailureResponse($"{ex.Message}:حدث خطأ أثناء ارسال الطلب"));
         }
     }
 
@@ -230,7 +229,7 @@ public class OrderController
     [Authorize(Roles = "cityAdmin")]
     public IActionResult RequestedHealthCareOrders()
     {
-        var adminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var adminId = User.FindFirst("id")!.Value;
 
         var orders =
             unitOfWork.OrderRepo
@@ -248,14 +247,14 @@ public class OrderController
     [Authorize(Roles = "governorateAdmin")]
     public IActionResult RequestedCityOrders()
     {
-        var governorateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var governorateAdminId = User.FindFirst("id")!.Value;
 
         var cityOrders =
             unitOfWork.OrderRepo.FindByCondition(order => order.CityAdminStaff.GovernorateAdminId == governorateAdminId, false, ["CityAdminStaff"])
             .Select(order => order.Adapt<CityOrderDetails>())
             .ToList();
 
-        var response = new GeneralResponse<List<CityOrderDetails>>(StatusCodes.Status200OK, cityOrders);
+        var response = GeneralResponse<List<CityOrderDetails>>.SuccessResponse(cityOrders);
 
         return Ok(response);
     }
@@ -270,7 +269,7 @@ public class OrderController
 
         var governorateOrdersDto = governorateOrders.Adapt<List<GovernorateOrderDto>>();
 
-        var response = new GeneralResponse<List<GovernorateOrderDto>>(StatusCodes.Status200OK, governorateOrdersDto);
+        var response = GeneralResponse<List<GovernorateOrderDto>>.SuccessResponse(governorateOrdersDto);
 
         return Ok(response);
     }
@@ -302,14 +301,14 @@ public class OrderController
 
             await unitOfWork.CommitTransactionAsync();
 
-            var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم قبول الطلب بنجاح");
+            var response = GeneralResponse<string>.SuccessResponse("تم قبول الطلب بنجاح");
 
             return Ok(response);
         }
         catch (Exception ex)
         {
             await unitOfWork.RollbackTransactionAsync();
-            return StatusCode(StatusCodes.Status500InternalServerError, new GeneralResponse<string>(StatusCodes.Status500InternalServerError, $"حدث خطا ما اثناء تسجيل البينات: {ex.Message}"));
+            return StatusCode(StatusCodes.Status500InternalServerError,  GeneralResponse<string>.FailureResponse($"حدث خطا ما اثناء تسجيل البينات: {ex.Message}"));
         }
     }
 
@@ -360,7 +359,7 @@ public class OrderController
             await unitOfWork.RollbackTransactionAsync();
 
             return StatusCode(StatusCodes.Status500InternalServerError,
-                new GeneralResponse<string>(StatusCodes.Status500InternalServerError, "حدث خطا ما اثناء تسجيل البينات"));
+                GeneralResponse<string>.FailureResponse("حدث خطا ما اثناء تسجيل البينات"));
         }
 
         return NoContent();

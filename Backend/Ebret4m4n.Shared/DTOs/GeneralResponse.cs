@@ -2,12 +2,16 @@
 
 public class GeneralResponse<T>
 {
-    public int Status { get; private set; }
-    public T Data { get; private set; }
+    public bool Success { get; private set; } 
 
-    public GeneralResponse(int status,T data)
-    {
-        Status = status;
-        Data = data;
-    }
+    public T? Data { get; private set; }
+
+    public T? Message { get; private set; }
+
+
+    public static GeneralResponse<T> SuccessResponse(T data)
+        => new GeneralResponse<T>() { Success = true, Data = data, Message = default };
+
+    public static GeneralResponse<T> FailureResponse(T message)
+        => new GeneralResponse<T> { Success = false, Data = default, Message = message };
 }

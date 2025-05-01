@@ -1,5 +1,4 @@
-﻿using Ebret4m4n.Shared.DTOs.HealthCareDtos;
-using Ebret4m4n.Shared.DTOs.ComplaintDtos;
+﻿using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Mapster;
@@ -25,7 +23,7 @@ public class ParentController
     [HttpGet("children-reservations")]
     public IActionResult ParentReservations()
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var userId = User.FindFirst("id")!.Value;
 
         var appointments =
             unitOfWork.AppointmentRepo.FindByCondition(
@@ -34,7 +32,7 @@ public class ParentController
 
         var userReservationsDto = appointments.Adapt<List<UserReservationDto>>();
 
-        var response = new GeneralResponse<List<UserReservationDto>>(StatusCodes.Status200OK, userReservationsDto);
+        var response = GeneralResponse<List<UserReservationDto>>.SuccessResponse(userReservationsDto);
 
         return Ok(response);
     }
@@ -49,7 +47,7 @@ public class ParentController
 
         var appointmentDto = appointment.Adapt<AppointmentDto>();
 
-        var response = new GeneralResponse<AppointmentDto>(StatusCodes.Status200OK, appointmentDto);
+        var response = GeneralResponse<AppointmentDto>.SuccessResponse(appointmentDto);
 
         return Ok(response);
     }
@@ -58,7 +56,7 @@ public class ParentController
     public async Task<IActionResult> AppointmentBook([FromBody] AddAppointmentDto model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity, "تاكد ان جميع مدخلات الحجز صحيحه"));
+            return UnprocessableEntity(GeneralResponse<string>.FailureResponse("تاكد ان جميع مدخلات الحجز صحيحه"));
 
         if (model.Date <= DateTime.UtcNow)
             throw new BadRequestException("لا يمكن حجز هذ الموعد");
@@ -69,7 +67,7 @@ public class ParentController
         if (appointmentExists)
             throw new BadRequestException("تم حجز معاد لهذا اللقاح من قبل");
 
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var parentId = User.FindFirst("id")!.Value;
 
         var user = await userManager.Users
             .Include(U => U.HealthCareCenter)
@@ -96,7 +94,7 @@ public class ParentController
 
         var appointmentDto = (appointment, childName).Adapt<AppointmentDto>();
 
-        var response = new GeneralResponse<AppointmentDto>(StatusCodes.Status200OK, appointmentDto);
+        var response = GeneralResponse<AppointmentDto>.SuccessResponse(appointmentDto);
 
         return Ok(response);
     }
@@ -104,7 +102,7 @@ public class ParentController
     [HttpPut("{childId}/appointment-reschedule")]
     public async Task<IActionResult> RescheduleAppointment([FromRoute] string childId, AppointmentRescheduleDto model)
     {
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var parentId = User.FindFirst("id")!.Value;
 
         if (model.Date <= DateTime.UtcNow)
             throw new BadRequestException("لا يمكن اضافه هذا المعاد");
@@ -124,7 +122,7 @@ public class ParentController
         if (result == 0)
             throw new BadRequestException("لم يتم اعاده جدوله هذا الحجز");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اعاده الجدوله بنجاح");
+        var response = GeneralResponse<string>.SuccessResponse("تم اعاده الجدوله بنجاح");
 
         return StatusCode(StatusCodes.Status204NoContent, response);
     }
@@ -149,7 +147,7 @@ public class ParentController
     [HttpPost("complaint-submit")]
     public async Task<IActionResult> SubmitComplaint(ComplaintMessageDto model)
     {
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var parentId = User.FindFirst("id")!.Value;
 
         var complaint = model.Adapt<Complaint>();
         complaint.UserId = parentId;
@@ -161,7 +159,7 @@ public class ParentController
         if (result == 0)
             throw new BadRequestException("لم يتم ارسال الشكوي الخاص بك الرجاء المحاوله مره اخري");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "شكرا لتعونك معنا سيتم حل الشكوي الخاص بك في اقرب وقت");
+        var response = GeneralResponse<string>.SuccessResponse("شكرا لتعونك معنا سيتم حل الشكوي الخاص بك في اقرب وقت");
 
         return Ok(response);
     }

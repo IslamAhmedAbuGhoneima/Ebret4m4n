@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 
@@ -33,6 +34,7 @@ public record RegisterDto
 
     public string Role { get; init; } = "parent";
 
+    [Required(ErrorMessage = "يجب اختيار وحده صحيه يتبع لها المستخدم لاكمال التسجيل")]
     public Guid HealthCareCenterId { get; init; }
 
 }

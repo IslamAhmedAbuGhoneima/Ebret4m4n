@@ -6,12 +6,10 @@ using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
-using Mapster;
-using Ebret4m4n.API.ChildBaseVaccines;
-using System.Text.Json;
 using Ebret4m4n.Entities.Models;
 using Microsoft.EntityFrameworkCore;
 using Ebret4m4n.API.Utilites;
+using Mapster;
 
 namespace Ebret4m4n.API.Controllers;
 
@@ -31,7 +29,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 
 		var childDtos = child.Adapt<ChildDto>();
 
-		var response = new GeneralResponse<ChildDto>(StatusCodes.Status200OK, childDtos);
+		var response = GeneralResponse<ChildDto>.SuccessResponse(childDtos);
 
 		return Ok(response);
 	}
@@ -40,7 +38,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 	public async Task<IActionResult> UpdateVaccineStatues(List<UpdateVaccineDto> model)
 	{
         if (!ModelState.IsValid)
-			return UnprocessableEntity(new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity, "تاكد من ان جميع المدخلات صحيحه"));
+			return UnprocessableEntity( GeneralResponse<string>.FailureResponse("تاكد من ان جميع المدخلات صحيحه"));
 
         var orgnizerHCId = User.FindFirst("healthCareId")!.Value;
 
@@ -96,7 +94,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 
 			await unitOfWork.CommitTransactionAsync();
 
-            var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم تحديث حاله التطعيم بنجاح");
+            var response = GeneralResponse<string>.SuccessResponse("تم تحديث حاله التطعيم بنجاح");
 
             return Ok(response);
 
@@ -104,7 +102,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 		catch(Exception ex)
 		{
 			await unitOfWork.RollbackTransactionAsync();
-			return StatusCode(StatusCodes.Status500InternalServerError, new GeneralResponse<string>(StatusCodes.Status500InternalServerError, $"حدث خطأ ما اثناء تحديث حالة التطعيم : {ex.Message}"));
+			return StatusCode(StatusCodes.Status500InternalServerError,  GeneralResponse<string>.FailureResponse($"حدث خطأ ما اثناء تحديث حالة التطعيم : {ex.Message}"));
         }  
 	}
 
@@ -125,7 +123,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 		if (result == 0) 
 			throw new BadRequestException("لم يتم تاجيل الميعاد");
 
-		var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم تاجيل الميعاد بنجاح");
+		var response = GeneralResponse<string>.SuccessResponse("تم تاجيل الميعاد بنجاح");
 
         return Ok(response);
 	}
@@ -141,7 +139,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 			
 		var childrenDtos = children.Adapt<List<ComingChildrenDto>>();
 
-		var response = new GeneralResponse<List<ComingChildrenDto>>(StatusCodes.Status200OK, childrenDtos);
+		var response = GeneralResponse<List<ComingChildrenDto>>.SuccessResponse(childrenDtos);
 
 		return Ok(response);
 	}

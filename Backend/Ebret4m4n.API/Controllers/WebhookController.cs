@@ -62,7 +62,7 @@ public class WebhookController
         }
         catch (StripeException ex)
         {
-            return BadRequest(new GeneralResponse<string>(StatusCodes.Status400BadRequest, $"stripe webhook error {ex.Message}"));
+            return BadRequest(GeneralResponse<string>.FailureResponse($"stripe webhook error {ex.Message}"));
         }
 
         return Ok();

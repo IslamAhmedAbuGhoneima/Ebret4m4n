@@ -30,7 +30,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         var childDto = child.Adapt<ChildDto>();
 
-        var response = new GeneralResponse<ChildDto>(StatusCodes.Status200OK,childDto);
+        var response = GeneralResponse<ChildDto>.SuccessResponse(childDto);
 
         return Ok(response);
     }
@@ -38,7 +38,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     [HttpGet("children")]
     public async Task<IActionResult> GetChildren()
     {
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var parentId = User.FindFirst("id")!.Value;
 
         var children = 
             await unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, false, ["Vaccines"]).ToListAsync();
@@ -49,7 +49,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         var childrenDtos = children.Adapt<List<ChildrenDto>>();
 
-        var response = new GeneralResponse<List<ChildrenDto>>(StatusCodes.Status200OK, childrenDtos);
+        var response = GeneralResponse<List<ChildrenDto>>.SuccessResponse(childrenDtos);
 
         return Ok(response);
     }
@@ -57,9 +57,9 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     [HttpPost("child-add")]
     public async Task<IActionResult> AddChild([FromForm]AddChildDto dto)
     {
-        if(!ModelState.IsValid)
+        if (!ModelState.IsValid)
             return UnprocessableEntity(
-                new GeneralResponse<object>(StatusCodes.Status400BadRequest,ModelState));
+                GeneralResponse<object>.FailureResponse(ModelState));
 
         var checkUniqNameIdentifier =
             await unitOfWork.ChildRepo.FindAsync(C => C.Id == dto.Id, false);
@@ -91,7 +91,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         if (result == 0)
             throw new BadRequestException("لم يتم حفظ الطفل الرجاء المحاوله مره اخري");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اضافه الطفل بنجاح");
+        var response = GeneralResponse<string>.FailureResponse("تم اضافه الطفل بنجاح");
 
         return Ok(response);
     }

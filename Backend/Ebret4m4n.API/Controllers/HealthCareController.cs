@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Mapster;
@@ -35,7 +34,7 @@ public class HealthCareController(IUnitOfWork unitOfWork,
 
 
         var response =
-            new GeneralResponse<List<GovernoratesAndCitiesDto>>(StatusCodes.Status200OK, locations);
+             GeneralResponse<List<GovernoratesAndCitiesDto>>.SuccessResponse(locations);
         return Ok(response);
     }
 
@@ -47,7 +46,7 @@ public class HealthCareController(IUnitOfWork unitOfWork,
             .Select(hc => hc.Adapt<HealthCaresListDto>())
             .ToList() ?? [];
 
-        var response = new GeneralResponse<List<HealthCaresListDto>>(StatusCodes.Status200OK, healthcareCenters);
+        var response = GeneralResponse<List<HealthCaresListDto>>.SuccessResponse(healthcareCenters);
 
         return Ok(response);
 
@@ -57,7 +56,7 @@ public class HealthCareController(IUnitOfWork unitOfWork,
     [Authorize(Roles = "parent")]
     public async Task<IActionResult> HealthCareDetails()
     {
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var parentId = User.FindFirst("id")!.Value;
 
         var user = await userManager.Users
             .Include(U => U.HealthCareCenter)
@@ -68,7 +67,7 @@ public class HealthCareController(IUnitOfWork unitOfWork,
 
         var healthCareDetailsDto = user.HealthCareCenter.Adapt<HealthCareDetailsDto>();
 
-        var response = new GeneralResponse<HealthCareDetailsDto>(StatusCodes.Status200OK, healthCareDetailsDto);
+        var response = GeneralResponse<HealthCareDetailsDto>.SuccessResponse(healthCareDetailsDto);
 
         return Ok(response);
     }

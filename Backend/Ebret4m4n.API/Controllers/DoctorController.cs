@@ -28,7 +28,7 @@ public class DoctorController
 
 
         var childrenDto = children.Adapt<List<ChildDto>>();
-        var response = new GeneralResponse<List<ChildDto>>(StatusCodes.Status200OK, childrenDto);
+        var response = GeneralResponse<List<ChildDto>>.SuccessResponse(childrenDto);
 
         return Ok(response);
     }
@@ -41,7 +41,7 @@ public class DoctorController
 
         var childDto = child.Adapt<ChildDto>();
 
-        var response = new GeneralResponse<ChildDto>(StatusCodes.Status302Found, childDto);
+        var response = GeneralResponse<ChildDto>.SuccessResponse(childDto);
 
         return Ok(response);
     }
@@ -62,7 +62,7 @@ public class DoctorController
 
         await emailSender.SendEmailAsync(child.User.Email!, "تاجيل التطعيمات", $"<p>بناء علي التحاليل المقدمه تم تاجيل التطعيم لطفلك : {child.Name}</p>");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم تاجيل اللقاحات لهذا الطفل");
+        var response = GeneralResponse<string>.SuccessResponse("تم تاجيل اللقاحات لهذا الطفل");
 
         return Ok(response);
     }
@@ -76,7 +76,7 @@ public class DoctorController
         if (children is null)
             throw new NotFoundException("لا يوجد اطفال مؤجلين حتي الان");
 
-        var response = new GeneralResponse<List<string>>(StatusCodes.Status200OK, children);
+        var response = GeneralResponse<List<string>>.SuccessResponse(children);
         return Ok(response);
     }
 
@@ -95,7 +95,7 @@ public class DoctorController
         if (result == 0)
             throw new BadRequestException("لم يتم اضافه جدول التطعيمات حاول مره اخري");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اضافه جدول التطعيمات للطفل");
+        var response = GeneralResponse<string>.SuccessResponse("تم اضافه جدول التطعيمات للطفل");
 
         return Ok(response);
     }

@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Identity;                
 using Ebret4m4n.Entities.Models;                    
-using Microsoft.AspNetCore.Mvc;                     
-using System.Security.Claims;                                              
+using Microsoft.AspNetCore.Mvc;                                                                 
 using Ebret4m4n.Shared.DTOs;                        
 using Ebret4m4n.Contracts;                          
 using Mapster;
@@ -23,7 +22,7 @@ public class GovernorateAdminController
     public IActionResult GetCities([FromQuery] string? governorate)
     {
         string adminGovernorate = string.Empty;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
+        var adminRole = User.FindFirst("role")!.Value;
 
         if (adminRole == "governorateAdmin")
             adminGovernorate = User.FindFirst("governorate")!.Value;
@@ -36,14 +35,14 @@ public class GovernorateAdminController
         if (governorate is not null && adminGovernorate != governorate && adminRole != "admin")
             throw new BadRequestException("لا يمكنك عرض مدن محافظه اخري");
 
-        
+
         var cities = unitOfWork.HealthCareCenterRepo
             .FindByCondition(hc => hc.Governorate == targetGovernorate, false)
             .Select(hc => hc.City)
             .Distinct()
-            .ToList();
+            .ToList() ?? [];
 
-        var response = new GeneralResponse<List<string>>(StatusCodes.Status200OK, cities);
+        var response = GeneralResponse<List<string>>.SuccessResponse(cities);
 
         return Ok(response);
     }
@@ -60,7 +59,7 @@ public class GovernorateAdminController
 
         var cityDetails = cityAdminStaff.Adapt<CityRecordDetailsDto>();
 
-        var response = new GeneralResponse<CityRecordDetailsDto>(StatusCodes.Status200OK, cityDetails);
+        var response = GeneralResponse<CityRecordDetailsDto>.SuccessResponse(cityDetails);
 
         return Ok(response);
     }
@@ -69,14 +68,14 @@ public class GovernorateAdminController
     [Authorize(Roles = "governorateAdmin")]
     public IActionResult CityAdmins()
     {
-        var governorateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var governorateAdminId = User.FindFirst("id")!.Value;
 
         var cityAdmins =
             unitOfWork.CityAdminStaffRepo.FindByCondition(admin => admin.GovernorateAdminId == governorateAdminId, false, "User")
             .Select(admin => admin.Adapt<CityAdminsDto>())
             .ToList() ?? [];
 
-        var response = new GeneralResponse<List<CityAdminsDto>>(StatusCodes.Status200OK, cityAdmins);
+        var response = GeneralResponse<List<CityAdminsDto>>.SuccessResponse(cityAdmins);
 
         return Ok(response);
     }
@@ -86,14 +85,14 @@ public class GovernorateAdminController
     public async Task<IActionResult> AddCityAdmin(AddCityAdminDto model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(new GeneralResponse<string>(StatusCodes.Status422UnprocessableEntity,"تاكد ان جميع المدخلات صحيحه"));
+            return UnprocessableEntity(GeneralResponse<string>.FailureResponse("تاكد ان جميع المدخلات صحيحه"));
 
         var checkAdminCityExists = await unitOfWork.CityAdminStaffRepo.ExistsAsync(city => city.City == model.City);
 
         if (checkAdminCityExists)
             throw new BadRequestException("يوجد ادمن لهذه المدينه");
 
-        var governorateAdminId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var governorateAdminId = User.FindFirst("id")!.Value;
 
         var user = model.Adapt<ApplicationUser>();
 
@@ -114,7 +113,7 @@ public class GovernorateAdminController
         if (dbResult == 0)
             throw new BadRequestException("لم يتم حفظ البيانات الخاصه بهذا المستخدم");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status200OK, "تم اضافه ادمن مدينه بنجاح");
+        var response = GeneralResponse<string>.SuccessResponse("تم اضافه ادمن مدينه بنجاح");
 
         return Ok(response);
     }
@@ -142,7 +141,7 @@ public class GovernorateAdminController
         if (result == 0)
             throw new BadRequestException("لم يتم حذف هذا المستخدم حاول مره اخري");
 
-        var response = new GeneralResponse<string>(StatusCodes.Status204NoContent, "تم حذف هذا المستخدم");
+        var response = GeneralResponse<string>.SuccessResponse("تم حذف هذا المستخدم");
 
         return Ok(response);
     }
