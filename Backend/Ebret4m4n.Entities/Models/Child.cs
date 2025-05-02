@@ -6,6 +6,7 @@ namespace Ebret4m4n.Entities.Models;
 public class Child
 {
     #region Properties
+    
     public string Id { get; set; } = null!;
 
     public string Name { get; set; } = null!;
