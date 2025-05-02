@@ -37,9 +37,6 @@ public static class ServiceExtenstions
         service.AddIdentity<ApplicationUser, IdentityRole>(opts =>
         {
             opts.User.RequireUniqueEmail = true;
-            opts.User.AllowedUserNameCharacters =
-            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._@ " +
-            "ءآأؤإئابةتثجحخدذرزسشصضطظعغفقكلمنهوىي";
 
             opts.Password.RequireNonAlphanumeric = false;
             opts.Password.RequiredLength = 8;

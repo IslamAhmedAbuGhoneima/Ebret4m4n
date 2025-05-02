@@ -3,6 +3,6 @@
 public class InValidTokenBadRequest : BadRequestException
 {
     public InValidTokenBadRequest() 
-        : base("Invalid token.")
+        : base("تم انتهاء صلاحيه هذ الرابط")
     { }
 }

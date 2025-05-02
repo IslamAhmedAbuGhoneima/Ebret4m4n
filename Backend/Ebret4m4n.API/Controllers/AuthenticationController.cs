@@ -18,6 +18,7 @@ using System.Data;
 using System.Text;
 using System.Net;
 using Mapster;
+using Ebret4m4n.Shared.DTOs.NotificationDtos;
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -82,7 +83,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         }
 
         await userManager.ResetAccessFailedCountAsync(_user!);
-        var token = await GenerageToken(true);
+        var token = await GenerateToken(true);
 
         var response = GeneralResponse<TokenDto>.SuccessResponse(token);
 
@@ -102,7 +103,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         _user = user;
 
-        var token = await GenerageToken(false);
+        var token = await GenerateToken(false);
         var response = GeneralResponse<TokenDto>.SuccessResponse(token);
 
         return Ok(response);
@@ -119,18 +120,18 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         _user = await userManager.FindByEmailAsync(model.Email);
 
         if (_user is null)
-            return Ok(new { Message = "If your email is registered, you will receive a password reset link." });
+            return Ok(GeneralResponse<string>.SuccessResponse("سوف يتم ارسال رساله علي الجيميل اذا كنت مسجل به"));
 
         var token = await userManager.GeneratePasswordResetTokenAsync(_user);
 
-        var callbackUrl = Url.Action("ResetPassword", "Authentication",
-            new { userId = _user.Id, token = token }, protocol: HttpContext.Request.Scheme);
-        
+        var callbackUrl = $"http://localhost:4200/auth/change-password?userId={_user.Id}&token={Uri.EscapeDataString(token)}";
+
+
         string email = model.Email;
-        string subject = "Reset Password";
+        string subject = "اعاده تعيين كلمه المرور";
         string body = await GenerateEmailMessage(callbackUrl!,
-            "Reset Your Password",
-            "You requested a password reset.Click the link below to reset it:");
+            "اعاده تعيين كلمه المرور",
+            "تم طلب اعاده تعيين كلمه مرور جديد");
 
         await emailSender.SendEmailAsync(email, subject, body);
 
@@ -149,7 +150,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         _user = await userManager.FindByIdAsync(model.UserId);
 
         if (_user is null)
-            throw new NotFoundBadRequest($"user with {model.UserId} not found");
+            return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد مستخدم بهذا الرقم : {_user.Id}"));
 
 
         string decodedToken = WebUtility.UrlDecode(model.Token);
@@ -169,23 +170,23 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     [HttpPost("reset-email")]
     public async Task<IActionResult> ResetEmail([FromBody] ResetEmailDto model)
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+        var userId = User.FindFirst("id")!.Value;
         _user = await userManager.FindByIdAsync(userId);
 
         if (_user is null)
-            throw new NotFoundBadRequest($"user with {userId} not found");
+            return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد مستخدم بهذا الرقم : {_user.Id}"));
+
 
         var token = await userManager.GenerateChangeEmailTokenAsync(_user, model.NewEmail);
 
-        var callbackUrl = Url.Action("ResetPassword", "Authenticate",
-            new { userId = _user.Id, email = model.NewEmail, token = token }, protocol: HttpContext.Request.Scheme);
 
+        var callbackUrl = $"http://localhost:4200/auth/change-email?userId={_user.Id}&email={model.NewEmail}&token={Uri.EscapeDataString(token)}";
 
         string newEmail = model.NewEmail;
-        string subject = "Change Email";
+        string subject = "طلب تغير ايميل";
         string body = await GenerateEmailMessage(callbackUrl!,
-            "Change your email",
-            "You requested an email reset.Click the link below to reset it:");
+            "تغير الايميل",
+            "طلبت تغير الايميل الخاص بك الرجاء الضغط علي الرابط في الاسفل");
 
         await emailSender.SendEmailAsync(newEmail, subject, body);
 
@@ -203,7 +204,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         _user = await userManager.FindByIdAsync(model.UserId);
         if (_user is null)
-            throw new NotFoundBadRequest($"user with {model.UserId} not found");
+            return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد مستخدم بهذا الرقم : {_user.Id}"));
 
         var decodedToken = WebUtility.UrlDecode(model.Token);
         var newEmail = model.NewEmail;
@@ -229,7 +230,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
             .FirstOrDefaultAsync(U => U.Id == userId);
 
         if (_user is null)
-            throw new NotFoundBadRequest($"user with {userId} not found");
+            return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد مستخدم بهذا الرقم : {_user.Id}"));
 
 
         var userChildren = new List<ChildDto>();
@@ -248,7 +249,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
     #region Private actions
 
-    private async Task<TokenDto> GenerageToken(bool populateExp)
+    private async Task<TokenDto> GenerateToken(bool populateExp)
     {
         var claims = await GetClaims();
 
@@ -292,7 +293,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         List<Claim> claims = [
             new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
             new("id",_user!.Id),
-            new("name",_user.UserName!),
+            new("name",$"{_user.FirstName} {_user.LastName}"),
             new("email",_user.Email!),
         ];
 

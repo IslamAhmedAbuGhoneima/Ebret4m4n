@@ -3,6 +3,6 @@
 public class LockedOutBadRequest : BadRequestException
 {
     public LockedOutBadRequest() 
-        : base("You are Locked try again later")
+        : base("لقد تم حظرك لمده 15 دقيقه")
     { }
 }

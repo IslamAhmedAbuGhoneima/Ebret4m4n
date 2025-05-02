@@ -5,7 +5,6 @@ using Ebret4m4n.API.Mapping;
 using Ebret4m4n.API.Hubs;
 using Hangfire;
 using Stripe;
-using System.IdentityModel.Tokens.Jwt;
 
 
 var builder = WebApplication.CreateBuilder(args);

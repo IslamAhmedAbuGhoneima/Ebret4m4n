@@ -3,6 +3,6 @@
 public class LoginBadRequest : BadRequestException
 {
     public LoginBadRequest() 
-        : base("Wrong email or password")
+        : base("خطا في الايمل او كلمه المرور")
     { }
 }
