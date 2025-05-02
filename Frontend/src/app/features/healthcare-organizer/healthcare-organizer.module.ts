@@ -1,18 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedModule } from '../../shared/shared.module';
 import { RouterModule, Routes } from '@angular/router';
-import { OrganizerOfHealthcareHomePageComponent } from './components/organizer-of-healthcare-home-page/organizer-of-healthcare-home-page.component';
+import { IncomingChildrenComponent } from './components/incoming-children/incoming-children.component';
+import { VaccinatedChildrenComponent } from './components/vaccinated-children/vaccinated-children.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/healthcare-organizer/home', pathMatch: 'full' },
-  { path: 'home', component: OrganizerOfHealthcareHomePageComponent },
+  { path: '', component: IncomingChildrenComponent },
+  {
+    path: 'incoming-children',
+    component: IncomingChildrenComponent,
+  },
+  {
+    path: 'vaccinated-children',
+    component: VaccinatedChildrenComponent,
+  },
 ];
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule, RouterModule.forChild(routes)
-  ]
+  declarations: [IncomingChildrenComponent, VaccinatedChildrenComponent],
+  imports: [CommonModule, RouterModule.forChild(routes)],
 })
-export class HeathCareOrganizerModule { }
+export class HeathCareOrganizerModule {}

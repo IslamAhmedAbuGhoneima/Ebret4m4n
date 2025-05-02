@@ -1,0 +1,71 @@
+<section class="bg-mainBg-200 min-h-screen">
+  <div class="container pt-6 pb-5">
+    <h3 class="text-[28px] font-semibold text-[#51419]">الأطفال</h3>
+
+    <div class="mt-4">
+      <div class="flex justify-between items-center mb-2">
+        <div class="flex gap-2">
+          <a
+            href="/healthcare-organizer/incoming-children"
+            class="border px-6 py-3 rounded-[42px] hover:bg-primary-hov transition-colors"
+          >
+         الأطفال القادمون
+          </a>
+          <a
+            href="/healthcare-organizer/vaccinated-children"
+            class="bg-primary-btn text-white border px-6 py-3 rounded-[42px]"
+          >
+           الأطفال الحاصلة على اللقاح
+        </a>
+        </div>
+
+        <div class="relative w-64">
+          <input
+            type="number"
+            placeholder="بحث بالرقم القومى"
+            class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+          />
+          <img
+            class="absolute right-4 top-1/2 -translate-y-[calc(50%-2px)] text-sm"
+            src="icons/search.svg"
+            alt=""
+          />
+        </div>
+      </div>
+
+      <table
+        class="min-w-full overflow-x-auto text-lg text-[#151419] text-center border-separate border-spacing-y-2 [&_tbody_tr]:bg-white [&_td]:px-6 [&_td]:py-3 font-semibold"
+      >
+        <thead class="bg-primary-table">
+          <tr>
+            <td scope="col" class="rounded-s-md">إسم الطفل</td>
+            <td scope="col">الرقم القومى</td>
+            <td scope="col">الجرعة</td>
+            <td scope="col" class="rounded-e-md">الحالة</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="border border-[#E5E7EB] border-l-transparent">
+              أحمد محمد
+            </td>
+            <td class="border border-[#E5E7EB] border-x-transparent">
+              30306077483923499
+            </td>
+            <td class="border border-[#E5E7EB] border-x-transparent">
+              الجرعة التانية
+            </td>
+            <td class="border border-[#E5E7EB] border-r-transparent">
+              <div
+                class="w-fit flex mx-auto px-4 py-1 bg-primary-light text-primary-txt100 font-semibold rounded-2xl"
+              >
+                <img class="ml-1" src="/icons/Dot2.svg" alt="" />
+                <span>تم التطعيم</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,199 @@
+<section class="font-arabic">
+  <button (click)="close()" class="p-1 block">
+    <img src="./icons/close.svg" alt="" class="block w-5 h-5" />
+  </button>
+
+  <div class="text-center px-[26px] mt-5">
+    <form>
+      <div class="grid grid-cols-3 gap-4 text-center">
+        <label
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-2 border border-third-border"
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة الميلاد'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة الميلاد']
+          }"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_1"
+            #vaccineCheckbox
+            [value]="'جرعة الميلاد'"
+            [(ngModel)]="selectedStates['جرعة الميلاد']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            جرعة الميلاد
+            <span class="block text-xs"> أول 24 ساعة </span>
+          </div>
+        </label>
+        <label
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-2 border border-third-border"
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة الصفرية'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة الصفرية']
+          }"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_2"
+            #vaccineCheckbox
+            [value]="'جرعة الصفرية'"
+            [(ngModel)]="selectedStates['جرعة الصفرية']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            الجرعة الصفرية
+            <span class="block text-xs"> عند الميلاد </span>
+          </div>
+        </label>
+        <label
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-2 border border-third-border"
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة الدرن'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة الدرن']
+          }"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_3"
+            #vaccineCheckbox
+            [value]="'جرعة الدرن'"
+            [(ngModel)]="selectedStates['جرعة الدرن']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            جرعة الدرن
+            <span class="block text-xs"> عند الميلاد </span>
+          </div>
+        </label>
+        <label
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-2 border border-third-border"
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة الأولى'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة الأولى']
+          }"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_4"
+            #vaccineCheckbox
+            [value]="'جرعة الأولى'"
+            [(ngModel)]="selectedStates['جرعة الأولى']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            الجرعة الأولى
+            <span class="block text-xs"> عمر شهرين </span>
+          </div>
+        </label>
+        <label
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-2 border border-third-border"
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة الثانية'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة الثانية']
+          }"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_5"
+            #vaccineCheckbox
+            [value]="'جرعة الثانية'"
+            [(ngModel)]="selectedStates['جرعة الثانية']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            الجرعة الثانية
+            <span class="block text-xs"> عمر 4 أشهر </span>
+          </div>
+        </label>
+        <label
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-2 border border-third-border"
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة الثالثة'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة الثالثة']
+          }"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_6"
+            #vaccineCheckbox
+            [value]="'جرعة الثالثة'"
+            [(ngModel)]="selectedStates['جرعة الثالثة']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            الجرعة الثالثة
+            <span class="block text-xs"> عمر 6 أشهر </span>
+          </div>
+        </label>
+        <label
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-2 border border-third-border"
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة الرابعة'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة الرابعة']
+          }"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_7"
+            #vaccineCheckbox
+            [value]="'جرعة الرابعة'"
+            [(ngModel)]="selectedStates['جرعة الرابعة']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            الجرعة الرابعة
+            <span class="block text-xs"> عمر 9 أشهر </span>
+          </div>
+        </label>
+        <label
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-2 border border-third-border"
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة الخامسة'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة الخامسة']
+          }"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_8"
+            #vaccineCheckbox
+            [value]="'جرعة الخامسة'"
+            [(ngModel)]="selectedStates['جرعة الخامسة']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            الجرعة الخامسة
+            <span class="block text-xs"> عمر سنة </span>
+          </div>
+        </label>
+        <label
+          [ngClass]="{
+            'border-third-border bg-white': !selectedStates['جرعة المنشطة'],
+            'border-primary-bg bg-primary-table': selectedStates['جرعة المنشطة']
+          }"
+          class="block text-[#151419] cursor-pointer bg-white rounded-[32px] px-4 py-3 border border-third-border"
+        >
+          <input
+            type="checkbox"
+            name="vaccine_9"
+            #vaccineCheckbox
+            [value]="'جرعة المنشطة'"
+            [(ngModel)]="selectedStates['جرعة المنشطة']"
+            class="hidden vaccine-check"
+          />
+          <div class="vaccine-btn text-base">
+            الجرعة المنشطة
+            <span class="block text-xs"> عمر سنة ونصف </span>
+          </div>
+        </label>
+      </div>
+      <button
+        type="button"
+        (click)="submitVaccines()"
+        class="mx-auto mt-5 block cursor-pointer font-arabic gap-[10px] py-[9px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+      >
+        إضافة
+      </button>
+    </form>
+  </div>
+</section>

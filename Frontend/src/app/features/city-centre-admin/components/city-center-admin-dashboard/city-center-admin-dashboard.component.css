@@ -1,0 +1,12 @@
+.scroll-container {
+  height: 290px;
+  overflow-y: auto;
+
+  /* إخفاء الشريط لمتصفحات مختلفة */
+  scrollbar-width: none;      /* Firefox */
+  -ms-overflow-style: none;   /* Internet Explorer 10+ */
+}
+
+.scroll-container::-webkit-scrollbar {
+  display: none;              /* Chrome, Safari */
+}

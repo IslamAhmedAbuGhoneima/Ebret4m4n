@@ -1,0 +1,38 @@
+<section class="font-arabic">
+  <button (click)="close()" class="p-1 block">
+    <img src="./icons/close.svg" alt="" class="block w-5 h-5" />
+  </button>
+
+  <div class="text-center px-[26px] pb-8 mt-5">
+    <div class="mb-6">
+      <h4 class="font-bold text-[22px] text-[#121212] mb-2">
+        تعديل موعد تطعيم الجرعة الأولى
+      </h4>
+      <p class="font-semibold text-xl text-third-txt mb-2">
+        الموعد الذى تم حجزه سابقاً يوم الثلاثاء الموافق 7/22
+      </p>
+    </div>
+    <div class="flex flex-col gap-2">
+      <h6 class="font-semibold text-xl text-[#121212]">
+        إختر اليوم المناسب لك
+      </h6>
+      <mat-radio-group aria-label="Select an option">
+        <mat-radio-button value="1">يوم الثلاثاء الموافق 7/22</mat-radio-button>
+        <mat-radio-button value="2">يوم الأربعاء الموافق 7/23</mat-radio-button>
+      </mat-radio-group>
+    </div>
+  </div>
+
+  <div class="flex justify-center items-center gap-6">
+    <button
+      class="cursor-pointer py-[11px] px-6 rounded-lg text-sm font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+    >
+      <span> تعديل</span>
+    </button>
+    <button
+      class="cursor-pointer py-[11px] px-4 rounded-lg text-sm font-bold bg-[#B4231B] text-mainBg-100 transition duration-200 hover:bg-[#7A271A]"
+    >
+      <span> إلغاء الحجز</span>
+    </button>
+  </div>
+</section>

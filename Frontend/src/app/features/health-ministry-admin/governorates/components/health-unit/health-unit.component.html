@@ -1,0 +1,73 @@
+<section class="bg-mainBg-200 min-h-screen">
+  <div class="container pt-6 pb-5">
+    <h6 class="text-[28px] font-semibold text-[#51419]">
+      الوحدة الصحية بقرية البرجاية
+    </h6>
+    <div class="flex items-center gap-1 mt-3">
+      <a routerLink="/health-ministry/governorates">الصفحة الرئيسية</a>
+      <img
+        src="/icons/Caret Down.svg"
+        alt=""
+        class="rotate-90 h-3 w-3 mt-[6px]"
+      />
+      <a routerLink="/health-ministry/governorates/governorate">
+        محافظة المنيا</a
+      >
+      <img
+        src="/icons/Caret Down.svg"
+        alt=""
+        class="rotate-90 h-3 w-3 mt-[6px]"
+      />
+      <a routerLink="/health-ministry/governorates/center"> مركز المنيا</a>
+      <img
+        src="/icons/Caret Down.svg"
+        alt=""
+        class="rotate-90 h-3 w-3 mt-[6px]"
+      />
+      <a routerLink="/health-ministry/governorates/health-unit">
+        الوحدة الصحية بقرية البرجاية</a
+      >
+    </div>
+
+    <div class="mt-6">
+      <div
+        class="bg-white rounded-lg px-6 pt-4 pb-8 mb-8 border border-third-border"
+      >
+        <h6 class="font-semibold text-lg mb-6">معلومات الوحدة</h6>
+        <div class="flex mb-6 pr-4">
+          <div class="w-1/2">
+            <img class="inline" src="/icons/location.svg" alt="" />
+            <span class="mr-1 text-third-txt font-normal">العنوان</span>
+            <p class="font-semibold mt-1">مركز المنيا - محافظة المنيا</p>
+          </div>
+          <div class="w-1/2">
+            <img class="inline" src="/icons/city-admin.svg" alt="" />
+            <span class="mr-1 text-third-txt font-normal">المسئول</span>
+            <p class="font-semibold mt-1">محمد سيد</p>
+          </div>
+        </div>
+        <div class="flex mb-6 pr-4">
+          <div class="w-1/2">
+            <img class="inline" src="/icons/lucide_calendar-days.svg" alt="" />
+            <span class="mr-1 text-third-txt font-normal">أيام العمل</span>
+            <p class="font-semibold mt-1">الثلاثاء - الأربعاء</p>
+          </div>
+          <div class="w-1/2">
+            <img class="inline" src="/icons/doctor.svg" alt="" />
+            <span class="mr-1 text-third-txt font-normal">الدكتور</span>
+            <p class="font-semibold mt-1">محمد سيد</p>
+          </div>
+        </div>
+      </div>
+
+      <button
+        (click)="goBack()"
+        class="flex gap-x-2 mt-8 mx-auto w-fit bg-black text-white py-2 px-6 rounded-lg cursor-pointer hover:bg-opacity-80 transition-colors"
+      >
+        <img src="/icons/streamline_emergency-exit.svg" class="" alt="" />
+
+        <span class="font-bold text-sm"> رجوع </span>
+      </button>
+    </div>
+  </div>
+</section>

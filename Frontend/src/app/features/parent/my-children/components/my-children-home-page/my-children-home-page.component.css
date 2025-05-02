@@ -1,0 +1,5 @@
+.my-children-home-page-tooltip-style {
+  /* --mat-sys-inverse-on-surface: rgba(0, 238, 255, 0.65) !important; */
+
+  --mat-sys-body-small-font: "Cairo", sans-serif !important;
+}

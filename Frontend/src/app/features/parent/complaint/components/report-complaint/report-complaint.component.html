@@ -1,0 +1,86 @@
+<section class="bg-[#F9FAFB] min-h-screen">
+  <div class="container pt-6">
+    <h3 class="text-[28px] font-semibold text-[#51419]">إبلاغ عن شكوى</h3>
+    <h4 class="text-[28px] font-bold text-[#121212] mx-auto w-fit mt-12">
+      قدم شكوتك وسيتم حل مشكلتك فى أسرع وقت
+    </h4>
+    <div class="mt-10 max-w-[488px] mx-auto">
+      <form [formGroup]="formComplaint" (ngSubmit)="submit()">
+        <div class="mb-4">
+          <input
+            [ngClass]="{
+              'border-red-700': heathCareUnit?.invalid && heathCareUnit?.dirty,
+              'border-third-border':
+                heathCareUnit?.valid || heathCareUnit?.untouched
+            }"
+            class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-md border-[1.5px] border-third-border"
+            type="text"
+            formControlName="heathCareUnit"
+            name="healthcare-unit"
+            id="healthcare-unit"
+            placeholder="الوحدة الصحية بقرية الروضة"
+          />
+
+          <div
+            class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+            *ngIf="heathCareUnit?.invalid && heathCareUnit?.dirty"
+          >
+            <img
+              src="./icons/si_warning-fill.svg"
+              alt=""
+              class="w-4 h-4 mt-[1px]"
+            />
+            <div>
+              <small *ngIf="heathCareUnit?.errors?.['required']">
+                هذه الخانة مطلوبة.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <label
+            class="block text-xl font-semibold mb-2 mr-4 text-[#151419]"
+            for="complaint-details"
+          >
+            تفاصيل الشكوى</label
+          >
+
+          <textarea
+            formControlName="complaint"
+            [ngClass]="{
+              'border-red-700': complaint?.invalid && complaint?.dirty,
+              'border-third-border': complaint?.valid || complaint?.untouched
+            }"
+            name="complaint-details"
+            id="complaint-details"
+            class="block w-full h-24 resize-none overflow-y-auto placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border-[1.5px] border-third-border"
+            placeholder="أكتب شكوتك"
+          ></textarea>
+
+          <div
+            class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+            *ngIf="complaint?.invalid && complaint?.dirty"
+          >
+            <img
+              src="./icons/si_warning-fill.svg"
+              alt=""
+              class="w-4 h-4 mt-[1px]"
+            />
+            <small *ngIf="complaint?.errors?.['required']">
+              هذه الخانة مطلوبة.
+            </small>
+          </div>
+        </div>
+
+        <button
+          class="flex items-center mx-auto mt-6 justify-center gap-2 bg-primary-btn text-mainBg-100 px-4 py-[11px] rounded-lg transition duration-200 hover:bg-[#0B4632]"
+        >
+          <span class="text-sm font-bold">إبلاغ عن شكوى</span>
+
+          <img src="/icons/mingcute_warning-line.svg" alt="" class="w-6 h-6" />
+        </button>
+      </form>
+    </div>
+  </div>
+</section>

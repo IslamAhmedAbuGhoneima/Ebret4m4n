@@ -1,0 +1,28 @@
+.custom-stepper-add-child-style .mat-horizontal-stepper-header-container {
+  display: none !important;
+}
+
+.custom-stepper-add-child-style .mat-horizontal-content-container {
+  padding: 0 !important;
+}
+
+.custom-stepper-add-child-style.mat-stepper-horizontal,
+.custom-stepper-add-child-style.mat-stepper-vertical {
+  display: block !important;
+  background: transparent !important;
+}
+
+/* بقية الاستايلات العادية */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
+input,
+select {
+  box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05) !important;
+}

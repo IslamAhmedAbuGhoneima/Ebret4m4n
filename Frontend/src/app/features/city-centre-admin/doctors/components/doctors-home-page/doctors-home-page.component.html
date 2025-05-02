@@ -1,0 +1,82 @@
+<section class="bg-mainBg-200 min-h-screen">
+  <div class="container pt-6 pb-5">
+    <h3 class="text-2xl font-semibold">الأطباء</h3>
+    <div class="flex justify-between mb-2 mt-5">
+      <div class="relative w-64">
+        <input
+          class="w-full py-3 pl-3 pr-9 border border-third-border rounded-lg outline-none placeholder:text-third-txt placeholder:text-lg"
+          type="text"
+          placeholder="بحث عن طبيب"
+        />
+        <img class="absolute top-1/3 right-3" src="/icons/search.svg" alt="" />
+      </div>
+      <a
+        class="block bg-primary-bg px-6 py-3 rounded-lg hover:bg-primary-hovbtn transition-colors"
+        routerLink="/city-center-admin/doctors/add-doctor"
+      >
+        <span class="text-white ml-2 text-sm font-bold">إضافة طبيب</span>
+        <img class="float-left" src="/icons/lets-icons_user-add.svg" alt="" />
+      </a>
+    </div>
+    <table
+      class="w-full text-center text-lg [&_td]:py-3 [&_tbody_tr]:bg-white [&_tbody_td]:border-b border-separate border-spacing-y-2"
+    >
+      <thead class="bg-primary-table">
+        <tr>
+          <td class="rounded-tr-md">الإسم</td>
+          <td>الوحدة الصحية</td>
+          <td>البريد الإلكترونى</td>
+          <td class="rounded-tl-md">الإجراءات</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>محمد أحمد</td>
+          <td>إسم الوحدة</td>
+          <td>someonaexample.com</td>
+          <td class="flex gap-8 justify-center">
+            <a routerLink="/city-center-admin/doctors/edit-doctor"
+              ><img src="/icons/edit.svg" alt=""
+            /></a>
+            <button><img src="/icons/delete.svg" alt="" /></button>
+          </td>
+        </tr>
+        <tr>
+          <td>محمد أحمد</td>
+          <td>إسم الوحدة</td>
+          <td>someonaexample.com</td>
+          <td class="flex gap-8 justify-center">
+            <a routerLink="/city-center-admin/doctors/edit-doctor"
+              ><img src="/icons/edit.svg" alt=""
+            /></a>
+            <button><img src="/icons/delete.svg" alt="" /></button>
+          </td>
+        </tr>
+        <tr>
+          <td>محمد أحمد</td>
+          <td>إسم الوحدة</td>
+          <td>someonaexample.com</td>
+          <td class="flex gap-8 justify-center">
+            <a routerLink="/city-center-admin/doctors/edit-doctor"
+              ><img src="/icons/edit.svg" alt=""
+            /></a>
+            <button><img src="/icons/delete.svg" alt="" /></button>
+          </td>
+        </tr>
+        <tr>
+          <td>محمد أحمد</td>
+          <td>إسم الوحدة</td>
+          <td>someonaexample.com</td>
+          <td class="flex gap-8 justify-center">
+            <a routerLink="/city-center-admin/doctors/edit-doctor"
+              ><img src="/icons/edit.svg" alt=""
+            /></a>
+            <button><img src="/icons/delete.svg" alt="" /></button>
+          </td>
+        </tr>
+        
+
+      </tbody>
+    </table>
+  </div>
+</section>

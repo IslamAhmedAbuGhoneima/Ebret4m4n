@@ -1,1 +1,528 @@
-<p>register works!</p>
+<section
+  class="font-arabic relative bg-mainBg-100 w-full min-h-screen before:absolute before:top-0 before:left-0 before:min-h-full before:w-[40%] before:bg-primary-bg before:rounded-r-4xl"
+>
+  <div class="container relative pt-8">
+    <h2 class="text-left text-xl font-bold absolute left-4 top-8">
+      <a routerLink="/home"> إبرة <span class="text-mainBg-100">أمان</span></a>
+    </h2>
+
+    <mat-stepper linear #stepper class="stepper-register-style">
+      <mat-step>
+        <div class="flex justify-between items-center font-arabic">
+          <div class="text-right w-1/2">
+            <div class="mb-8 text-center">
+              <h5 class="font-arabic font-bold text-[40px] mb-2">إنشاء حساب</h5>
+              <p class="font-arabic font-semibold text-xl">
+                برجاء إدخال البيانات التالية لإنشاء الحساب
+              </p>
+            </div>
+            <form [formGroup]="firstFormGroup">
+              <!-- name -->
+              <div class="flex flex-row gap-5 mb-3">
+                <div class="flex-1">
+                  <label
+                    class="block text-xl font-semibold mb-2 mr-2"
+                    for="firstName"
+                    >الإسم الأول</label
+                  >
+                  <input
+                    formControlName="firstName"
+                    [ngClass]="{
+                      'border-red-700': firstName?.invalid && firstName?.dirty,
+                      'border-third-border':
+                        firstName?.valid || firstName?.untouched
+                    }"
+                    class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border-[1.5px] border-third-border"
+                    type="text"
+                    name="firstName"
+                    id="firstName"
+                    placeholder="الإسم الأول"
+                  />
+
+                  <div
+                    class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                    *ngIf="firstName?.invalid && firstName?.dirty"
+                  >
+                    <img
+                      src="./icons/si_warning-fill.svg"
+                      alt=""
+                      class="w-4 h-4 mt-[1px]"
+                    />
+                    <div>
+                      <small *ngIf="firstName?.errors?.['required']">
+                        أدخل الإسم الأول
+                      </small>
+                      <small *ngIf="firstName?.errors?.['pattern']">
+                        يجب إدخال الإسم باللغة العربية فقط.
+                      </small>
+
+                      <small
+                        *ngIf="!firstName?.errors?.['pattern']  && firstName?.errors?.['minlength']"
+                        >يجب أن يكون طول الإسم لا يقل عن 3 حروف.
+                      </small>
+                      <small
+                        *ngIf="!firstName?.errors?.['pattern']  && firstName?.errors?.['maxlength']"
+                      >
+                        يجب أن يكون طول الإسم لا يتعدى 20 حرف.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="flex-1">
+                  <label
+                    class="block text-xl font-semibold mb-2 mr-2"
+                    for="secondName"
+                    >الإسم الثانى</label
+                  >
+                  <input
+                    formControlName="secondName"
+                    [ngClass]="{
+                      'border-red-700':
+                        secondName?.invalid && secondName?.dirty,
+                      'border-third-border':
+                        secondName?.valid || secondName?.untouched
+                    }"
+                    class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border border-third-border"
+                    type="text"
+                    name="secondName"
+                    id="secondName"
+                    placeholder="إسم العائلة"
+                  />
+
+                  <div
+                    class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-x-1"
+                    *ngIf="secondName?.invalid && secondName?.dirty"
+                  >
+                    <img
+                      src="./icons/si_warning-fill.svg"
+                      alt=""
+                      class="w-4 h-4 mt-[1px]"
+                    />
+                    <div>
+                      <small *ngIf="secondName?.errors?.['required']">
+                        أدخل الإسم الثانى
+                      </small>
+                      <small *ngIf="secondName?.errors?.['pattern']">
+                        يجب إدخال الإسم باللغة العربية فقط.
+                      </small>
+
+                      <small
+                        *ngIf="!secondName?.errors?.['pattern']  && secondName?.errors?.['minlength']"
+                        >يجب أن يكون طول الإسم لا يقل عن 3 حروف.
+                      </small>
+                      <small
+                        *ngIf="!secondName?.errors?.['pattern']  && secondName?.errors?.['maxlength']"
+                      >
+                        يجب أن يكون طول الإسم لا يتعدى 20 حرف.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-4">
+                <label class="block text-xl font-semibold mb-2 mr-2" for="email"
+                  >البريد الإلكتروني</label
+                >
+                <div class="relative">
+                  <input
+                    formControlName="email"
+                    [ngClass]="{
+                      'border-red-700': email?.invalid && email?.dirty,
+                      'border-third-border': email?.valid || email?.untouched
+                    }"
+                    type="email"
+                    name="email"
+                    id="email"
+                    placeholder="someone@example.com"
+                    class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+                  />
+                  <img
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-sm"
+                    src="icons/tabler_mail.svg"
+                    alt=""
+                  />
+                </div>
+                <div
+                  class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                  *ngIf="email?.invalid && email?.dirty"
+                >
+                  <img
+                    src="./icons/si_warning-fill.svg"
+                    alt=""
+                    class="w-4 h-4 mt-[1px]"
+                  />
+                  <div>
+                    <small *ngIf="email?.errors?.['required']">
+                      أدخل البريد الإلكتروني.
+                    </small>
+                    <small *ngIf="email?.errors?.['email']">
+                      الرجاء إدخال عنوان بريد إلكتروني صحيح (مثل
+                      name&#64;example.com).
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="block text-xl font-semibold mb-2 mr-2" for="phone"
+                  >رقم الهاتف</label
+                >
+                <div class="relative">
+                  <input
+                    formControlName="phone"
+                    [ngClass]="{
+                      'border-red-700': phone?.invalid && phone?.dirty,
+                      'border-third-border': phone?.valid || phone?.untouched
+                    }"
+                    type="tel"
+                    name="phone"
+                    id="phone"
+                    placeholder="رقم الهاتف"
+                    class="text-right placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+                  />
+                  <img
+                    class="absolute right-4 top-1/2 -translate-y-[calc(50%+1.5px)] text-sm rotate-[240deg]"
+                    src="icons/fluent_call-28-filled.svg"
+                    alt=""
+                  />
+                </div>
+                <div
+                  class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                  *ngIf="phone?.invalid && phone?.dirty"
+                >
+                  <img
+                    src="./icons/si_warning-fill.svg"
+                    alt=""
+                    class="w-4 h-4 mt-[1px]"
+                  />
+                  <div>
+                    <small *ngIf="phone?.errors?.['required']">
+                      أدخل رقم الهاتف.
+                    </small>
+                    <small *ngIf="phone?.errors?.['minlength']">
+                      أدخل رقم هاتف صحيح.
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-4">
+                <label
+                  class="block text-xl font-semibold mb-2 mr-2"
+                  for="password"
+                  >كلمة المرور</label
+                >
+                <div class="relative">
+                  <input
+                    formControlName="password"
+                    [ngClass]="{
+                      'border-red-700': password?.invalid && password?.dirty,
+                      'border-third-border':
+                        password?.valid || password?.untouched
+                    }"
+                    [type]="showPassword ? 'text' : 'password'"
+                    name="password"
+                    id="password"
+                    placeholder="أدخل كلمة المرور"
+                    class="placeholder:font-arabic w-full py-3 px-10 border rounded text-right outline-none placeholder:text-third-txt placeholder:text-base"
+                  />
+                  <img
+                    class="absolute right-4 top-1/2 -translate-y-[calc(50%+3px)] text-sm"
+                    src="icons/humbleicons_lock.svg"
+                    alt=""
+                  />
+
+                  <img
+                    (click)="togglePassword()"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 text-lg cursor-pointer"
+                    src="icons/ri_eye-off-line.svg"
+                    alt=""
+                  />
+                </div>
+
+                <div
+                  class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                  *ngIf="password?.invalid && password?.dirty"
+                >
+                  <img
+                    src="./icons/si_warning-fill.svg"
+                    alt=""
+                    class="w-4 h-4 mt-[1px]"
+                  />
+                  <div>
+                    <small *ngIf="password?.errors?.['required']">
+                      يجب إدخال كلمه مرور.
+                    </small>
+                    <small *ngIf="password?.errors?.['minlength']">
+                      يجب أن كلمة مرور لا تقل عن 8 أحرف ويجب أن تحتوى على حرف
+                      ورقم على الأقل.
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-4">
+                <label
+                  class="block text-xl font-semibold mb-2 mr-2"
+                  for="confirm_password"
+                >
+                  تأكيد كلمة المرور
+                </label>
+                <div class="relative">
+                  <input
+                    formControlName="confirmPassword"
+                    [ngClass]="{
+                      'border-red-700':
+                        confirmPassword?.invalid && confirmPassword?.dirty,
+                      'border-third-border':
+                        confirmPassword?.valid || confirmPassword?.untouched
+                    }"
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    name="confirm_password"
+                    id="confirm_password"
+                    placeholder="أعد كتابة كلمة المرور"
+                    class="placeholder:font-arabic w-full py-3 px-10 border rounded text-right outline-none placeholder:text-third-txt placeholder:text-base"
+                  />
+                  <img
+                    class="absolute right-4 top-1/2 -translate-y-[calc(50%+3px)] text-sm"
+                    src="icons/humbleicons_lock.svg"
+                    alt=""
+                  />
+                  <img
+                    (click)="toggleConfirmPassword()"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 text-lg cursor-pointer"
+                    src="icons/ri_eye-off-line.svg"
+                    alt=""
+                  />
+                </div>
+
+                <div
+                  class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                  *ngIf="confirmPassword?.dirty && (confirmPassword?.errors?.['required'] || firstFormGroup?.errors?.['unMatchedPassword'])"
+                >
+                  <img
+                    src="./icons/si_warning-fill.svg"
+                    alt=""
+                    class="w-4 h-4 mt-[1px]"
+                  />
+                  <div>
+                    <small *ngIf="confirmPassword?.errors?.['required']">
+                      هذه الخانة مطلوبة.
+                    </small>
+                    <small
+                      *ngIf="( firstFormGroup?.errors?.['unMatchedPassword'] &&  !confirmPassword?.errors?.['required'] )"
+                    >
+                      كلمتان المرور غير متطابقتان .
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <button
+                [disabled]="firstFormGroup.invalid"
+                matStepperNext
+                class="disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer flex font-arabic gap-[10px] py-[9px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+              >
+                <img src="/icons/carbon_send-filled.svg" alt="" />
+                <span class="inline-block"> التالى</span>
+              </button>
+            </form>
+          </div>
+          <div class="text-mainBg-100 text-center">
+            <div class="max-w-[350px] m-auto">
+              <h5 class="font-bold text-[40px] mb-2">أهلاً بك</h5>
+              <p class="text-lg font-semibold mb-8 not-italic">
+                إبرة أمان يساعدك على إدارة تطعيمات أطفالك بسهولة أدخل بياناتك
+                لإنشاء حساب
+              </p>
+              <p class="font-semibold text-xl mb-2 not-italic">
+                لديك حساب بالفعل؟ سجل دخول
+              </p>
+              <a
+                routerLink="/auth/login"
+                class="block border w-fit mx-auto px-6 py-[9px] rounded-lg font-bold text-lg cursor-pointer transition duration-300 hover:bg-white hover:text-primary-txt"
+              >
+                تسجيل دخول
+              </a>
+            </div>
+          </div>
+        </div>
+      </mat-step>
+      <mat-step>
+        <div class="flex justify-between items-center font-arabic mt-28">
+          <div class="text-right w-1/2">
+            <div class="mb-16 text-center">
+              <h5 class="font-arabic font-bold text-[40px] mb-2">إنشاء حساب</h5>
+              <p class="font-arabic font-semibold text-xl">
+                حدد موقعك وإختر الوحدة الصحية المناسبة لك
+              </p>
+            </div>
+            <form (ngSubmit)="signUp()" [formGroup]="secondFormGroup">
+              <div class="flex flex-row-reverse gap-5 mb-6">
+                <div class="flex-1">
+                  <div class="relative">
+                    <select
+                      formControlName="city"
+                      [ngClass]="{
+                        'border-red-700':
+                          city?.invalid && (city?.touched || city?.dirty),
+                        'border-third-border': city?.valid || city?.untouched
+                      }"
+                      class="w-full px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                      name="city"
+                      id="city"
+                    >
+                      <option value="" disabled>اختر محافظة</option>
+                      <option value="القاهرة">القاهرة</option>
+                      <option value="المنيا">المنيا</option>
+                      <option value="الإسكندرية">الإسكندرية</option>
+                    </select>
+
+                    <img
+                      class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
+                      src="/icons/Caret Down.svg"
+                      alt=""
+                    />
+                  </div>
+                  <div
+                    class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                    *ngIf="city?.invalid && (city?.touched || city?.dirty)"
+                  >
+                    <img
+                      src="./icons/si_warning-fill.svg"
+                      alt=""
+                      class="w-4 h-4 mt-[1px]"
+                    />
+                    <div>
+                      <small *ngIf="city?.errors?.['required']">
+                        إختر المحافظة.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <div class="relative">
+                    <select
+                      formControlName="town"
+                      [ngClass]="{
+                        'border-red-700':
+                          town?.invalid && (town?.touched || town?.dirty),
+                        'border-third-border': town?.valid || town?.untouched
+                      }"
+                      class="w-full px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                      name="town"
+                      id="town"
+                    >
+                      <option value="" disabled>اختر مركز</option>
+                      <option value="سمالوط">سمالوط</option>
+                      <option value="المنيا">المنيا</option>
+                    </select>
+
+                    <img
+                      class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
+                      src="/icons/Caret Down.svg"
+                      alt=""
+                    />
+                  </div>
+                  <div
+                    class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                    *ngIf="town?.invalid && (town?.touched || town?.dirty)"
+                  >
+                    <img
+                      src="./icons/si_warning-fill.svg"
+                      alt=""
+                      class="w-4 h-4 mt-[1px]"
+                    />
+                    <div>
+                      <small *ngIf="town?.errors?.['required']">
+                        إختر المركز.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex-1">
+                <div class="relative">
+                  <select
+                    formControlName="healthUnit"
+                    [ngClass]="{
+                      'border-red-700':
+                        healthUnit?.invalid &&
+                        (healthUnit?.touched || healthUnit?.dirty),
+                      'border-third-border':
+                        healthUnit?.valid || healthUnit?.untouched
+                    }"
+                    class="w-full px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                    name="healthUnit"
+                    id="healthUnit"
+                  >
+                    <option value="" disabled>إختر الوحدة الصحية</option>
+                    <option value="سمالوط">سمالوط</option>
+                    <option value="المنيا">المنيا</option>
+                  </select>
+
+                  <img
+                    class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
+                    src="/icons/Caret Down.svg"
+                    alt=""
+                  />
+                </div>
+                <div
+                  class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                  *ngIf="
+                    healthUnit?.invalid &&
+                    (healthUnit?.touched || healthUnit?.dirty)
+                  "
+                >
+                  <img
+                    src="./icons/si_warning-fill.svg"
+                    alt=""
+                    class="w-4 h-4 mt-[1px]"
+                  />
+                  <div>
+                    <small *ngIf="healthUnit?.errors?.['required']">
+                      يجب إختيار جنس الطفل.
+                    </small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-between mt-9 px-3">
+                <button
+                  matStepperPrevious
+                  class="block bg-black text-mainBg-100 px-6 py-3 rounded-lg hover:bg-opacity-80 transition-colors"
+                >
+                  رجوع
+                </button>
+                <button
+                  type="submit"
+                  class="block bg-primary-btn text-mainBg-100 px-6 py-3 rounded-lg"
+                >
+                  إنشاء حساب
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div class="text-mainBg-100 text-center">
+            <div class="max-w-[350px] m-auto">
+              <h5 class="font-bold text-[40px] mb-2">أهلاً بك</h5>
+              <p class="text-lg font-semibold mb-8 not-italic">
+                إبرة أمان يساعدك على إدارة تطعيمات أطفالك بسهولة أدخل بياناتك
+                لإنشاء حساب
+              </p>
+              <p class="font-semibold text-xl mb-2 not-italic">
+                لديك حساب بالفعل؟ سجل دخول
+              </p>
+              <a
+                routerLink="/auth/login"
+                class="block border w-fit mx-auto px-6 py-[9px] rounded-lg font-bold text-lg cursor-pointer transition duration-200 hover:bg-white hover:text-primary-txt"
+              >
+                تسجيل دخول
+              </a>
+            </div>
+          </div>
+        </div>
+      </mat-step>
+    </mat-stepper>
+  </div>
+</section>

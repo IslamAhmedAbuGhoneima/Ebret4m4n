@@ -1,0 +1,47 @@
+<section class="bg-[#F9FAFB] min-h-screen font-arabic">
+  <div class="container pt-6">
+    <h3 class="text-[28px] font-semibold text-[#51419]">الأطفال</h3>
+    <div class="mt-4 relative w-64 mr-auto">
+      <input
+        (keyup)="search($event)"
+        placeholder="بحث بالرقم القومى"
+        class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+      />
+      <img
+        class="absolute right-4 top-1/2 -translate-y-1/2 text-sm w-[14px] h-[14px]"
+        src="icons/search.svg"
+        alt=""
+      />
+    </div>
+    <div class="mt-2">
+      <table
+        class="min-w-full overflow-x-auto text-lg text-[#151419] text-center border-separate border-spacing-y-2 [&_tbody_tr]:bg-white [&_td]:px-6 [&_td]:py-3 font-semibold"
+      >
+        <thead class="bg-primary-table">
+          <tr>
+            <td scope="col" class="rounded-s-md">إسم الطفل</td>
+            <td scope="col">الرقم القومى</td>
+            <td scope="col" class="rounded-e-md">تفاصيل</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="border border-[#E5E7EB] border-l-transparent">
+              أحمد محمد
+            </td>
+            <td class="border border-[#E5E7EB] border-x-transparent">
+              30306077483923499
+            </td>
+            <td class="border border-[#E5E7EB] border-r-transparent">
+              <a
+                routerLink="/doctor/children/doctor-child-details" [queryParams]="{ from: 'children' }"
+                class="underline"
+                >عرض بيانات الطفل</a
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

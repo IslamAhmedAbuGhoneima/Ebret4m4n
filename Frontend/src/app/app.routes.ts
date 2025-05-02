@@ -1,28 +1,39 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './standalone/pages/home/home.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
-import { NotFoundComponent } from './standalone/components/not-found/not-found.component';
+import { NotFoundComponent } from './standalone/pages/not-found/not-found.component';
 import { ContactUsComponent } from './standalone/pages/contact-us/contact-us.component';
-import { VaccinationScheduleComponent } from './standalone/components/vaccination-schedule/vaccination-schedule.component';
+import { VaccinationScheduleComponent } from './standalone/pages/vaccination-schedule/vaccination-schedule.component';
 
 export const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent },
+  { path: 'contact-us', component: ContactUsComponent },
+  { path: 'vaccination-schedule', component: VaccinationScheduleComponent },
+
+  {
+    path: 'auth',
+    loadChildren: () =>
+      import('./features/auth/auth.module').then((m) => m.AuthModule),
+  },
+
   {
     path: '',
     component: MainLayoutComponent,
     children: [
-      { path: '', redirectTo: '/home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent },
-      { path: 'contact-us', component: ContactUsComponent },
-      { path: 'vaccination-schedule', component: VaccinationScheduleComponent },
       {
         path: 'doctor',
         loadChildren: () =>
           import('./features/doctor/doctor.module').then((m) => m.DoctorModule),
+        // canActivate: [roleGuard],
+        data: { role: 'doctor' },
       },
       {
         path: 'parent',
         loadChildren: () =>
           import('./features/parent/parent.module').then((m) => m.ParentModule),
+        // canActivate: [roleGuard],
+        data: { role: 'parent' },
       },
       {
         path: 'health-ministry',
@@ -30,13 +41,26 @@ export const routes: Routes = [
           import(
             './features/health-ministry-admin/health-ministry-admin.module'
           ).then((m) => m.HealthMinistryAdminModule),
+        // canActivate: [roleGuard],
+        data: { role: 'admin' },
       },
       {
-        path: 'city-centre-admin',
+        path: 'city-center-admin',
         loadChildren: () =>
           import('./features/city-centre-admin/city-centre-admin.module').then(
             (m) => m.CityCentreAdminModule
           ),
+        // canActivate: [roleGuard],
+        data: { role: 'cityAdmin' },
+      },
+      {
+        path: 'city-admin',
+        loadChildren: () =>
+          import('./features/city-admin/city-admin.module').then(
+            (m) => m.CityAdminModule
+          ),
+        // canActivate: [roleGuard],
+        data: { role: 'governorateAdmin' },
       },
       {
         path: 'healthcare-organizer',
@@ -44,14 +68,87 @@ export const routes: Routes = [
           import(
             './features/healthcare-organizer/healthcare-organizer.module'
           ).then((m) => m.HeathCareOrganizerModule),
+        // canActivate: [roleGuard],
+        data: { role: 'organizer' },
+      },
+
+      // Real-time & Shared Components
+      {
+        path: 'chat',
+        loadComponent: () =>
+          import('./standalone/components/real-time/chat/chat.component').then(
+            (c) => c.ChatComponent
+          ),
+        // canActivate: [roleGuard],
+        data: { role: 'parent' }, // أو أي رول مناسب
+      },
+      {
+        path: 'notifications',
+        loadComponent: () =>
+          import(
+            './standalone/components/real-time/notifications/notifications.component'
+          ).then((c) => c.NotificationsComponent),
+        // canActivate: [roleGuard],
+        data: { role: 'parent' },
+      },
+      {
+        path: 'vaccines',
+        loadComponent: () =>
+          import('./standalone/components/vaccines/vaccines.component').then(
+            (c) => c.VaccinesComponent
+          ),
+        // canActivate: [roleGuard],
+        data: { role: 'parent' },
+      },
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./standalone/components/orders/orders/orders.component').then(
+            (c) => c.OrdersComponent
+          ),
+        // canActivate: [roleGuard],
+        data: { role: 'parent' },
+      },
+      {
+        path: 'orders/my-orders',
+        loadComponent: () =>
+          import(
+            './standalone/components/orders/my-orders/my-orders.component'
+          ).then((c) => c.MyOrdersComponent),
+        // canActivate: [roleGuard],
+        data: { role: 'parent' },
+      },
+
+      // Admin Routes
+      {
+        path: 'admins',
+        loadComponent: () =>
+          import(
+            './standalone/components/administrator/administrators/administrators.component'
+          ).then((c) => c.AdministratorsComponent),
+        // canActivate: [roleGuard],
+        data: { role: 'ministryAdmin' },
+      },
+      {
+        path: 'admins/add-admin',
+        loadComponent: () =>
+          import(
+            './standalone/components/administrator/add-administrator/add-administrator.component'
+          ).then((c) => c.AddAdministratorComponent),
+        // canActivate: [roleGuard],
+        data: { role: 'ministryAdmin' },
+      },
+      {
+        path: 'admins/edit-admin',
+        loadComponent: () =>
+          import(
+            './standalone/components/administrator/edit-administrator/edit-administrator.component'
+          ).then((c) => c.EditAdministratorComponent),
+        // canActivate: [roleGuard],
+        data: { role: 'ministryAdmin' },
       },
     ],
   },
-  {
-    path: 'auth',
-    loadChildren: () =>
-      import('./features/auth/auth.module').then((m) => m.AuthModule),
-  },
-
-  { path: '**', component: NotFoundComponent }, //wild card path
+  
+  { path: '**', component: NotFoundComponent },
 ];
