@@ -2,16 +2,30 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { ParentHomePageComponent } from './components/parent-home-page/parent-home-page.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog'; // <-- أضف هذا السطر
+import { ParentProfileEditComponent } from './components/parent-profile-edit/parent-profile-edit.component';
+import { ParentProfileComponent } from './components/parent-profile/parent-profile.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
-
-const routes: Routes = [{ path: '', component: ParentHomePageComponent },
+const routes: Routes = [
+  { path: '', component: ParentHomePageComponent },
+  { path: 'profile/edit', component: ParentProfileEditComponent },
+  { path: 'profile', component: ParentProfileComponent },
 ];
 
-
 @NgModule({
-  declarations: [ParentHomePageComponent],
+  declarations: [
+    ParentHomePageComponent,
+    ParentProfileEditComponent,
+    ParentProfileComponent,
+  ],
   imports: [
-    CommonModule, RouterModule.forChild(routes)
-  ]
+    CommonModule,
+    ReactiveFormsModule,
+    RouterModule.forChild(routes),
+    MatButtonModule,
+    MatDialogModule,
+  ],
 })
-export class ParentDashboardModule { }
+export class ParentDashboardModule {}

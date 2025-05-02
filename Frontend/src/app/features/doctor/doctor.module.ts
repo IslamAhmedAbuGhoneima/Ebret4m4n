@@ -1,23 +1,42 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DoctorCreateScheduleComponent } from './components/doctor-create-schedule/create-schedule.component';
-import { DoctorHomePageComponent } from './components/doctor-home-page/doctor-home-page.component';
-import { RouterModule, RouterOutlet, Routes } from '@angular/router';
+import {
+  RouterLink,
+  RouterLinkActive,
+  RouterModule,
+  RouterOutlet,
+  Routes,
+} from '@angular/router';
+import { DeferredChildrenComponent } from './components/deferred-children/deferred-children.component';
+import { ChildrenComponent } from './components/children/children.component';
+import { DoctorChildDetailsComponent } from './components/doctor-child-details/doctor-child-details.component';
 const routes: Routes = [
+  { path: '', redirectTo: 'children', pathMatch: 'full' },
+  { path: 'children', component: ChildrenComponent },
+  { path: 'deferred-children', component: DeferredChildrenComponent },
   {
-    path: '',
-    loadChildren: () => import('../parent/parent.module').then(m => m.ParentModule)
+    path: 'doctor-child-details',
+    component: DoctorChildDetailsComponent,
   },
-  { path: 'children', component: DoctorHomePageComponent }
-
+  {
+    path: 'deferred-children/doctor-child-details',
+    component: DoctorChildDetailsComponent,
+  },
+  {
+    path: 'children/doctor-child-details',
+    component: DoctorChildDetailsComponent,
+  },
 ];
 
 @NgModule({
-  declarations: [DoctorCreateScheduleComponent, DoctorHomePageComponent],
-  imports: [
-    CommonModule,
-    RouterModule.forChild(routes), 
+  declarations: [
+    DoctorCreateScheduleComponent,
+    ChildrenComponent,
+    DeferredChildrenComponent,
+    DoctorChildDetailsComponent,
   ],
-  exports: []
+  imports: [CommonModule, RouterModule.forChild(routes)],
+  exports: [],
 })
-export class DoctorModule { }
+export class DoctorModule {}

@@ -6,34 +6,39 @@ module.exports = {
       fontFamily: {
         arabic: ["Cairo", "normal"],
       },
-      screens: {
-        xl: "1440px",
+      borderRadius: {
+        "4xl": "15rem",
       },
       container: {
         center: true,
-        padding: "1rem",
+        padding: "1.5rem",
         screens: {
           sm: "640px",
           md: "750px",
           lg: "970px",
           xl: "1200px",
+          "2xl": "1300px",
         },
       },
       colors: {
         mainBg: {
-          100: "#FCFCFC", //main white background... white
-        },
-        textColor: {
-          100: "#121212", //text color....black
-        },
-        formBg: {
-          100: "#24882805", //form background color....gray
+          100: "#f6f5f3", //main white background... white
+          200: "#F9FAFB",
         },
         primary: {
+          txt100: "#0B4632", //light green text
+          txt200: "#06291D", //dark green text                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      third:
+          table: "#B6D4CA",
+
           //green
-          btn: "#00712D", //button background color... green
-          txt: "#319136", // green text exist in button...green
-          num: "#46AC97", // text numeric data color.... mintgreen
+          btn: "#127453", //button background color... green
+          txt: "#127453", // green text exist in button...green
+          bg: "#127453", // text numeric data color.... mintgreen
+
+          light: "#ECFDF3",
+
+          hov: "#DBEAE5",
+          hovbtn: "#0B4632",
         },
         secondary: {
           //blue
@@ -41,25 +46,16 @@ module.exports = {
           table: "#2473AB", //vaccine table body background.... blue
           chart: "#60D3BC", //chart color
         },
-        error: {
-          //red
-          100: "#FE0000", //general vaccine table header background... red
-        },
+        error: "#B4231B", //general vaccine table header background... red
+        errorHov: "#7A271A",
         third: {
           //gray
-          table: "#00712D14", // vaccine table header background color....gray
-          btn: "#12121266", // report side effect button bg..gray
-          desc: "#12121299", //text description color... gray
-          place: "#12121266", //form placeholder color....gray
-        },
-        male: {
-          100: "#1E88E5", // male percentage color
-        },
-        female: {
-          100: "#DE65DA", //female percentage color
+          txt: "#8E98A8",
+          border: "#E5E7EB",
+          bg: "#DBEAE5",
         },
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/line-clamp")],
 };

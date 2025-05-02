@@ -2,9 +2,9 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
-    path: 'home',
+    path: 'dashboard',
     loadChildren: () =>
       import('./parent-dashboard/parent-dashboard.module').then(
         (m) => m.ParentDashboardModule
@@ -20,18 +20,14 @@ export const routes: Routes = [
   {
     path: 'complaint',
     loadChildren: () =>
-      import('./complaint/complaint.module').then(
-        (m) => m.ComplaintModule
-      ),
+      import('./complaint/complaint.module').then((m) => m.ComplaintModule),
   },
-
-
 ];
 
 @NgModule({
   declarations: [],
   imports: [CommonModule, RouterModule.forChild(routes)],
   // #####important##### exports to use this module in doctor module
-  exports: [RouterModule],
+  exports: [],
 })
-export class ParentModule { }
+export class ParentModule {}

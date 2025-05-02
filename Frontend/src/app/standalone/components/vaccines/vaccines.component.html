@@ -1,0 +1,56 @@
+<section class="bg-mainBg-200 min-h-screen">
+  <div class="container pt-6 pb-5">
+    <h3 class="text-[28px] font-semibold text-[#51419]">اللقاحات</h3>
+    <div class="p-6">
+      <div class="relative overflow-x-auto">
+        <table
+          class="w-full text-center text-lg [&_td]:py-3 [&_tbody_tr]:bg-white [&_tbody_td]:border-b border-separate border-spacing-y-2"
+        >
+          <thead class="bg-primary-table">
+            <tr>
+              <td class="rounded-r-md">إسم اللقاح</td>
+              <td class="rounded-l-md">عدد الجرعات</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="rounded-r-md">إسم اللقاح</td>
+              <td class="rounded-l-md text-error">20</td>
+            </tr>
+            <tr>
+              <td class="rounded-r-md">إسم اللقاح</td>
+              <td class="rounded-l-md text-error">20</td>
+            </tr>
+            <tr>
+              <td class="rounded-r-md">إسم اللقاح</td>
+              <td class="rounded-l-md">50</td>
+            </tr>
+            <tr>
+              <td class="rounded-r-md">إسم اللقاح</td>
+              <td class="rounded-l-md">50</td>
+            </tr>
+            <tr>
+              <td class="rounded-r-md">إسم اللقاح</td>
+              <td class="rounded-l-md">50</td>
+            </tr>
+            <tr>
+              <td class="rounded-r-md">إسم اللقاح</td>
+              <td class="rounded-l-md">50</td>
+            </tr>
+            <tr>
+              <td class="rounded-r-md">إسم اللقاح</td>
+              <td class="rounded-l-md">50</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <button
+        (click)="reportShortage()"
+        class="flex gap-x-2 mt-8 mx-auto w-fit bg-error text-white py-3 px-6 rounded-lg hover:bg-errorHov transition-colors"
+      >
+        <span class="font-bold text-sm"> إبلاغ عن نقص </span>
+        <img src="/icons/mingcute_warning-line.svg" class="" alt="" />
+      </button>
+    </div>
+  </div>
+</section>

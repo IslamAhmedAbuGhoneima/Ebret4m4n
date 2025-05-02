@@ -1,18 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { HealthMinistryAdminHomePageComponent } from './components/health-ministry-admin-home-page/health-ministry-admin-home-page.component';
+import { BaseChartDirective } from 'ng2-charts';
+import { MinistryAdminDashboardComponent } from './components/ministry-admin-dashboard/ministry-admin-dashboard.component';
 
-
- const routes: Routes = [
-  { path: '', redirectTo: '/health-ministry/home', pathMatch: 'full' },
-  { path: 'home', component: HealthMinistryAdminHomePageComponent },
+const routes: Routes = [
+  { path: '', redirectTo: '/health-ministry/dashboard', pathMatch: 'full' },
+  { path: 'dashboard', component: MinistryAdminDashboardComponent },
+  {
+    path: 'governorates',
+    loadChildren: () =>
+      import('./governorates/governorates.module').then(
+        (m) => m.GovernoratesModule
+      ),
+  },
 ];
 
 @NgModule({
-  declarations: [HealthMinistryAdminHomePageComponent],
-  imports: [
-    CommonModule, RouterModule.forChild(routes)
-  ]
+  declarations: [MinistryAdminDashboardComponent],
+  imports: [CommonModule, RouterModule.forChild(routes), BaseChartDirective],
 })
-export class HealthMinistryAdminModule { }
+export class HealthMinistryAdminModule {}

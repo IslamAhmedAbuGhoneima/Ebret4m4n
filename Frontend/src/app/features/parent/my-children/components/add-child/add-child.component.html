@@ -1,1 +1,406 @@
-<p>add-child works!</p>
+<section class="bg-[#F9FAFB] min-h-screen">
+  <div class="container pt-10 pb-5">
+    <div class="mb-9 text-center">
+      <h5 class="font-arabic font-semibold text-4xl mb-3 text-[#151419]">
+        إضافة طفل
+      </h5>
+      <p class="font-arabic font-semibold text-xl text-[#083425]">
+        برجاء إدخال البيانات التالية لإضافة طفل
+      </p>
+    </div>
+
+    <div class="max-w-[520px] mx-auto">
+      <form [formGroup]="formAddChild" (ngSubmit)="addChild()">
+        <mat-stepper linear #stepper class="custom-stepper-add-child-style">
+          <mat-step>
+            <div class="mb-4">
+              <label
+                class="block text-xl font-semibold mb-2 mr-2"
+                for="childName"
+              >
+                الإسم</label
+              >
+              <input
+                formControlName="childName"
+                [ngClass]="{
+                  'border-red-700': childName?.invalid && childName?.dirty,
+                  'border-third-border':
+                    childName?.valid || childName?.untouched
+                }"
+                class="block w-full placeholder:text-base placeholder:font-arabic placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border-[1.5px] border-third-border"
+                type="text"
+                name="childName"
+                id="childName"
+                placeholder=" إسم الطفل"
+              />
+
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="childName?.invalid && childName?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="childName?.errors?.['required']">
+                    يجب إدخال إسم الطفل.
+                  </small>
+                  <small *ngIf="childName?.errors?.['pattern']">
+                    يجب إدخال الإسم باللغة العربية فقط.
+                  </small>
+                  <small
+                    *ngIf="!childName?.errors?.['pattern']  && childName?.errors?.['minlength']"
+                    >يجب أن يكون طول الإسم لا يقل عن 3 حروف.
+                  </small>
+                </div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="block text-xl font-semibold mb-2 mr-2" for="NID">
+                الرقم القومى</label
+              >
+              <div class="relative">
+                <input
+                  formControlName="NID"
+                  [ngClass]="{
+                    'border-red-700': id?.invalid && id?.dirty,
+                    'border-third-border': id?.valid || id?.untouched
+                  }"
+                  type="number"
+                  name="NID"
+                  id="NID"
+                  placeholder="1234 5678 9123 45"
+                  class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+                />
+                <img
+                  class="absolute right-4 top-1/2 -translate-y-[calc(50%+1px)] text-sm w-[18px] h-[18px]"
+                  src="icons/teenyicons_id-outline.svg"
+                  alt=""
+                />
+              </div>
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="id?.invalid && id?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="id?.errors?.['required']">
+                    يجب إدخال الرقم القومي للطفل.
+                  </small>
+                  <small *ngIf="id?.errors?.['pattern']">
+                    يجب أن يكون الرقم القومي للطفل مكون من 14 خانة.
+                  </small>
+                </div>
+              </div>
+            </div>
+            <!-- birthday -->
+            <div class="mb-5" formGroupName="birthday">
+              <label class="block text-xl font-semibold mb-2 mr-2" for="day">
+                تاريخ الميلاد</label
+              >
+              <div class="flex gap-4">
+                <div class="flex-1">
+                  <input
+                    formControlName="day"
+                    [ngClass]="{
+                      'border-red-700': day?.invalid && day?.dirty,
+                      'border-third-border': day?.valid || day?.untouched
+                    }"
+                    class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border-[1.5px] border-third-border"
+                    type="number"
+                    name="day"
+                    id="day"
+                    placeholder="اليوم"
+                  />
+
+                  <div
+                    class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                    *ngIf="day?.invalid && day?.dirty"
+                  >
+                    <img
+                      src="./icons/si_warning-fill.svg"
+                      alt=""
+                      class="w-4 h-4 mt-[1px]"
+                    />
+                    <div>
+                      <small *ngIf="day?.errors?.['required']">
+                        إدخل يوم ميلاد الطفل.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-4 flex-1 font-arabic">
+                  <div class="relative">
+                    <select
+                      formControlName="month"
+                      [ngClass]="{
+                        'border-red-700':
+                          gender?.invalid && (month?.touched || month?.dirty),
+                        'border-third-border': month?.valid || month?.untouched
+                      }"
+                      class="w-full text-third-txt px-4 py-3 rounded-md border border-third-border appearance-none text-right outline-none cursor-pointer"
+                      name="months"
+                      id="months"
+                    >
+                      <option value="" disabled selected>الشهر</option>
+                      <option value="يناير">يناير</option>
+                      <option value="فبرايل">فبرايل</option>
+                      <option value="مارس">مارس</option>
+                      <option value="أبريل">أبريل</option>
+                      <option value="مايو">مايو</option>
+                      <option value="يونيو">يونيو</option>
+                      <option value="يوليو">يوليو</option>
+                      <option value="أغسطس">أغسطس</option>
+                      <option value="سبتمبر">سبتمبر</option>
+                      <option value="أكتوبر">أكتوبر</option>
+                      <option value="نوفمبر">نوفمبر</option>
+                      <option value="ديسمبر">ديسمبر</option>
+                    </select>
+
+                    <img
+                      class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
+                      src="icons/Caret Down.svg"
+                      alt=""
+                    />
+                  </div>
+                  <div
+                    class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                    *ngIf="month?.invalid && (month?.touched || month?.dirty)"
+                  >
+                    <img
+                      src="./icons/si_warning-fill.svg"
+                      alt=""
+                      class="w-4 h-4 mt-[1px]"
+                    />
+                    <div>
+                      <small *ngIf="month?.errors?.['required']">
+                        هذه الخانه مطلوبة.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex-1">
+                  <input
+                    formControlName="year"
+                    [ngClass]="{
+                      'border-red-700': year?.invalid && year?.dirty,
+                      'border-third-border': year?.valid || year?.untouched
+                    }"
+                    class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border border-third-border"
+                    type="number"
+                    name="year"
+                    id="year"
+                    placeholder="عام "
+                    (input)="year?.setValue($any($event.target).valueAsNumber)"
+                  />
+
+                  <div
+                    class="text-red-700 font-semibold font-arabic font-base flex items-center gap-x-1"
+                    *ngIf="year?.invalid && year?.dirty"
+                  >
+                    <img
+                      src="./icons/si_warning-fill.svg"
+                      alt=""
+                      class="w-4 h-4 mt-[1px]"
+                    />
+                    <div>
+                      <small *ngIf="year?.errors?.['required']">
+                        إدخل سنه ميلاد الطفل.
+                      </small>
+                      <small
+                        *ngIf="year?.errors?.['min'] || year?.errors?.['pattern']"
+                      >
+                        إدخل سنه صحيحه.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- gender -->
+            <div class="mb-4 flex-1 font-arabic">
+              <div class="relative">
+                <select
+                  formControlName="gender"
+                  [ngClass]="{
+                    'border-red-700':
+                      gender?.invalid && (gender?.touched || gender?.dirty),
+                    'border-third-border': gender?.valid || gender?.untouched
+                  }"
+                  class="w-full text-third-txt px-3 py-4 rounded-md border border-third-border appearance-none text-right outline-none cursor-pointer"
+                  name="gender"
+                  id="gender"
+                >
+                  <option value="" disabled>النوع</option>
+                  <option value="ذكر">ذكر</option>
+                  <option value="انثى">انثى</option>
+                </select>
+                <img
+                  class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
+                  src="icons/Caret Down.svg"
+                  alt=""
+                />
+              </div>
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="gender?.invalid && (gender?.touched || gender?.dirty)"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="gender?.errors?.['required']">
+                    يجب إختيار جنس الطفل.
+                  </small>
+                </div>
+              </div>
+            </div>
+            <div class="mb-4">
+              <label class="block text-xl font-semibold mb-2 mr-2" for="weight">
+                الوزن</label
+              >
+              <div class="relative">
+                <input
+                  formControlName="weight"
+                  [ngClass]="{
+                    'border-red-700': weight?.invalid && weight?.dirty,
+                    'border-third-border': weight?.valid || weight?.untouched
+                  }"
+                  type="number"
+                  name="weight"
+                  id="weight"
+                  placeholder="كيلو جرام"
+                  class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+                />
+                <img
+                  class="absolute right-4 top-1/2 -translate-y-[calc(50%+1px)] text-sm w-[18px] h-[18px]"
+                  src="icons/weight.svg"
+                  alt=""
+                />
+              </div>
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="weight?.invalid && weight?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="weight?.errors?.['required']">
+                    يجب إدخال وزن الطفل.
+                  </small>
+                  <small *ngIf="weight?.errors?.['pattern']">
+                    يجب أن يكون وزن الطفل أكثر من 1 كجم.
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              [disabled]="formAddChild.invalid"
+              matStepperNext
+              class="disabled:opacity-35 disabled:cursor-not-allowed mr-auto mt-4 cursor-pointer flex font-arabic gap-[10px] py-[9px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+            >
+              <span class="inline-block"> التالى</span>
+              <img src="/icons/lets-icons_user-add.svg" alt="" />
+            </button>
+          </mat-step>
+          <mat-step>
+            <div class="mb-4">
+              <label
+                class="block text-xl font-semibold mb-2 mr-2"
+                for="medical-history"
+              >
+                التاريخ المرضى
+
+                <span class="text-third-txt text-base"> (إختيارى)</span>
+              </label>
+              <div class="relative">
+                <input
+                  formControlName="medicalHistory"
+                  type="text"
+                  name="medical-history"
+                  id="medical-history"
+                  placeholder="التاريخ المرضى"
+                  class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+                />
+                <img
+                  class="absolute right-4 top-1/2 -translate-y-[calc(50%+1px)] text-sm w-[18px] h-[18px]"
+                  src="icons/material-symbols_history.svg"
+                  alt=""
+                />
+              </div>
+            </div>
+            <div
+              class="px-4 py-3 flex gap-2 w-full text-lg font-normal font-arabic text-third-txt"
+            >
+              <p>هل تريد إضافة صور تحاليل أو إشاعات</p>
+
+              <div class="flex">
+                <label
+                  for="medical-images"
+                  class="font-semibold text-[#121212] underline"
+                  >إضافة صور</label
+                >
+                <input
+                  type="file"
+                  id="medical-images"
+                  name="medical-images"
+                  class="shadow-none hidden"
+                  formControlName="medicalImages"
+                />
+              </div>
+            </div>
+            <div
+              class="px-4 py-3 flex gap-2 w-full text-lg font-normal font-arabic text-third-txt"
+            >
+              <p>هل حصل الطفل على لقاحات سابقة؟</p>
+
+              <button
+                type="button"
+                (click)="addVaccine()"
+                class="font-semibold text-[#121212] underline"
+              >
+                إضافة لقاحات
+              </button>
+            </div>
+
+            <div class="flex justify-between mt-9 font-arabic">
+              <button
+                matStepperPrevious
+                class="flex items-center justify-center gap-2 bg-[#151419] text-mainBg-100 px-6 py-[9px] rounded-lg transition duration-200 hover:opacity-80"
+                role="button"
+              >
+                <img
+                  src="/icons/streamline_emergency-exit.svg"
+                  alt=""
+                  class="w-6 h-6"
+                />
+                <span class="text-base font-semibold">رجوع</span>
+              </button>
+
+              <button
+                type="submit"
+                class="cursor-pointer flex font-arabic gap-2 py-[9px] px-6 rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+              >
+                <span class="inline-block"> إضافة طفل</span>
+                <img src="/icons/lets-icons_user-add.svg" alt="" />
+              </button>
+            </div>
+          </mat-step>
+        </mat-stepper>
+      </form>
+    </div>
+  </div>
+</section>

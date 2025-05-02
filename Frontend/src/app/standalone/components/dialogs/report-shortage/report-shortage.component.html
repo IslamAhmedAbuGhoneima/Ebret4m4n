@@ -1,0 +1,53 @@
+<section class="font-arabic bg-mainBg-200">
+  <button (click)="close()" class="p-1 block">
+    <img src="./icons/close.svg" alt="" class="block w-5 h-5" />
+  </button>
+
+  <table
+    class="w-full text-center px-10 mt-2 text-lg [&_td]:py-3 [&_tbody_tr]:bg-white border-separate border-spacing-y-2"
+  >
+    <thead class="bg-primary-table">
+      <tr>
+        <td class="rounded-r-md">إسم اللقاح</td>
+        <td>عدد الجرعات الموجودة</td>
+        <td class="rounded-l-md">العدد المطلوب</td>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of vaccines; track $index) {
+
+      <tr>
+        <td class="rounded-r-md border border-e-transparent">
+          {{ item.name }}
+        </td>
+        <td
+          class="border border-x-transparent text-center"
+          [ngClass]="{
+            'text-red-600 font-bold': item.available <= 20
+          }"
+        >
+          {{ item.available }}
+        </td>
+
+        <td class="border border-s-transparent">
+          <input
+            class="w-[143px] px-3 py-1 border rounded-lg outline-none placeholder:text-sm text-center"
+            type="number"
+            [(ngModel)]="item.requested"
+            name="number"
+            id="number"
+            placeholder="ادخل العدد المطلوب"
+          />
+        </td>
+      </tr>
+
+      }
+    </tbody>
+  </table>
+  <button
+    (click)="submitOrder()"
+    class="block bg-primary-bg w-fit mx-auto mt-4 py-3 px-6 text-white text-sm font-bold rounded-lg hover:bg-primary-txt100 transition-colors"
+  >
+    طلب أوردر
+  </button>
+</section>

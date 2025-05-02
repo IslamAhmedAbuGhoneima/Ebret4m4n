@@ -1,0 +1,229 @@
+<section class="bg-mainBg-200 min-h-screen">
+  <div class="container pt-6 pb-5">
+    <div class="mx-auto text-center">
+      <h6 class="text-4xl font-semibold mt-16">إضافة وحدة صحية</h6>
+      <p class="text-primary-txt100 text-xl font-semibold mt-3">
+        برجاء إدخال البيانات التالية لإضافة الوحدة
+      </p>
+
+      <div class="max-w-[520px] mt-8 mx-auto">
+        <form [formGroup]="addUnitForm" (ngSubmit)="addUnit()">
+          <div class="text-right">
+            <div class="mb-6">
+              <div>
+                <label
+                  class="block text-xl font-semibold mb-2 mr-4"
+                  for="unitName"
+                  >الإسم</label
+                >
+                <input
+                  class="block w-full placeholder:text-lg placeholder:text-third-txt px-4 py-3 outline-none rounded-lg border border-third-border"
+                  type="text"
+                  formControlName="healthUnitName"
+                  name="unitName"
+                  id="unitName"
+                  placeholder="أدخل إسم الوحدة الصحية"
+                />
+              </div>
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="healthUnitName?.invalid && healthUnitName?.touched"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+
+                <small *ngIf="healthUnitName?.errors?.['required']">
+                  يجب إدخال الوحدة الصحية.
+                </small>
+              </div>
+            </div>
+
+            <div formGroupName="LocationOfHealthUnit" class="mb-4">
+              <label class="block text-xl font-semibold mb-2 mr-4"
+                >موقع الوحدة</label
+              >
+
+              <div class="grid grid-cols-2 gap-4">
+                <div class="relative">
+                  <select
+                    [ngClass]="{
+                      'border-red-700':
+                        LocationOfHealthUnit?.invalid &&
+                        LocationOfHealthUnit?.touched,
+                      'border-third-border':
+                        LocationOfHealthUnit?.valid ||
+                        LocationOfHealthUnit?.untouched
+                    }"
+                    formControlName="city"
+                    class="w-full text-third-txt px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                    name="city"
+                    id="city"
+                  >
+                    <option value="" disabled>إختر محافظة</option>
+                    <option value="المنيا">المنيا</option>
+                    <option value="القاهرة">القاهرة</option>
+                    <option value="الجيزة">الجيزة</option>
+                    <option value="أسوان">أسوان</option>
+                  </select>
+
+                  <img
+                    class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
+                    src="/icons/Caret Down.svg"
+                    alt=""
+                  />
+                </div>
+
+                <div class="relative">
+                  <select
+                    [ngClass]="{
+                      'border-red-700':
+                        LocationOfHealthUnit?.invalid &&
+                        LocationOfHealthUnit?.touched,
+                      'border-third-border':
+                        LocationOfHealthUnit?.valid ||
+                        LocationOfHealthUnit?.untouched
+                    }"
+                    formControlName="center"
+                    class="w-full text-third-txt px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                    name="center"
+                    id="center"
+                  >
+                    <option value="" disabled>اختر مركز</option>
+                    <option value="سمالوط">سمالوط</option>
+                    <option value="المنيا">المنيا</option>
+                    <option value="بني مزار">بني مزار</option>
+                  </select>
+
+                  <img
+                    class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
+                    src="/icons/Caret Down.svg"
+                    alt=""
+                  />
+                </div>
+              </div>
+
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="
+                  LocationOfHealthUnit?.invalid && LocationOfHealthUnit?.touched
+                "
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+
+                <small> يجب إضافه موقع الوحدة الصحيه </small>
+              </div>
+            </div>
+
+            <div formGroupName="WorkDays" class="mb-4">
+              <label
+                class="block text-xl font-semibold mb-2 mr-4"
+                for="workDays"
+                >أيام العمل</label
+              >
+              <div class="grid grid-cols-2 gap-4">
+                <div class="relative">
+                  <select
+                    [ngClass]="{
+                      'border-red-700': workDays?.invalid && workDays?.touched,
+                      'border-third-border':
+                        workDays?.valid || workDays?.untouched
+                    }"
+                    formControlName="firstDay"
+                    class="w-full text-third-txt px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                    name="day"
+                    id="day"
+                  >
+                    <option value="" disabled>اليوم الأول</option>
+                    <option value="السبت">السبت</option>
+                    <option value="الاحد">الاحد</option>
+                    <option value="الاثنين">الاثنين</option>
+                    <option value="الثلاثاء">الثلاثاء</option>
+                    <option value="الاربعاء">الاربعاء</option>
+                    <option value="الخميس">الخميس</option>
+                  </select>
+
+                  <img
+                    class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
+                    src="/icons/Caret Down.svg"
+                    alt=""
+                  />
+                </div>
+
+                <div class="relative">
+                  <select
+                    [ngClass]="{
+                      'border-red-700': workDays?.invalid && workDays?.touched,
+                      'border-third-border':
+                        workDays?.valid || workDays?.untouched
+                    }"
+                    formControlName="secondDay"
+                    class="w-full text-third-txt px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                    name="day"
+                    id="day"
+                  >
+                    <option value="" disabled>اليوم الثانى</option>
+                    <option value="" disabled>اليوم الأول</option>
+                    <option value="السبت">السبت</option>
+                    <option value="الاحد">الاحد</option>
+                    <option value="الاثنين">الاثنين</option>
+                    <option value="الثلاثاء">الثلاثاء</option>
+                    <option value="الاربعاء">الاربعاء</option>
+                    <option value="الخميس">الخميس</option>
+                  </select>
+
+                  <img
+                    class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
+                    src="/icons/Caret Down.svg"
+                    alt=""
+                  />
+                </div>
+              </div>
+
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="workDays?.invalid && workDays?.touched"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+
+                <small> يجب إدخال أيام العمل. </small>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between mt-8">
+            <button
+              (click)="goBack()"
+              type="button"
+              class="block bg-black px-6 py-3 rounded-lg hover:bg-opacity-80 transition-colors"
+            >
+              <span class="text-white ml-2 text-[16px]">رجوع</span>
+            </button>
+
+            <button
+              *ngIf="addUnitForm.valid"
+              class="block bg-primary-bg px-6 py-3 rounded-lg hover:bg-primary-hovbtn transition-colors"
+            >
+              <span class="text-white ml-2 text-[16px]">إضافة وحدة</span>
+              <img
+                class="float-left"
+                src="/icons/lets-icons_user-add.svg"
+                alt=""
+              />
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

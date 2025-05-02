@@ -1,1 +1,184 @@
-<p class="bg-purple-900 text-white">dashboard works!</p>
+<aside
+  class="bg-primary-bg min-h-screen w-full flex flex-col justify-between sticky top-0"
+>
+  <div class="text-white">
+    <h2 class="pt-8 mb-9 text-center font-bold text-xl w-fit mx-auto">
+      إبرة أمان
+    </h2>
+    <!--  links -->
+    <div class="pr-4 pl-1">
+      <!-- parent links -->
+      <ul *ngIf="true" class="[&_a]:activeLink">
+        <li>
+          <a routerLink="/parent/dashboard" routerLinkActive="present"
+            ><img src="/icons/home icon-white.svg" alt="" /><span>
+              الرئيسية</span
+            >
+          </a>
+        </li>
+        <li>
+          <a routerLink="/parent/my-children" routerLinkActive="present"
+            ><img src="/icons/fa6-solid_children.svg" alt="" /><span
+              >أطفالى</span
+            ></a
+          >
+        </li>
+        <li>
+          <a routerLink="/parent/complaint" routerLinkActive="present"
+            ><img src="/icons/Vector.svg" alt="" /><span>إبلاغ عن شكوى</span></a
+          >
+        </li>
+        <li>
+          <a routerLink="/chat" routerLinkActive="present"
+            ><img src="/icons/bx_chat.svg" alt="" /><span>الرسائل </span>
+
+            <small
+              class="mr-auto text-base rounded-lg w-[41px] h-7 flex justify-center items-center bg-[#B4231B] text-white"
+              >9+</small
+            ></a
+          >
+        </li>
+        <li>
+          <a routerLink="/notifications" routerLinkActive="present"
+            ><img src="/icons/Frame.svg" alt="" /><span>الإشعارات</span>
+            <small
+              class="mr-auto text-base rounded-lg w-[41px] h-7 flex justify-center items-center bg-[#B4231B] text-white"
+              >9+</small
+            ></a
+          >
+        </li>
+
+        <!-- doctor links -->
+
+        <li>
+          <a routerLink="/doctor/children" routerLinkActive="present"
+            ><img src="/icons/fa6-solid_children.svg" alt="" /><span>
+              الأطفال</span
+            >
+          </a>
+        </li>
+        <li>
+          <a routerLink="/doctor/deferred-children" routerLinkActive="present"
+            ><img src="/icons/Mask group.svg" alt="" class="-mt-1" /><span
+              >الأطفال المؤجلين</span
+            ></a
+          >
+        </li>
+
+        <!-- Organizer of Healthcare links -->
+
+        <li>
+          <a routerLink="/healthcare-organizer" routerLinkActive="present"
+            ><img src="/icons/fa6-solid_children.svg" alt="" /><span>
+              الأطفال</span
+            >
+          </a>
+        </li>
+        <li>
+          <a routerLink="/vaccines" routerLinkActive="present"
+            ><img src="/icons/vaccine.svg" alt="" /><span>اللقاحات </span></a
+          >
+        </li>
+
+        <!-- Admin of city links -->
+
+        <li>
+          <a routerLink="/city-admin/dashboard" routerLinkActive="present"
+            ><img src="/icons/dashboard.svg" alt="" /><span> لوحة التحكم</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/city-admin/centers" routerLinkActive="present"
+            ><img src="/icons/city.svg" alt="" /><span>المراكز </span></a
+          >
+        </li>
+
+        <li>
+          <a routerLink="/admins" routerLinkActive="present"
+            ><img src="/icons/Frame (1).svg" alt="" /><span>المسئولين</span></a
+          >
+        </li>
+
+        <li>
+          <a routerLink="/orders" routerLinkActive="present"
+            ><img src="/icons/Group (1).svg" alt="" /><span>الطلبات</span></a
+          >
+        </li>
+
+        <!-- Admin of city center links -->
+        <li>
+          <a
+            routerLink="/city-center-admin/dashboard"
+            routerLinkActive="present"
+            ><img src="/icons/dashboard.svg" alt="" /><span> لوحة التحكم</span>
+          </a>
+        </li>
+
+        <li>
+          <a routerLink="/city-center-admin/units" routerLinkActive="present"
+            ><img src="/icons/units.svg" alt="" /><span>الوحدات </span></a
+          >
+        </li>
+
+        <li>
+          <a routerLink="/city-center-admin/doctors" routerLinkActive="present"
+            ><img src="/icons/doctors.svg" alt="" /><span>الأطباء </span></a
+          >
+        </li>
+
+        <li>
+          <a
+            routerLink="/city-center-admin/complaints"
+            routerLinkActive="present"
+            ><img src="/icons/Vector.svg" alt="" /><span> الشكاوى </span></a
+          >
+        </li>
+
+        <!-- Admin Of Ministry Of health links -->
+        <li>
+          <a routerLink="/health-ministry/dashboard" routerLinkActive="present"
+            ><img src="/icons/dashboard.svg" alt="" /><span> لوحة التحكم</span>
+          </a>
+        </li>
+
+        <li>
+          <a
+            routerLink="/health-ministry/governorates"
+            routerLinkActive="present"
+            ><img src="/icons/city.svg" alt="" /><span>المحافظات </span></a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- user -->
+  <div
+    class="p-4 bg-third-bg flex flex-row-reverse justify-between items-center px-4"
+  >
+    <!-- logout -->
+    <a
+      class="block"
+      routerLink="/home"
+      matTooltipClass="logout-tooltip-style"
+      matTooltip="تسجيل الخروج"
+    >
+      <img src="/icons/Vector logout.svg" alt="" />
+    </a>
+
+    <!-- admin name -->
+    <a
+      routerLink="/parent/dashboard/profile"
+      matTooltipClass="logout-tooltip-style"
+      matTooltip="ملفي الشخصي"
+      class="flex items-center gap-4"
+    >
+      <div>
+        <h5 class="text-lg text-primary-txt200">محمد أحمد</h5>
+        <small class="text-base text-third-txt font-normal">
+          someoneexample.com</small
+        >
+      </div>
+    </a>
+  </div>
+</aside>

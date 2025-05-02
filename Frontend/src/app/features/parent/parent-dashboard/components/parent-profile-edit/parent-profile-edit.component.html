@@ -1,0 +1,342 @@
+<section class="bg-[#F9FAFB] min-h-screen font-arabic">
+  <div class="container pt-6 pb-7">
+    <h3 class="text-[28px] font-semibold text-[#51419]">تعديل الملف الشخصى</h3>
+
+    <div class="max-w-[520px] mx-auto mt-6">
+      <div class="flex justify-center items-center">
+        <img src="/images/edit profile.svg" />
+      </div>
+      <div class="mt-4">
+        <form [formGroup]="formEditProfile" (ngSubmit)="saveNewData()">
+          <!-- name -->
+          <div class="flex flex-row gap-5 mb-3">
+            <div class="flex-1">
+              <label
+                class="block text-xl font-semibold mb-2 mr-2"
+                for="firstName"
+                >الإسم الأول</label
+              >
+              <input
+                formControlName="firstName"
+                [ngClass]="{
+                  'border-red-700': firstName?.invalid && firstName?.dirty,
+                  'border-third-border':
+                    firstName?.valid || firstName?.untouched
+                }"
+                class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border-[1.5px] border-third-border"
+                type="text"
+                name="firstName"
+                id="firstName"
+                placeholder="الإسم الأول"
+              />
+
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="firstName?.invalid && firstName?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="firstName?.errors?.['required']">
+                    أدخل الإسم الأول
+                  </small>
+                  <small *ngIf="firstName?.errors?.['pattern']">
+                    يجب إدخال الإسم باللغة العربية فقط.
+                  </small>
+
+                  <small
+                    *ngIf="!firstName?.errors?.['pattern']  && firstName?.errors?.['minlength']"
+                    >يجب أن يكون طول الإسم لا يقل عن 3 حروف.
+                  </small>
+                  <small
+                    *ngIf="!firstName?.errors?.['pattern']  && firstName?.errors?.['maxlength']"
+                  >
+                    يجب أن يكون طول الإسم لا يتعدى 20 حرف.
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex-1">
+              <label
+                class="block text-xl font-semibold mb-2 mr-2"
+                for="secondName"
+                >الإسم الثانى</label
+              >
+              <input
+                formControlName="secondName"
+                [ngClass]="{
+                  'border-red-700': secondName?.invalid && secondName?.dirty,
+                  'border-third-border':
+                    secondName?.valid || secondName?.untouched
+                }"
+                class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border border-third-border"
+                type="text"
+                name="secondName"
+                id="secondName"
+                placeholder="إسم العائلة"
+              />
+
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-x-1"
+                *ngIf="secondName?.invalid && secondName?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="secondName?.errors?.['required']">
+                    أدخل الإسم الثانى
+                  </small>
+                  <small *ngIf="secondName?.errors?.['pattern']">
+                    يجب إدخال الإسم باللغة العربية فقط.
+                  </small>
+
+                  <small
+                    *ngIf="!secondName?.errors?.['pattern']  && secondName?.errors?.['minlength']"
+                    >يجب أن يكون طول الإسم لا يقل عن 3 حروف.
+                  </small>
+                  <small
+                    *ngIf="!secondName?.errors?.['pattern']  && secondName?.errors?.['maxlength']"
+                  >
+                    يجب أن يكون طول الإسم لا يتعدى 20 حرف.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xl font-semibold mb-2 mr-2" for="email"
+              >البريد الإلكتروني</label
+            >
+            <div class="relative">
+              <input
+                formControlName="email"
+                [ngClass]="{
+                  'border-red-700': email?.invalid && email?.dirty,
+                  'border-third-border': email?.valid || email?.untouched
+                }"
+                type="email"
+                name="email"
+                id="email"
+                placeholder="someone@example.com"
+                class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+              />
+              <img
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-sm"
+                src="icons/tabler_mail.svg"
+                alt=""
+              />
+            </div>
+            <div
+              class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+              *ngIf="email?.invalid && email?.dirty"
+            >
+              <img
+                src="./icons/si_warning-fill.svg"
+                alt=""
+                class="w-4 h-4 mt-[1px]"
+              />
+              <div>
+                <small *ngIf="email?.errors?.['required']">
+                  أدخل البريد الإلكتروني.
+                </small>
+                <small *ngIf="email?.errors?.['email']">
+                  الرجاء إدخال عنوان بريد إلكتروني صحيح (مثل
+                  name&#64;example.com).
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="block text-xl font-semibold mb-2 mr-2" for="phone"
+              >رقم الهاتف</label
+            >
+            <div class="relative">
+              <input
+                formControlName="phone"
+                [ngClass]="{
+                  'border-red-700': phone?.invalid && phone?.dirty,
+                  'border-third-border': phone?.valid || phone?.untouched
+                }"
+                type="tel"
+                name="phone"
+                id="phone"
+                placeholder="رقم الهاتف"
+                class="text-right placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+              />
+              <img
+                class="absolute right-4 top-1/2 -translate-y-[calc(50%+1.5px)] text-sm rotate-[240deg]"
+                src="icons/fluent_call-28-filled.svg"
+                alt=""
+              />
+            </div>
+            <div
+              class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+              *ngIf="phone?.invalid && phone?.dirty"
+            >
+              <img
+                src="./icons/si_warning-fill.svg"
+                alt=""
+                class="w-4 h-4 mt-[1px]"
+              />
+              <div>
+                <small *ngIf="phone?.errors?.['required']">
+                  أدخل رقم الهاتف.
+                </small>
+                <small *ngIf="phone?.errors?.['minlength']">
+                  أدخل رقم هاتف صحيح.
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-row-reverse gap-5 mb-6 font-arabic">
+            <div class="relative flex-1">
+              <select
+                formControlName="city"
+                [ngClass]="{
+                  'border-red-700': city?.errors && city?.touched,
+                  'border-third-border': city?.valid || city?.untouched
+                }"
+                class="w-full px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                name="city"
+                id="city"
+              >
+                <option value="" disabled>اختر محافظة</option>
+                <option value="القاهرة">القاهرة</option>
+                <option value="المنيا">المنيا</option>
+                <option value="الإسكندرية">الإسكندرية</option>
+              </select>
+              <img
+                class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
+                src="icons/Caret Down.svg"
+                alt=""
+              />
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="city?.errors && city?.touched"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="city?.errors?.['required']">
+                    إختر المحافظة.
+                  </small>
+                </div>
+              </div>
+            </div>
+            <div class="relative flex-1">
+              <select
+                formControlName="town"
+                [ngClass]="{
+                  'border-red-700': town?.errors && town?.touched,
+                  'border-third-border': town?.valid || town?.untouched
+                }"
+                class="w-full px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                name="town"
+                id="town"
+              >
+                <option value="" disabled>اختر مركز</option>
+                <option value="القاهرة">القاهرة</option>
+                <option value="المنيا">المنيا</option>
+                <option value="الإسكندرية">الإسكندرية</option>
+              </select>
+
+              <img
+                class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
+                src="icons/Caret Down.svg"
+                alt=""
+              />
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="town?.errors && town?.touched"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="town?.errors?.['required']">
+                    إختر المركز.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="relative flex-1 font-arabic">
+            <select
+              formControlName="healthUnit"
+              [ngClass]="{
+                'border-red-700': healthUnit?.errors && healthUnit?.touched,
+                'border-third-border':
+                  healthUnit?.valid || healthUnit?.untouched
+              }"
+              class="w-full px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+              name="healthUnit"
+              id="healthUnit"
+            >
+              <option value="" disabled>إختر الوحدة الصحية</option>
+              <option value="القاهرة">القاهرة</option>
+              <option value="المنيا">المنيا</option>
+              <option value="الإسكندرية">الإسكندرية</option>
+            </select>
+
+            <img
+              class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
+              src="icons/Caret Down.svg"
+              alt=""
+            />
+            <div
+              class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+              *ngIf="healthUnit?.errors && healthUnit?.touched"
+            >
+              <img
+                src="./icons/si_warning-fill.svg"
+                alt=""
+                class="w-4 h-4 mt-[1px]"
+              />
+              <div>
+                <small *ngIf="healthUnit?.errors?.['required']">
+                  إختر الوحدة الصحية.
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center mt-5">
+            <button
+              (click)="goBack()"
+              class="flex w-fit items-center justify-center gap-2 bg-[#151419] text-mainBg-100 px-6 py-[9px] rounded-lg transition duration-200 hover:opacity-80"
+            >
+              <img
+                src="/icons/streamline_emergency-exit.svg"
+                alt=""
+                class="w-6 h-6"
+              />
+              <span class="text-base font-semibold">رجوع</span>
+            </button>
+
+            <button
+              *ngIf="formEditProfile.valid && formEditProfile.dirty"
+              class="cursor-pointer text-lg flex font-arabic gap-[10px] py-[9px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+            >
+              حفظ التغييرات
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

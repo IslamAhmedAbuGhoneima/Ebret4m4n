@@ -1,1 +1,140 @@
-<p>login works!</p>
+<section
+  class="font-arabic relative bg-mainBg-100 w-full min-h-screen before:absolute before:top-0 before:right-0 before:min-h-full before:w-[40%] before:bg-primary-bg before:rounded-l-4xl"
+>
+  <div class="container relative pt-8">
+    <h2 class="text-left text-xl font-bold absolute left-4 top-8">
+      <a routerLink="/home"> إبرة <span class="text-primary-txt">أمان</span></a>
+    </h2>
+
+    <div class="flex items-center justify-between translate-y-1/2">
+      <!-- right side ....welcome -->
+      <div class="text-center text-mainBg-100 max-w-[350px] -mt-28">
+        <h5 class="font-bold text-4xl mb-4">مرحبًا بعودتك</h5>
+        <p class="mb-6 text-lg">سجل دخولك لاستخدام جميع مميزات موقعنا</p>
+        <p class="mb-2">ليس لديك حساب؟ إنشئ حسابًا</p>
+        <a
+          routerLink="/auth/register"
+          class="block border w-fit mx-auto px-6 py-[9px] rounded-lg font-bold text-lg cursor-pointer transition duration-300 hover:bg-white hover:text-primary-txt"
+        >
+          إنشاء حساب
+        </a>
+      </div>
+
+      <!-- left side ...login -->
+      <div class="text-right w-1/2">
+        <h2 class="text-4xl font-bold text-center mb-8">تسجيل دخول</h2>
+        <form class="w-full" [formGroup]="formLogin" (ngSubmit)="login()">
+          <div>
+            <label class="block p-2 pr-4 text-xl" for="email"
+              >البريد الإلكتروني</label
+            >
+            <div class="mb-4">
+              <div class="relative">
+                <input
+                  formControlName="email"
+                  [ngClass]="{
+                    'border-red-700': email?.invalid && email?.dirty,
+                    'border-third-border': email?.valid || email?.untouched
+                  }"
+                  type="email"
+                  name="email"
+                  id="email"
+                  placeholder="البريد الإلكتروني"
+                  class="w-full py-3 px-10 border rounded text-right outline-none"
+                />
+                <img
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-sm"
+                  src="/icons/tabler_mail.svg"
+                  alt=""
+                />
+              </div>
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="email?.invalid && email?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="email?.errors?.['required']">
+                    هذه الخانة مطلوبة.
+                  </small>
+                  <small *ngIf="email?.errors?.['email']">
+                    أدخل بريد إلكترونى صحيح.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <label class="block p-2 pr-4 text-xl" for="password"
+              >كلمة المرور</label
+            >
+            <div class="mb-6">
+              <div class="relative">
+                <input
+                  formControlName="password"
+                  [ngClass]="{
+                    'border-red-700': password?.invalid && password?.dirty,
+                    'border-third-border':
+                      password?.valid || password?.untouched
+                  }"
+                  [type]="showPassword ? 'text' : 'password'"
+                  name="password"
+                  id="password"
+                  placeholder="كلمة المرور"
+                  class="w-full py-3 px-10 border rounded text-right outline-none"
+                />
+                <img
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-sm"
+                  src="/icons/humbleicons_lock.svg"
+                  alt=""
+                />
+                <img
+                  (click)="togglePassword()"
+                  class="absolute left-4 top-1/2 -translate-y-1/2 text-lg cursor-pointer"
+                  src="/icons/ri_eye-off-line.svg"
+                  alt=""
+                />
+              </div>
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="password?.invalid && password?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="password?.errors?.['required']">
+                    هذه الخانة مطلوبة.
+                  </small>
+                  <small *ngIf="password?.errors?.['minlength']">
+                    يجب أن كلمة مرور لا تقل عن 8 أحرف ويجب أن تحتوى على حرف ورقم
+                    على الأقل.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <a
+            routerLink="/auth/forget-password"
+            class="block w-fit m-auto text-center text-third-txt mb-3 hover:underline"
+          >
+            هل نسيت كلمة المرور؟
+          </a>
+          <button
+            type="submit"
+            class="flex gap-[10px] py-[11px] px-[24px] m-auto rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+          >
+            <span class="inline-block"> تسجيل دخول</span>
+            <img src="/icons/lets-icons_user-add.svg" alt="" />
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

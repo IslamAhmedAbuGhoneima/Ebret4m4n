@@ -1,0 +1,25 @@
+/* stepper */
+
+.stepper-register-style .mat-horizontal-stepper-header-container {
+  display: none !important;
+}
+
+.stepper-register-style .mat-horizontal-content-container {
+  padding: 0 !important;
+}
+
+.stepper-register-style.mat-stepper-horizontal,
+.stepper-register-style.mat-stepper-vertical {
+  display: block !important;
+  background: transparent !important;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear,
+input[type="password"]::-webkit-credentials-auto-fill-button,
+input[type="password"]::-webkit-textfield-decoration-container {
+  display: none !important;
+  opacity: 0;
+  pointer-events: none;
+}
+

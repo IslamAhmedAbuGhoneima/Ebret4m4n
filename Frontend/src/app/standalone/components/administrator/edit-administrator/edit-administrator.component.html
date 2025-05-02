@@ -1,0 +1,221 @@
+<section class="bg-mainBg-200 min-h-screen">
+  <div class="container pt-6 pb-5">
+    <h5 class="text-[28px] font-semibold text-[#51419]">
+      تعديل بيانات المسئول
+    </h5>
+
+    <div class="max-w-[520px] mx-auto mt-6">
+      <div class="flex justify-center items-center">
+        <img src="/images/edit-admin.svg" />
+      </div>
+      <div class="mt-4">
+        <form [formGroup]="formEditProfileAdmin" (ngSubmit)="saveNewData()">
+          <div class="flex flex-row gap-5 mb-3">
+            <div class="flex-1">
+              <label
+                class="block text-xl font-semibold mb-2 mr-2"
+                for="firstName"
+                >الإسم الأول</label
+              >
+              <input
+                formControlName="firstName"
+                [ngClass]="{
+                  'border-red-700': firstName?.invalid && firstName?.dirty,
+                  'border-third-border':
+                    firstName?.valid || firstName?.untouched
+                }"
+                class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border-[1.5px] border-third-border"
+                type="text"
+                name="firstName"
+                id="firstName"
+                placeholder="الإسم الأول"
+              />
+
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="firstName?.invalid && firstName?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="firstName?.errors?.['required']">
+                    أدخل الإسم الأول
+                  </small>
+                  <small *ngIf="firstName?.errors?.['pattern']">
+                    يجب إدخال الإسم باللغة العربية فقط.
+                  </small>
+
+                  <small
+                    *ngIf="!firstName?.errors?.['pattern']  && firstName?.errors?.['minlength']"
+                    >يجب أن يكون طول الإسم لا يقل عن 3 حروف.
+                  </small>
+                  <small
+                    *ngIf="!firstName?.errors?.['pattern']  && firstName?.errors?.['maxlength']"
+                  >
+                    يجب أن يكون طول الإسم لا يتعدى 20 حرف.
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex-1">
+              <label
+                class="block text-xl font-semibold mb-2 mr-2"
+                for="secondName"
+                >الإسم الثانى</label
+              >
+              <input
+                formControlName="secondName"
+                [ngClass]="{
+                  'border-red-700': secondName?.invalid && secondName?.dirty,
+                  'border-third-border':
+                    secondName?.valid || secondName?.untouched
+                }"
+                class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border border-third-border"
+                type="text"
+                name="secondName"
+                id="secondName"
+                placeholder="إسم العائلة"
+              />
+
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-x-1"
+                *ngIf="secondName?.invalid && secondName?.dirty"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <div>
+                  <small *ngIf="secondName?.errors?.['required']">
+                    أدخل الإسم الثانى
+                  </small>
+                  <small *ngIf="secondName?.errors?.['pattern']">
+                    يجب إدخال الإسم باللغة العربية فقط.
+                  </small>
+
+                  <small
+                    *ngIf="!secondName?.errors?.['pattern']  && secondName?.errors?.['minlength']"
+                    >يجب أن يكون طول الإسم لا يقل عن 3 حروف.
+                  </small>
+                  <small
+                    *ngIf="!secondName?.errors?.['pattern']  && secondName?.errors?.['maxlength']"
+                  >
+                    يجب أن يكون طول الإسم لا يتعدى 20 حرف.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-xl font-semibold mb-2 mr-2" for="email"
+              >البريد الإلكتروني</label
+            >
+            <div class="relative">
+              <input
+                formControlName="email"
+                [ngClass]="{
+                  'border-red-700': email?.invalid && email?.dirty,
+                  'border-third-border': email?.valid || email?.untouched
+                }"
+                type="email"
+                name="email"
+                id="email"
+                placeholder="someone@example.com"
+                class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+              />
+              <img
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-sm"
+                src="icons/tabler_mail.svg"
+                alt=""
+              />
+            </div>
+            <div
+              class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+              *ngIf="email?.invalid && email?.dirty"
+            >
+              <img
+                src="./icons/si_warning-fill.svg"
+                alt=""
+                class="w-4 h-4 mt-[1px]"
+              />
+              <div>
+                <small *ngIf="email?.errors?.['required']">
+                  أدخل البريد الإلكتروني.
+                </small>
+                <small *ngIf="email?.errors?.['email']">
+                  الرجاء إدخال عنوان بريد إلكتروني صحيح (مثل
+                  name&#64;example.com).
+                </small>
+              </div>
+            </div>
+          </div>
+          <div class="mb-4 flex-1 font-arabic">
+            <div class="relative">
+              <select
+                formControlName="center"
+                [ngClass]="{
+                  'border-red-700':
+                    center?.invalid && (center?.touched || center?.dirty),
+                  'border-third-border': center?.valid || center?.untouched
+                }"
+                class="w-full text-third-txt px-3 py-4 rounded-md border border-third-border appearance-none text-right outline-none cursor-pointer"
+                name="center"
+                id="center"
+              >
+                <option value="" disabled>المركز</option>
+                <option value="المنيا">المنيا</option>
+                <option value="ابو قرقاص">ابو قرقاص</option>
+              </select>
+              <img
+                class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
+                src="icons/Caret Down.svg"
+                alt=""
+              />
+            </div>
+            <div
+              class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+              *ngIf="center?.invalid && (center?.touched || center?.dirty)"
+            >
+              <img
+                src="./icons/si_warning-fill.svg"
+                alt=""
+                class="w-4 h-4 mt-[1px]"
+              />
+              <div>
+                <small *ngIf="center?.errors?.['required']">
+                  يجب إختيار المركز .
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center mt-5">
+            <button
+              (click)="goBack()"
+              class="flex w-fit items-center justify-center gap-2 bg-[#151419] text-mainBg-100 px-6 py-[9px] rounded-lg transition duration-200 hover:opacity-80"
+            >
+              <img
+                src="/icons/streamline_emergency-exit.svg"
+                alt=""
+                class="w-6 h-6"
+              />
+              <span class="text-base font-semibold">رجوع</span>
+            </button>
+
+            <button
+              *ngIf="formEditProfileAdmin.valid && formEditProfileAdmin.dirty"
+              class="cursor-pointer text-lg flex font-arabic gap-[10px] py-[9px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+            >
+              حفظ التغييرات
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
