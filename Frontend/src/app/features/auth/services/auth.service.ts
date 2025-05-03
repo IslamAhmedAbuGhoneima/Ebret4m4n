@@ -5,6 +5,8 @@ import { Login } from '../../../core/models/login';
 import { Observable, Subject, tap } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { jwtDecode } from 'jwt-decode';
+import { Router } from '@angular/router';
+import { ChangePassword } from '../../../core/models/changePassword';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +15,11 @@ export class AuthService {
   user = new Subject();
   private tokenKey = 'auth_token';
 
-  constructor(private http: HttpClient, private cookies: CookieService) {}
+  constructor(
+    private http: HttpClient,
+    private cookies: CookieService,
+    private router: Router
+  ) {}
 
   login(model: Login): Observable<any> {
     return this.http
@@ -64,9 +70,27 @@ export class AuthService {
 
   logout(): void {
     this.cookies.delete(this.tokenKey, '/');
+
+    this.router.navigate(['/home']).then(() => {
+      window.location.reload();
+    });
   }
 
   isLoggedIn(): boolean {
     return !!this.cookies.get(this.tokenKey);
+  }
+
+  forgetPassword(model: { email: string }) {
+    return this.http.post(
+      `${environment.apiUrl}/Authentication/forget-password`,
+      model
+    );
+  }
+
+  changePass(model: ChangePassword) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Authentication/reset-password`,
+      model
+    );
   }
 }

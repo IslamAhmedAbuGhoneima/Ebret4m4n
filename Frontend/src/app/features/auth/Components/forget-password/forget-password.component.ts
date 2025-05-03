@@ -1,6 +1,7 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Route, Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-forget-password',
@@ -10,27 +11,30 @@ import { Route, Router } from '@angular/router';
 })
 export class ForgetPasswordComponent {
   forgetPasswordForm!: FormGroup;
-  constructor(private fb: FormBuilder, private router: Router) {}
+  errorMessage: string ='';
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService
+  ) {}
   ngOnInit() {
     this.createForm();
   }
   createForm() {
     this.forgetPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      // role: ['user'],
     });
   }
   verifyEmail() {
     if (this.forgetPasswordForm.valid) {
-      console.log('valid');
-      // this._apiService.signIn(this.forgetPasswordForm.value).subscribe({
-      //   next: (response: any) => {
-      //     localStorage.setItem('user_token', response.token);
-      //     this.router.navigate(['/tasks']);
-      //   },
-      // });
-
-      this.router.navigate(['/auth/change-password']);
+      this.authService.forgetPassword(this.forgetPasswordForm.value).subscribe({
+        next: (res) => {
+          console.log(res);
+        },
+        error: (err) => {
+          this.errorMessage = err.error.Message || 'حدث خطأ أثناء إرسال الطلب';
+        },
+      });
     } else {
       this.markAllAsDirty(this.forgetPasswordForm);
     }

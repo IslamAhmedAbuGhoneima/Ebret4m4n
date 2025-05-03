@@ -8,7 +8,7 @@ import { HealthUnitComponent } from './components/health-unit/health-unit.compon
 const routes: Routes = [
   { path: '', component: GovernoratesListComponent },
   {
-    path: 'governorate',
+    path: 'governorate/:governorateName',
     component: GovernorateComponent,
   },
   {

@@ -10,6 +10,7 @@ import {
 } from '@angular/common/http';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { loaderInterceptor } from './core/interceptors/loader.interceptor';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -20,10 +21,7 @@ export const appConfig: ApplicationConfig = {
     provideCharts(withDefaultRegisterables()),
     provideHttpClient(
       withFetch(),
-      withInterceptors([
-        loaderInterceptor,
-        
-      ])
+      withInterceptors([loaderInterceptor, authInterceptor])
     ),
   ],
 };

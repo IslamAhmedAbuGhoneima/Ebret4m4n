@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { passwordMatch } from '../../../../core/customValidation/passwordMatch.validator';
+import { AuthService } from '../../services/auth.service';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-change-password',
@@ -13,10 +15,21 @@ export class ChangePasswordComponent implements OnInit {
   changePasswordForm!: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
+  errorMessage: any;
 
-  constructor(private fb: FormBuilder) {}
+  userId: string = '';
+  token: string = '';
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private _ActivatedRoute: ActivatedRoute
+  ) {}
 
   ngOnInit() {
+    this._ActivatedRoute.queryParams.subscribe((params) => {
+      this.userId = params['userId'];
+      this.token = params['token'];
+    });
     this.createForm();
   }
 
@@ -32,28 +45,19 @@ export class ChangePasswordComponent implements OnInit {
 
   changePassword() {
     if (this.changePasswordForm.valid) {
-      console.log('valid');
-      // let model: VMHttp = {
-      //   username: this.changePasswordForm.value['username'],
-      //   email: this.changePasswordForm.value['email'],
-      //   password: this.changePasswordForm.value['password'],
-      //   role: 'user',
-      // };
-      // this._apiService.createAccount(model).subscribe({
-      //   next: (response: any) => {
-      //     // Use translation keys for Toastr messages
-      //     this.toastr.success(
-      //       this.translate.instant('REGISTER.SUCCESS_MESSAGE'),
-      //       this.translate.instant('REGISTER.GREETING', {
-      //         username: model.username,
-      //       })
-      //     );
-      //     localStorage.setItem('user_token', response.token);
-      //     this.router.navigate(['/tasks']);
-      //   },
-      // });
+      const model = {
+        userId: this.userId,
+        token: this.token,
+        newPassword: this.changePasswordForm.value.password,
+      };
+
+      this.authService.changePass(model).subscribe({
+        next: (res) => {},
+        error: (err) => {
+          this.errorMessage = err.error.Message || 'حدث خطأ أثناء إرسال الطلب';
+        },
+      });
     } else {
-      console.log('InValid');
       this.changePasswordForm.setErrors({ mismatch: true });
       this.changePasswordForm.markAllAsTouched();
     }
