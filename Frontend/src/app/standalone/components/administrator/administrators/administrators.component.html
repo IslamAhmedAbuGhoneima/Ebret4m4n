@@ -31,50 +31,18 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>محمد أحمد</td>
-          <td>المنيا</td>
-          <td>2012 34567890</td>
+     @for (item of data; track $index) {   <tr>
+          <td> {{item.firstName}} {{item.lastName}}</td>
+          <td>{{item.governorate}}</td>
+          <td>{{item.email}}</td>
           <td class="flex gap-8 justify-center">
             <a routerLink="/admins/edit-admin"
               ><img src="/icons/edit.svg" alt=""
             /></a>
             <button><img src="/icons/delete.svg" alt="" /></button>
           </td>
-        </tr>
-        <tr>
-          <td>محمد أحمد</td>
-          <td>المنيا</td>
-          <td>2012 34567890</td>
-          <td class="flex gap-8 justify-center">
-            <a routerLink="/admins/edit-admin"
-              ><img src="/icons/edit.svg" alt=""
-            /></a>
-            <button><img src="/icons/delete.svg" alt="" /></button>
-          </td>
-        </tr>
-        <tr>
-          <td>محمد أحمد</td>
-          <td>المنيا</td>
-          <td>2012 34567890</td>
-          <td class="flex gap-8 justify-center">
-            <a routerLink="/admins/edit-admin"
-              ><img src="/icons/edit.svg" alt=""
-            /></a>
-            <button><img src="/icons/delete.svg" alt="" /></button>
-          </td>
-        </tr>
-        <tr>
-          <td>محمد أحمد</td>
-          <td>المنيا</td>
-          <td>2012 34567890</td>
-          <td class="flex gap-8 justify-center">
-            <a routerLink="/admins/edit-admin"
-              ><img src="/icons/edit.svg" alt=""
-            /></a>
-            <button><img src="/icons/delete.svg" alt="" /></button>
-          </td>
-        </tr>
+        </tr>}
+ 
       </tbody>
     </table>
   </div>

@@ -59,28 +59,25 @@
           </div>
 
           <div class="flex-1">
-            <label
-              class="block text-xl font-semibold mb-2 mr-2"
-              for="secondName"
+            <label class="block text-xl font-semibold mb-2 mr-2" for="lastName"
               >الإسم الثانى</label
             >
             <input
-              formControlName="secondName"
+              formControlName="lastName"
               [ngClass]="{
-                'border-red-700': secondName?.invalid && secondName?.dirty,
-                'border-third-border':
-                  secondName?.valid || secondName?.untouched
+                'border-red-700': lastName?.invalid && lastName?.dirty,
+                'border-third-border': lastName?.valid || lastName?.untouched
               }"
               class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border border-third-border"
               type="text"
-              name="secondName"
-              id="secondName"
+              name="lastName"
+              id="lastName"
               placeholder="إسم العائلة"
             />
 
             <div
               class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-x-1"
-              *ngIf="secondName?.invalid && secondName?.dirty"
+              *ngIf="lastName?.invalid && lastName?.dirty"
             >
               <img
                 src="./icons/si_warning-fill.svg"
@@ -88,19 +85,19 @@
                 class="w-4 h-4 mt-[1px]"
               />
               <div>
-                <small *ngIf="secondName?.errors?.['required']">
+                <small *ngIf="lastName?.errors?.['required']">
                   أدخل الإسم الثانى
                 </small>
-                <small *ngIf="secondName?.errors?.['pattern']">
+                <small *ngIf="lastName?.errors?.['pattern']">
                   يجب إدخال الإسم باللغة العربية فقط.
                 </small>
 
                 <small
-                  *ngIf="!secondName?.errors?.['pattern']  && secondName?.errors?.['minlength']"
+                  *ngIf="!lastName?.errors?.['pattern']  && lastName?.errors?.['minlength']"
                   >يجب أن يكون طول الإسم لا يقل عن 3 حروف.
                 </small>
                 <small
-                  *ngIf="!secondName?.errors?.['pattern']  && secondName?.errors?.['maxlength']"
+                  *ngIf="!lastName?.errors?.['pattern']  && lastName?.errors?.['maxlength']"
                 >
                   يجب أن يكون طول الإسم لا يتعدى 20 حرف.
                 </small>
@@ -167,6 +164,7 @@
               <option value="" disabled>المركز</option>
               <option value="المنيا">المنيا</option>
               <option value="ابو قرقاص">ابو قرقاص</option>
+              <option value="مغاغه">مغاغه</option>
             </select>
             <img
               class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
@@ -293,6 +291,22 @@
                 *ngIf="( addAdminForm?.errors?.['unMatchedPassword'] &&  !confirmPassword?.errors?.['required'] )"
               >
                 كلمتان المرور غير متطابقتان .
+              </small>
+            </div>
+          </div>
+
+          <div
+            class="text-red-700 mr-2 font-bold font-arabic font-base flex items-center gap-1"
+            *ngIf="errorMessage"
+          >
+            <img
+              src="./icons/si_warning-fill.svg"
+              alt=""
+              class="w-4 h-4 mt-[1px]"
+            />
+            <div>
+              <small>
+                {{ errorMessage }}
               </small>
             </div>
           </div>

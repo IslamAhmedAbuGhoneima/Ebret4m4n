@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
 import { environment } from '../../../../environments/environment';
+import { AddAdmin } from '../../../core/models/AddAdmin';
 
 @Injectable({
   providedIn: 'root',
@@ -22,4 +23,17 @@ export class HealthMinistryService {
       { params }
     );
   }
+
+  getStatisticsOfAdmin() {
+    return this.http.get<any>(`${environment.apiUrl}/Statistics/admin`);
+  }
+
+
+
+
+
+
+
+
+  
 }

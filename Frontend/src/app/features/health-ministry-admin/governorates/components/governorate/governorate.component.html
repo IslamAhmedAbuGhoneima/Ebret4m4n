@@ -78,18 +78,19 @@
       <div>
         <p class="text-third-txt rounded-lg font-normal mb-2">مخزون اللقاحات</p>
         <div class="border rounded-lg">
-          <div class="flex justify-between bg-primary-table rounded-t-lg py-2">
+          <div
+            class="flex justify-between bg-primary-btn text-white rounded-t-lg py-2"
+          >
             <p class="pr-6">إسم اللقاح</p>
             <p class="pl-6">العدد</p>
           </div>
 
-          <div
-            *ngFor="let item of data.mainInventories; index as i"
-            class="flex justify-between bg-primary-table py-2"
-          >
+          @for (item of data.mainInventories; track $index) {
+          <div class="flex justify-between bg-white py-2">
             <p class="pr-6">{{ item.antigen }}</p>
             <p class="pl-6">{{ item.amount }}</p>
           </div>
+          }
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, model } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,6 +8,9 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { passwordMatch } from '../../../../core/customValidation/passwordMatch.validator';
+import { AuthService } from '../../../../features/auth/services/auth.service';
+import { AddAdmin } from '../../../../core/models/AddAdmin';
+import { BaseApiService } from '../../../../core/services/APIs/base-api.service';
 
 @Component({
   selector: 'app-add-administrator',
@@ -19,14 +22,19 @@ export class AddAdministratorComponent implements OnInit {
   addAdminForm!: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
+  role: string | null | undefined;
+  errorMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
     private route: Router,
-    private location: Location
+    private location: Location,
+    private _BaseApiService: BaseApiService,
+    private _AuthService: AuthService
   ) {}
 
   ngOnInit() {
+    this.role = this._AuthService.getRole();
     this.createForm();
   }
 
@@ -42,7 +50,7 @@ export class AddAdministratorComponent implements OnInit {
             Validators.maxLength(20),
           ],
         ],
-        secondName: [
+        lastName: [
           '',
           [
             Validators.required,
@@ -62,36 +70,48 @@ export class AddAdministratorComponent implements OnInit {
 
   addAdmin() {
     if (this.addAdminForm.valid) {
-      console.log('valid');
-      // let model: VMHttp = {
-      //   username: this.addAdminForm.value['username'],
-      //   email: this.addAdminForm.value['email'],
-      //   password: this.addAdminForm.value['password'],
-      //   role: 'user',
-      // };
-      // this._apiService.createAccount(model).subscribe({
-      //   next: (response: any) => {
-      //     // Use translation keys for Toastr messages
-      //     this.toastr.success(
-      //       this.translate.instant('REGISTER.SUCCESS_MESSAGE'),
-      //       this.translate.instant('REGISTER.GREETING', {
-      //         username: model.username,
-      //       })
-      //     );
-      //     localStorage.setItem('user_token', response.token);
-      //     this.router.navigate(['/tasks']);
-      //   },
-      // });
-    } else {
-      console.log('InValid');
+      const model = {
+        firstName: this.addAdminForm.value.firstName,
+        lastName: this.addAdminForm.value.lastName,
+        email: this.addAdminForm.value.email,
+        password: this.addAdminForm.value.password,
+        governorate: this.addAdminForm.value.center,
+      };
+
+      this.getService(model);
+      this.goBack();
     }
   }
 
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+  toggleConfirmPassword() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+  getService(model: AddAdmin) {
+    
+    if (this.role === 'admin') {
+      this._BaseApiService.addAdmin(model).subscribe({
+        next: (res) => {
+
+
+
+        },
+        error: (err) => {
+          this.errorMessage = err.error.Message;
+        },
+      });
+    }
+  }
+  goBack() {
+    this.location.back();
+  }
   get firstName() {
     return this.addAdminForm.get('firstName');
   }
-  get secondName() {
-    return this.addAdminForm.get('secondName');
+  get lastName() {
+    return this.addAdminForm.get('lastName');
   }
 
   get center() {
@@ -107,15 +127,5 @@ export class AddAdministratorComponent implements OnInit {
 
   get confirmPassword() {
     return this.addAdminForm.get('confirmPassword');
-  }
-
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
-  toggleConfirmPassword() {
-    this.showConfirmPassword = !this.showConfirmPassword;
-  }
-  goBack() {
-    this.location.back();
   }
 }

@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AddAdmin } from '../../models/AddAdmin';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -7,19 +9,15 @@ import { Injectable } from '@angular/core';
 export class BaseApiService {
   constructor(protected http: HttpClient) {}
 
-  get<T>(url: string, options?: any) {
-    return this.http.get<T>(url, options);
+  getAdmins() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/MinistryOfHealth/governorate-admins`
+    );
   }
-
-  post<T>(url: string, data: any, options?: any) {
-    return this.http.post<T>(url, data, options);
-  }
-
-  put<T>(url: string, data: any, options?: any) {
-    return this.http.put<T>(url, data, options);
-  }
-
-  delete<T>(url: string, options?: any) {
-    return this.http.delete<T>(url, options);
+  addAdmin(model: AddAdmin) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/MinistryOfHealth/add-governorate-admin`,
+      model
+    );
   }
 }

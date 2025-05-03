@@ -1,6 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { HealthMinistryService } from '../../services/health-ministry.service';
+import { StatisticsAdmin } from '../../../../core/models/statisticsAdmin';
 
 @Component({
   selector: 'app-ministry-admin-dashboard',
@@ -8,11 +10,48 @@ import { BaseChartDirective } from 'ng2-charts';
   templateUrl: './ministry-admin-dashboard.component.html',
   styleUrl: './ministry-admin-dashboard.component.css',
 })
-export class MinistryAdminDashboardComponent {
+export class MinistryAdminDashboardComponent implements OnInit {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
   @ViewChild(BaseChartDirective) chartBar:
     | BaseChartDirective<'bar'>
     | undefined;
+  errorMessage: string = '';
+  data: any = {};
+
+  constructor(private _HealthMinistryService: HealthMinistryService) {}
+  ngOnInit(): void {
+    this.getStatistics();
+  }
+  getStatistics() {
+    this._HealthMinistryService.getStatisticsOfAdmin().subscribe({
+      next: (res) => {
+        this.data = res;
+
+        const labels = this.data.vaccineRequests.map(
+          (item: any) => item.vaccineName
+        );
+        const data = this.data.vaccineRequests.map(
+          (item: any) => item.requestedAmount
+        );
+        this.barChartData1.labels = labels;
+        this.barChartData1.datasets[0].data = data;
+        this.barChartData1 = { ...this.barChartData1 };
+
+        const labels2 = this.data.topGovernoratesByVaccines.map(
+          (item: any) => item.governorate
+        );
+        const data2 = this.data.topGovernoratesByVaccines.map(
+          (item: any) => item.totalVaccinesRequested
+        );
+        this.barChartData2.labels = labels;
+        this.barChartData2.datasets[0].data = data;
+        this.barChartData2 = { ...this.barChartData1 };
+      },
+      error: (err) => {
+        this.errorMessage = err.error.Message;
+      },
+    });
+  }
 
   // Pie
   public pieChartOptions: ChartConfiguration['options'] = {
@@ -55,12 +94,12 @@ export class MinistryAdminDashboardComponent {
     labels: ['ذكر', 'أنثى'],
     datasets: [
       {
-        data: [300, 500],
-        backgroundColor: ['#00ACF8', '#ec4899'], // 💙 ذكر، 💗 أنثى
+        data: [this.data.maleChildren, this.data.femaleChildren],
+        backgroundColor: ['#00ACF8', '#ec4899'],
       },
     ],
   };
-
+  //--------------------------------- bar---------------------------------
   public pieChartType: ChartType = 'pie';
   // first bar
   public barChartType = 'bar' as const;
@@ -104,19 +143,11 @@ export class MinistryAdminDashboardComponent {
   };
 
   public barChartData1: ChartData<'bar'> = {
-    labels: [
-      'الثلاثى البكتيرى',
-      'BCG',
-      'سولك',
-      'MMR',
-      'الخماسى',
-      'سابين',
-      'كبدى B',
-    ],
+    labels: [],
     datasets: [
       {
         label: 'عدد الطلبات',
-        data: [32000, 18000, 37000, 120000, 21000, 15000, 10000],
+        data: [],
         backgroundColor: '#127453', // اللون الأخضر الداكن كما في الصورة
         borderRadius: 6, // زوايا دائرية
         barThickness: 30, // سمك العمود
@@ -125,7 +156,6 @@ export class MinistryAdminDashboardComponent {
   };
 
   //second bar
-
   public barChartOptions2: ChartConfiguration<'bar'>['options'] = {
     responsive: true,
     scales: {
@@ -165,20 +195,11 @@ export class MinistryAdminDashboardComponent {
   };
 
   public barChartData2: ChartData<'bar'> = {
-    labels: [
-      'المنيا',
-      'السويس',
-      'أسوان',
-      'أسيوط',
-      'بني سويف',
-      'بورسعيد',
-      'دمياط',
-      'الأقصر',
-    ],
+    labels: [],
     datasets: [
       {
         label: 'عدد الطلبات',
-        data: [320500, 20000, 19000, 180040, 18000, 140020, 180000, 105000],
+        data: [],
         backgroundColor: '#127453', // اللون الأخضر الداكن كما في الصورة
         borderRadius: 6, // زوايا دائرية
         barThickness: 30, // سمك العمود

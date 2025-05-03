@@ -5,14 +5,14 @@
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الوحدات الصحية</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          5607
+          {{ data.healthCareUnits }}
         </span>
       </div>
 
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الأطفال المسجلة</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          600,000
+          {{ data.registeredChildren }}
         </span>
       </div>
       <div class="bg-white p-4">
@@ -20,25 +20,25 @@
           عدد الأطفال الحاصلة على جميع التطعيمات
         </h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          90,000
+          {{ data.fullyVaccinatedChildren }}
         </span>
       </div>
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد اللقاحات المأخوذة</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          3.5 مليون
+          {{ data.totalVaccinesTaken }}
         </span>
       </div>
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الشكاوى</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          12,000
+          {{ data.totalComplaints }}
         </span>
       </div>
     </div>
 
     <div class="flex items-start gap-6 mt-5">
-      <div class="bg-white p-4 pb-0 flex-1 rounded-lg  scroll-container">
+      <div class="bg-white p-4 pb-0 flex-1 rounded-lg scroll-container">
         <table
           class="min-w-full overflow-x-auto text-lg text-center [&_tbody_tr]:bg-white [&_td]:px-6 [&_td]:py-3 [&_thead_td]:text-[#8E98A8] [&_thead_td]:text-sm [&_tbody_td]text-[#151419] font-semibold"
         >
@@ -59,36 +59,14 @@
             </tr>
           </thead>
           <tbody>
+            @for (item of data.governoratesReport; track $index) {
             <tr>
-              <td class="border-b-2 border-third-border">القاهرة</td>
-              <td class="border-b-2 border-third-border">33</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
+              <td class="border-b-2 border-third-border">{{item.governorate}}</td>
+              <td class="border-b-2 border-third-border">{{item.cityCount}}</td>
+              <td class="border-b-2 border-third-border">{{item.healthUnitCount}}</td>
+              <td class="border-b-2 border-third-border">{{item.vaccinesTaken}}</td>
             </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">القاهرة</td>
-              <td class="border-b-2 border-third-border">33</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">القاهرة</td>
-              <td class="border-b-2 border-third-border">33</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">القاهرة</td>
-              <td class="border-b-2 border-third-border">33</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">القاهرة</td>
-              <td class="border-b-2 border-third-border">33</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
+            }
           </tbody>
         </table>
       </div>

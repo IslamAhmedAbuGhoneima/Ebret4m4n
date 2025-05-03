@@ -1,1 +1,14 @@
-<p>not-found works!</p>
+<div class="min-h-screen font-arabic flex flex-col items-center justify-center">
+        <h1 class="text-9xl font-bold text-primary-table mb-4">404</h1>
+        <h2 class="text-6xl font-bold text-primary-bg mb-4">
+            أُووبس! يبدو أنك ضللت الطريق!
+        </h2>
+        <p class="text-third-txt text-xl font-semibold mb-6">
+            هذه الصفحة غير موجودة... لكن لا تقلق، سنعيدك للطريق الصحيح
+        </p>
+        <button (click)="goBack()"
+            class="flex gap-x-2 mt-4 mx-auto w-fit bg-primary-btn text-white py-2 px-6 rounded-lg cursor-pointer hover:bg-primary-hovbtn transition-colors">
+            <img src="/icons/streamline_emergency-exit.svg" class="" alt="">
+            <span class="font-bold ">رجوع</span>
+        </button>
+    </div>
