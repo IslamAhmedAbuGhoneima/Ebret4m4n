@@ -13,6 +13,7 @@ import { jwtDecode } from 'jwt-decode';
 export class LoginComponent {
   formLogin!: FormGroup;
   showPassword: boolean = false;
+  errorMessage: string = '';
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -31,11 +32,10 @@ export class LoginComponent {
     if (this.formLogin.valid) {
       this.authService.login(this.formLogin.value).subscribe({
         next: (res) => {
-          console.log(res);
-          // this.navigateByRole()
+          this.navigateByRole();
         },
         error: (error) => {
-          console.log(error);
+          this.errorMessage = error.error.Message;
         },
       });
     } else {
@@ -63,22 +63,22 @@ export class LoginComponent {
     const role = this.authService.getRole();
     switch (role) {
       case 'parent':
-        this.router.navigate(['/parent/dashboard']);
+        this.router.navigate(['/parent']);
         break;
       case 'governorateAdmin': // city admin
-        this.router.navigate(['/city-admin/dashboard']);
+        this.router.navigate(['/city-admin']);
         break;
       case 'cityAdmin': // city center admin
-        this.router.navigate(['/city-center-admin/dashboard']);
+        this.router.navigate(['/city-center-admin']);
         break;
       case 'organizer':
         this.router.navigate(['/health-organizer']);
         break;
       case 'admin':
-        this.router.navigate(['/ministry/dashboard']);
+        this.router.navigate(['/health-ministry']);
         break;
       default:
-        this.router.navigate(['/login']); // fallback
+        this.router.navigate(['/auth/login']); // fallback
         break;
     }
   }

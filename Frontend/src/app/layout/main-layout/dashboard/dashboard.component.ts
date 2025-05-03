@@ -10,4 +10,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   styleUrl: './dashboard.component.css',
   encapsulation: ViewEncapsulation.None,
 })
-export class DashboardComponent {}
+export class DashboardComponent {
+
+
+  
+}

@@ -21,7 +21,10 @@ export class AuthService {
       .pipe(
         tap((response) => {
           const token = response.data.accessToken;
-          if (token) this.cookies.set(this.tokenKey, token);
+          if (token) {
+            // تخزين التوكن فقط داخل الكوكي
+            this.cookies.set(this.tokenKey, token);
+          }
         })
       );
   }
@@ -37,8 +40,30 @@ export class AuthService {
     }
   }
 
+  getUserEmail(): string | null {
+    const token = this.cookies.get(this.tokenKey);
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.email || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  getUserName(): string | null {
+    const token = this.cookies.get(this.tokenKey);
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.name || null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   logout(): void {
-    this.cookies.delete(this.tokenKey);
+    this.cookies.delete(this.tokenKey, '/');
   }
 
   isLoggedIn(): boolean {
