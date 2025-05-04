@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.VaccinDto;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
-using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
@@ -22,10 +21,10 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 	[HttpGet("{id}/search_by_id")]
 	public async Task<IActionResult> GetById(string id)
 	{
-		var child=await unitOfWork.ChildRepo.FindAsync(c=>c.Id==id,false, ["Vaccines", "HealthReportFiles"]);
+		var child = await unitOfWork.ChildRepo.FindAsync(c => c.Id == id, false, ["Vaccines", "HealthReportFiles"]);
 
 		if (child == null)
-			throw new NotFoundBadRequest("لا يوجد طفل مسجل بهذا الرقم");
+			return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد طفل مسجل بهذا الرقم"));
 
 		var childDtos = child.Adapt<ChildDto>();
 
@@ -74,8 +73,8 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 
                 var vaccine = child.Vaccines.FirstOrDefault(v => v.Name == data.VaccineName);
 
-                if (vaccine is null)
-                    throw new NotFoundBadRequest("لا يوجد تطعيم بهذا الاسم");
+				if (vaccine is null)
+					return NotFound(GeneralResponse<string>.FailureResponse($"لايوجد تطيعم بهذا الاسم: {data.VaccineName}"));
 
                 vaccine.IsTaken = true;
 
@@ -90,7 +89,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
             var result = await unitOfWork.SaveAsync();
 
             if (result == 0)
-                throw new BadRequestException("لم يتم تحديث حالة التطعيم");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث حالة التطعيم حاول مره اخري"));
 
 			await unitOfWork.CommitTransactionAsync();
 
@@ -112,7 +111,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 		var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.ChildId == childId, false);
 
 		if (appointment == null)
-			throw new NotFoundBadRequest("الموعد غير موجود");
+			 return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد موعد محجوز لهذا الطفل"));
 
 		appointment.Date = appointment.Date.AddDays(7);
 
@@ -121,7 +120,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 		var result = await unitOfWork.SaveAsync();
 
 		if (result == 0) 
-			throw new BadRequestException("لم يتم تاجيل الميعاد");
+			return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تاجيل الموعد حاول مره اخري"));
 
 		var response = GeneralResponse<string>.SuccessResponse("تم تاجيل الميعاد بنجاح");
 

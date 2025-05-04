@@ -1,7 +1,6 @@
 ﻿using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 using Ebret4m4n.Shared.DTOs.HealthCareDtos;
 using Microsoft.AspNetCore.Authorization;
-using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Ebret4m4n.Entities.Models;
@@ -30,7 +29,7 @@ public class HealthCareController(IUnitOfWork unitOfWork,
             )).ToList();
 
         if (!locations.Any())
-            throw new NotFoundBadRequest("لم يتم العثور على وحدات مسجلة لأي محافظة");
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور على وحدات مسجلة لأي محافظة"));
 
 
         var response =
@@ -63,7 +62,7 @@ public class HealthCareController(IUnitOfWork unitOfWork,
             .FirstOrDefaultAsync(U => U.Id == parentId);
 
         if (user?.HealthCareCenter is null)
-            throw new NotFoundBadRequest("هذا المستخدم لا ينتمي الي اي وحده صحيه");
+            return NotFound(GeneralResponse<string>.FailureResponse("هذا المستخدم لا ينتمي الي اي وحده صحيه"));
 
         var healthCareDetailsDto = user.HealthCareCenter.Adapt<HealthCareDetailsDto>();
 

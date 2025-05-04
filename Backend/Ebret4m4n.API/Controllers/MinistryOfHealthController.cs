@@ -60,12 +60,12 @@ public class MinistryOfHealthController
             var result = await userManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
-                throw new BadRequestException("لم يتم انشاء ادمن محافظه");
+                return BadRequest("الرجاء التاكد من البريد الالكتروني او هذا الايميل موجود بالفعل");
 
             var roleResult = await userManager.AddToRoleAsync(user, "governorateAdmin");
 
             if(!roleResult.Succeeded)
-                throw new BadRequestException("لم يتم اضافه الادمن للدور");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم اضافه الادمن للدور"));
 
             var governorateAdmin = new GovernorateAdminStaff() { Governorate = model.Governorate, UserId = user.Id };
 
@@ -74,7 +74,7 @@ public class MinistryOfHealthController
             var dbResult = await unitOfWork.SaveAsync();
 
             if (dbResult == 0)
-                throw new BadRequestException("لم يتم حفظ البيانات");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات حاول مره اخري"));
 
             var response = GeneralResponse<string>.SuccessResponse("تم اضافه هذا الادمن بنجاح");
 

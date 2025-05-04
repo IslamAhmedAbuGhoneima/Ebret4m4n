@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
-using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Shared.DTOs;
@@ -58,7 +57,7 @@ public class DoctorController
         int result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم تاجيل اللقاحات لهذا الطفل حاول مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تاجيل اللقاحات لهذا الطفل حاول مره اخري"));
 
         await emailSender.SendEmailAsync(child.User.Email!, "تاجيل التطعيمات", $"<p>بناء علي التحاليل المقدمه تم تاجيل التطعيم لطفلك : {child.Name}</p>");
 
@@ -71,10 +70,7 @@ public class DoctorController
     public IActionResult SuspendedChildren()
     {
         var children = unitOfWork.ChildRepo.FindByCondition(children => children.IsNormal == false, false)
-            .Select(children => children.Name).ToList();
-
-        if (children is null)
-            throw new NotFoundException("لا يوجد اطفال مؤجلين حتي الان");
+            .Select(children => children.Name).ToList() ?? [];
 
         var response = GeneralResponse<List<string>>.SuccessResponse(children);
         return Ok(response);
@@ -93,7 +89,7 @@ public class DoctorController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم اضافه جدول التطعيمات حاول مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم اضافه جدول التطعيمات حاول مره اخري"));
 
         var response = GeneralResponse<string>.SuccessResponse("تم اضافه جدول التطعيمات للطفل");
 

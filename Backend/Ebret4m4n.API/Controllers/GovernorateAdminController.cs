@@ -1,7 +1,7 @@
 ﻿using Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
 using Microsoft.AspNetCore.Authorization;
-using Ebret4m4n.Entities.Exceptions;
-using Microsoft.AspNetCore.Identity;                
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 using Ebret4m4n.Entities.Models;                    
 using Microsoft.AspNetCore.Mvc;                                                                 
 using Ebret4m4n.Shared.DTOs;                        
@@ -22,18 +22,18 @@ public class GovernorateAdminController
     public IActionResult GetCities([FromQuery] string? governorate)
     {
         string adminGovernorate = string.Empty;
-        var adminRole = User.FindFirst("role")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
         if (adminRole == "governorateAdmin")
             adminGovernorate = User.FindFirst("governorate")!.Value;
 
         if (adminRole == "admin" && governorate == null)
-            throw new BadRequestException("من فظلك ادخل اسم المحافظه لتحميل المراكز الخاصه بها");
+            return BadRequest(GeneralResponse<string>.FailureResponse("من فظلك ادخل اسم المحافظه لتحميل المراكز الخاصه بها"));
 
         var targetGovernorate = adminRole == "admin" ? governorate : adminGovernorate;
 
         if (governorate is not null && adminGovernorate != governorate && adminRole != "admin")
-            throw new BadRequestException("لا يمكنك عرض مدن محافظه اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكنك عرض مدن محافظه اخري"));
 
 
         var cities = unitOfWork.HealthCareCenterRepo
@@ -46,15 +46,15 @@ public class GovernorateAdminController
 
         return Ok(response);
     }
+
     [HttpGet("city-details")]
-    
     public async Task<IActionResult> CityDetails([FromQuery] string cityName)
     {
         var cityAdminStaff =
              await unitOfWork.CityAdminStaffRepo.FindAsync(C => C.City == cityName, false, ["MainInventories", "User"]);
 
         if (cityAdminStaff is null)
-            throw new NotFoundBadRequest("لا يوجد ادمن لهذه المدينه");
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد ادمن لهذه المدينه"));
 
 
         var cityDetails = cityAdminStaff.Adapt<CityRecordDetailsDto>();
@@ -87,10 +87,12 @@ public class GovernorateAdminController
         if (!ModelState.IsValid)
             return UnprocessableEntity(GeneralResponse<string>.FailureResponse("تاكد ان جميع المدخلات صحيحه"));
 
+        var adminGovernorate = User.FindFirst("governorate")!.Value;
+
         var checkAdminCityExists = await unitOfWork.CityAdminStaffRepo.ExistsAsync(city => city.City == model.City);
 
         if (checkAdminCityExists)
-            throw new BadRequestException("يوجد ادمن لهذه المدينه");
+            return BadRequest(GeneralResponse<string>.FailureResponse("يوجد ادمن لهذه المدينه بالفعل"));
 
         var governorateAdminId = User.FindFirst("id")!.Value;
 
@@ -98,20 +100,24 @@ public class GovernorateAdminController
 
         var result = await userManager.CreateAsync(user, model.Password);
 
-        if(!result.Succeeded)
-            throw new BadRequestException("لم يتم انشاء هذا المستخدم");
+        if (!result.Succeeded)
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم انشاء هذا المستخدم تاكد من ادخال البيانات بشكل صحيح"));
 
         await userManager.AddToRoleAsync(user, model.Role);
         
-        var cityAdmin = model.Adapt<CityAdminStaff>();
-        cityAdmin.UserId = user.Id;
-        cityAdmin.GovernorateAdminId = governorateAdminId;
+        var cityAdmin = new CityAdminStaff 
+        {
+            UserId = user.Id,
+            GovernorateAdminId = governorateAdminId,
+            Governorate = adminGovernorate,
+            City = model.City
+        };
 
         await unitOfWork.CityAdminStaffRepo.AddAsync(cityAdmin);
         var dbResult = await unitOfWork.SaveAsync();
 
         if (dbResult == 0)
-            throw new BadRequestException("لم يتم حفظ البيانات الخاصه بهذا المستخدم");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات الخاصه بهذا المستخدم"));
 
         var response = GeneralResponse<string>.SuccessResponse("تم اضافه ادمن مدينه بنجاح");
 
@@ -128,7 +134,7 @@ public class GovernorateAdminController
             await unitOfWork.CityAdminStaffRepo.FindAsync(admin => admin.UserId == adminId, false);
 
         if (cityAdmin == null)
-            throw new NotFoundException("لم يتم العثور علي هذا المستخدم");
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور علي هذا المستخدم"));
 
         var user = await userManager.FindByIdAsync(adminId);
 
@@ -139,7 +145,7 @@ public class GovernorateAdminController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم حذف هذا المستخدم حاول مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حذف هذا المستخدم حاول مره اخري"));
 
         var response = GeneralResponse<string>.SuccessResponse("تم حذف هذا المستخدم");
 

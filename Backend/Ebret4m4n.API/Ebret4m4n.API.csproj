@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ebret4m4n.Repository\Ebret4m4n.Repository.csproj" />
     <ProjectReference Include="..\Ebret4m4n.Shared\Ebret4m4n.Shared.csproj" />
   </ItemGroup>
 

@@ -11,6 +11,7 @@ using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.API.Hubs;
 using Mapster;
+using System.Security.Claims;
 
 namespace Ebret4m4n.API.Controllers;
 
@@ -26,7 +27,7 @@ public class OrderController
     public IActionResult Orders()
     {
         var adminId = User.FindFirst("id")!.Value;
-        var adminRole = User.FindFirst("role")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
         var orders =
             adminRole == "governorateAdmin" ?
@@ -51,7 +52,7 @@ public class OrderController
             .ToList();
 
         if (orderItems is null)
-            throw new BadRequestException("لايوجد طلبات بهذا الرقم");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لايوجد طلبات بهذا الرقم"));
 
         var orderItemsDto = orderItems.Adapt<List<OrderItemsDto>>();
 
@@ -68,7 +69,7 @@ public class OrderController
             return UnprocessableEntity(GeneralResponse<string>.FailureResponse("الرجاء التاكد من المدخلات"));
 
         var adminId = User.FindFirst("id")!.Value;
-        var adminRole = User.FindFirst("role")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
         await unitOfWork.BeginTransactionAsync();
 
@@ -86,12 +87,12 @@ public class OrderController
 
             var orderSaveResult = await unitOfWork.SaveAsync();
             if (orderSaveResult == 0)
-                throw new BadRequestException("لم يتم حفظ بيانات الطلب");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ بيانات الطلب"));
 
             var saveItemsResult = await SaveOrderItems(model, order.Id);
 
             if (!saveItemsResult)
-                throw new BadHttpRequestException("لم يتم حفظ عناصر الطلب");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ عناصر الطلب"));
 
             await unitOfWork.CommitTransactionAsync();
 
@@ -112,7 +113,7 @@ public class OrderController
     public async Task<IActionResult> MarkeReceivedOrder(Guid orderId)
     {
         var adminId = User.FindFirst("id")!.Value;
-        var adminRole = User.FindFirst("role")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
         await unitOfWork.BeginTransactionAsync();
 
@@ -123,10 +124,10 @@ public class OrderController
             .FindAsync(order => order.Id == orderId, true, ["OrderItems", "CityAdminStaff", "GovernorateAdminStaff", "MedicalStaff"]);
 
             if (order is null)
-                throw new NotFoundBadRequest($"لم نتمكن من ايجاد هذ الطلب");
+                return NotFound(GeneralResponse<string>.FailureResponse("لم نتمكن من ايجاد هذ الطلب"));
 
             if (order.Status == OrderStatus.Recived)
-                throw new BadRequestException("تم استلام هذا الطلب من قبل");
+                return BadRequest(GeneralResponse<string>.FailureResponse("تم استلام هذا الطلب من قبل"));
 
             var inventory = GetInventory(adminRole, adminId);
 
@@ -135,7 +136,7 @@ public class OrderController
             var updateResult = UpdateInventory(orderItems, inventory, '+');
 
             if (!updateResult)
-                throw new BadRequestException("هناك خطأ ما في هذا الطلب، راجع بيانات الطلب والمخزن");
+                return BadRequest(GeneralResponse<string>.FailureResponse("هناك خطأ ما في هذا الطلب، راجع بيانات الطلب والمخزن"));
 
             order.Status = OrderStatus.Recived;
             order.DateApproved = DateTime.UtcNow;
@@ -148,7 +149,7 @@ public class OrderController
             int result = await unitOfWork.SaveAsync();
 
             if (result == 0)
-                throw new BadRequestException("لم يتم تغير حاله الطلب حوال مره اخري");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تغير حاله الطلب حوال مره اخري"));
 
             await unitOfWork.CommitTransactionAsync();
 
@@ -172,7 +173,7 @@ public class OrderController
     public async Task<IActionResult> AcceptVaccineOrder(Guid orderId)
     {
         var adminId = User.FindFirst("id")!.Value;
-        var adminRole = User.FindFirst("role")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
         await unitOfWork.BeginTransactionAsync();
 
@@ -182,7 +183,7 @@ public class OrderController
             await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, true, ["OrderItems"]);
 
             if (order is null)
-                throw new NotFoundBadRequest("لم يتم ايجاد هذا الطلب");
+                return NotFound(GeneralResponse<string>.FailureResponse("لم يتم ايجاد هذا الطلب"));
 
             var inventory = GetInventory(adminRole, adminId);
 
@@ -191,7 +192,7 @@ public class OrderController
             var updateInventory = UpdateInventory(orderItems, inventory, '-');
 
             if (!updateInventory)
-                throw new BadRequestException("لم يتم تحديث بيانات المخزن");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث بيانات المخزن"));
 
             order.Status = OrderStatus.Processing;
             unitOfWork.OrderRepo.Update(order);
@@ -205,7 +206,7 @@ public class OrderController
             var result = await unitOfWork.SaveAsync();
 
             if (result == 0)
-                throw new BadRequestException("لم يتم حفظ البيانات");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات"));
 
             var notificationDto = notification.Adapt<NotificationDto>();
 
@@ -235,10 +236,7 @@ public class OrderController
             unitOfWork.OrderRepo
             .FindByCondition(order => order.MedicalStaff.CityAdminStaffId == adminId, false, ["MedicalStaff"])
             .Select(order => order.Adapt<HealthCareOrdersDto>())
-            .ToList();
-
-        if (orders == null)
-            throw new BadRequestException("لم يتم العثور على الطلب");
+            .ToList() ?? [];
 
         return Ok(orders);
     }
@@ -252,7 +250,7 @@ public class OrderController
         var cityOrders =
             unitOfWork.OrderRepo.FindByCondition(order => order.CityAdminStaff.GovernorateAdminId == governorateAdminId, false, ["CityAdminStaff"])
             .Select(order => order.Adapt<CityOrderDetails>())
-            .ToList();
+            .ToList() ?? [];
 
         var response = GeneralResponse<List<CityOrderDetails>>.SuccessResponse(cityOrders);
 
@@ -295,7 +293,7 @@ public class OrderController
             var result = await unitOfWork.SaveAsync();
 
             if (result == 0)
-                throw new BadRequestException("لم يتم حفظ البيانات");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات"));
 
             await hubContext.Clients.User(order.GovernorateAdminStaffId!).SendAsync("NotificationMessage");
 
@@ -324,7 +322,7 @@ public class OrderController
             var order = await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, true, ["OrderItems"]);
 
             if (order is null)
-                throw new NotFoundBadRequest("لم يتم العثور على الطلب");
+                return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور على الطلب"));
 
             var inventory = unitOfWork.InventoryRepo.FindByCondition(inv => inv.HealthCareCenterId.ToString() == orgnizerHcId, true)
                 .ToList();
@@ -336,7 +334,7 @@ public class OrderController
                 var inventoryItem = inventory.FirstOrDefault(inv => inv.Antigen == antigine.Antigen);
 
                 if (inventoryItem is null)
-                    throw new BadRequestException("لم يتم العثور على العنصر في المخزن");
+                    return BadRequest($"لم يتم العثور علي العنصر : {antigine.Antigen} في المخزن");
 
                 inventoryItem.Amount += antigine.Amount;
 
@@ -350,7 +348,7 @@ public class OrderController
             var result = await unitOfWork.SaveAsync();
 
             if (result == 0)
-                throw new BadRequestException("لم يتم حفظ البيانات");
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات"));
 
             await unitOfWork.CommitTransactionAsync();
         }

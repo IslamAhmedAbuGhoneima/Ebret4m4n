@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.Shared.DTOs;
@@ -43,7 +42,7 @@ public class ParentController
         var appointment = await unitOfWork.AppointmentRepo.FindAsync(app => app.Id == id, false);
 
         if (appointment is null)
-            throw new NotFoundBadRequest("لا يوجد حجز بهذا المعاد");
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور علي اي حجز"));
 
         var appointmentDto = appointment.Adapt<AppointmentDto>();
 
@@ -59,13 +58,13 @@ public class ParentController
             return UnprocessableEntity(GeneralResponse<string>.FailureResponse("تاكد ان جميع مدخلات الحجز صحيحه"));
 
         if (model.Date <= DateTime.UtcNow)
-            throw new BadRequestException("لا يمكن حجز هذ الموعد");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكن حجز هذ الموعد"));
 
         var appointmentExists =
             await unitOfWork.AppointmentRepo.ExistsAsync(appointment => appointment.VaccineName == model.VaccineName && appointment.ChildId == model.ChildId);
 
         if (appointmentExists)
-            throw new BadRequestException("تم حجز معاد لهذا اللقاح من قبل");
+            return BadRequest(GeneralResponse<string>.FailureResponse("تم حجز معاد لهذا اللقاح من قبل"));
 
         var parentId = User.FindFirst("id")!.Value;
 
@@ -76,10 +75,10 @@ public class ParentController
 
 
         if (user?.Children is null)
-            throw new BadRequestException($"you do not have children with {model.ChildId} to reserve an appointment");
+            return BadRequest(GeneralResponse<string>.FailureResponse("ليس لديك اي اطفال لتتمكن من حجز تطعيم اضف طفل اولا"));
 
         if (user?.HealthCareCenterId == null)
-            throw new NotFoundBadRequest("هذا المستخدم لا ينتمي الي اي وحده صحيه");
+            return NotFound(GeneralResponse<string>.FailureResponse("هذا المستخدم لا ينتمي الي اي وحده صحيه"));
 
         var appointment = (model, user.HealthCareCenter, parentId).Adapt<Appointment>();
 
@@ -87,7 +86,7 @@ public class ParentController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم حفظ الحجز الخاص بك الرجاء المحاوله مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ الحجز الخاص بك الرجاء المحاوله مره اخري"));
 
 
         string childName = user.Children.FirstOrDefault()!.Name;
@@ -105,13 +104,13 @@ public class ParentController
         var parentId = User.FindFirst("id")!.Value;
 
         if (model.Date <= DateTime.UtcNow)
-            throw new BadRequestException("لا يمكن اضافه هذا المعاد");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكن اضافه هذا المعاد"));
 
         var appointment = 
             await unitOfWork.AppointmentRepo.FindAsync(appointment => appointment.ChildId == childId && appointment.UserId == parentId, true);
 
         if (appointment is null)
-            throw new NotFoundBadRequest("لم يتم ايجاد اي حجز لهذا الطفل");
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم ايجاد اي حجز لهذا الطفل"));
 
         appointment.Date = model.Date;
 
@@ -120,7 +119,7 @@ public class ParentController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم اعاده جدوله هذا الحجز");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم اعاده جدوله هذا الحجز"));
 
         var response = GeneralResponse<string>.SuccessResponse("تم اعاده الجدوله بنجاح");
 
@@ -133,13 +132,13 @@ public class ParentController
         var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.Id == id, false);
 
         if (appointment == null)
-            throw new NotFoundBadRequest("لا يوجد موعد خاص بهذا المستخدم");
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد موعد خاص بهذا المستخدم"));
 
         unitOfWork.AppointmentRepo.Remove(appointment);
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم الغاء المعاد حاول مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم الغاء المعاد حاول مره اخري"));
 
         return NoContent();
     }
@@ -157,9 +156,37 @@ public class ParentController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم ارسال الشكوي الخاص بك الرجاء المحاوله مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم ارسال الشكوي الخاص بك الرجاء المحاوله مره اخري"));
 
         var response = GeneralResponse<string>.SuccessResponse("شكرا لتعونك معنا سيتم حل الشكوي الخاص بك في اقرب وقت");
+
+        return Ok(response);
+    }
+
+    [HttpPut("update-parent")]
+    public async Task<IActionResult> UpdateParent([FromBody] UpdateParentDto model)
+    {
+        var parentId = User.FindFirst("id")!.Value;
+
+        var parent = await userManager.FindByIdAsync(parentId);
+
+        if (parent is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد مستخدم بهذا الرقم"));
+
+        var healthCareCenter = await unitOfWork.HealthCareCenterRepo
+            .ExistsAsync(h => h.HealthCareCenterId == model.HealthCareCenterId);
+
+        if(!healthCareCenter)
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد وحده صحيه بهذا الرقم"));
+        
+        var Updatedparent = model.Adapt<ApplicationUser>();
+
+        var result = await userManager.UpdateAsync(Updatedparent);
+
+        if(!result.Succeeded)
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث بياناتك الرجاء التاكد من ادخال بيانات صحيحه"));
+
+        var response = GeneralResponse<string>.SuccessResponse("تم تحديث بياناتك بنجاح");
 
         return Ok(response);
     }

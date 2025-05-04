@@ -1,12 +1,12 @@
 ﻿using Ebret4m4n.Shared.DTOs.InventoriesDtos;
 using Microsoft.AspNetCore.Authorization;
-using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Mapster;
+using System.Security.Claims;
 
 namespace Ebret4m4n.API.Controllers;
 
@@ -20,14 +20,14 @@ public class InventoryController
     public async Task<IActionResult> EstablishInventory()
     {
         var adminId = User.FindFirst("id")!.Value;
-        var adminRole = User.FindFirst("role")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
         CityAdminStaff? cityAdmin = null;
         GovernorateAdminStaff? governorateAdmin = null;
 
         var inventoryExists = await unitOfWork.MainInventoryRepo.ExistsAsync(inv => inv.GovernorateAdminStaffId == adminId || inv.CityAdminStaffId == adminId);
 
         if (inventoryExists)
-            throw new BadRequestException("تم انشاء محزن لهذا المستخدم من قبل");
+            return BadRequest(GeneralResponse<string>.FailureResponse("تم انشاء محزن لهذا المستخدم من قبل"));
 
 
         if (adminRole == "cityAdmin")
@@ -64,7 +64,7 @@ public class InventoryController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم حفظ بيانات المخزن الرجاء المحاوله مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ بيانات المخزن الرجاء المحاوله مره اخري"));
 
 
         var inventoryDto = inventoryAntigens.Adapt<List<InventoryDto>>();
@@ -79,15 +79,12 @@ public class InventoryController
     public IActionResult GetAdminsInventory()
     {
         var adminId = User.FindFirst("id")!.Value;
-        var adminRole = User.FindFirst("role")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
 
         var inventory = adminRole == "cityAdmin" ?
             unitOfWork.MainInventoryRepo.FindByCondition(inv => inv.CityAdminStaffId == adminId, false).ToList() ?? [] :
             unitOfWork.MainInventoryRepo.FindByCondition(inv => inv.GovernorateAdminStaffId == adminId, false).ToList() ?? [];
-
-        if (inventory is null) 
-            throw new BadRequestException("لم يتم العثور علي بيانات المخزن او لم يتم انشائه");
 
         var invenrotyDto = inventory.Adapt<List<InventoryDto>>();
 
@@ -122,7 +119,7 @@ public class InventoryController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم حفظ بيانات المخزن الرجاء المحاوله مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ بيانات المخزن الرجاء المحاوله مره اخري"));
 
         var response = GeneralResponse<string>.SuccessResponse("تم انشاء المخزن بنجاح");
 
@@ -138,9 +135,6 @@ public class InventoryController
         var inventory =
              unitOfWork.InventoryRepo.FindByCondition(inv => inv.HealthCareCenterId.ToString() == organizerHCId, false)
              .ToList() ?? [];
-
-        if (inventory == null)
-            throw new NotFoundBadRequest("لم يتم انشاء مخزن ل هذه الوحدة");
 
         var inventoryDto = inventory.Adapt<List<InventoryDto>>();
 

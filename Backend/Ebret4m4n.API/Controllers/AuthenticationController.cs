@@ -18,7 +18,6 @@ using System.Data;
 using System.Text;
 using System.Net;
 using Mapster;
-using Ebret4m4n.Shared.DTOs.NotificationDtos;
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -38,17 +37,15 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
     public async Task<IActionResult> Register([FromBody] RegisterDto model)
     {
         if(!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+            return UnprocessableEntity(GeneralResponse<object>.FailureResponse(ModelState));
 
         var user = model.Adapt<ApplicationUser>();
 
         var result = await userManager.CreateAsync(user, model.Password);
 
         if (!result.Succeeded)
-        {
-            var errors = result.Errors.Select(e => e.Description);
-            return BadRequest(new { Errors = errors });
-        }
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم انشاء مستخدم الرجاء التاكد من ان البيانات صحيحه"));
+        
 
         await userManager.AddToRoleAsync(user, model.Role);
 

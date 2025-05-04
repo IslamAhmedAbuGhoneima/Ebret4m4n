@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Ebret4m4n.Shared.CutomAttribute;
+using System.ComponentModel.DataAnnotations;
 
 namespace Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 
@@ -15,6 +15,7 @@ public record RegisterDto
 
     [Required(ErrorMessage = "من فضلك ادخل عنوان بريد الكتروني")]
     [EmailAddress(ErrorMessage = "من فضلك ادخل بريد الكنروني صحيح")]
+    [UniqueEmail]
     public string Email { get; init; } = null!;
 
     [Required(ErrorMessage = "من فضلك ادخل مرور")]

@@ -4,16 +4,17 @@ using Ebret4m4n.Shared.DTOs.HealthCareDtos;
 using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.SignalRDtos;
-using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.API.Hubs;
 using Mapster;
+
 
 
 
@@ -33,10 +34,10 @@ public class CityAdminController
     public IActionResult GetHealthCareInVillage([FromQuery] string? city)
     {
         string adminCity = string.Empty;
-        var adminRole = User.FindFirst("role")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
         if (adminRole == "admin" && city == null)
-            throw new BadRequestException("من فضلك ادخل اسم المدينه لتحميل الوحدات الصحيه الخاصه بها");
+            return  BadRequest(GeneralResponse<string>.FailureResponse("من فضلك ادخل اسم المدينه لتحميل الوحدات الصحيه الخاصه بها"));
 
         if (adminRole == "cityAdmin")
             adminCity = User.FindFirst("city")!.Value;
@@ -44,7 +45,7 @@ public class CityAdminController
         var targetCity = adminRole == "admin" ? city : adminCity;
 
         if (city is not null && adminCity != city && adminRole != "admin")
-            throw new BadRequestException("لا يمكنك عرض وحدات صحيه من مدينه اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكنك عرض وحدات صحيه من مدينه اخري"));
 
         var healthCareCenters = unitOfWork.HealthCareCenterRepo
             .FindByCondition(hc => hc.City == targetCity, false)
@@ -52,7 +53,7 @@ public class CityAdminController
             .ToList();
 
         if (healthCareCenters is null)
-            throw new BadRequestException("لم يتم اضافه اي وحدات صحيه بعد لهذا المركز");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم اضافه اي وحدات صحيه بعد لهذا المركز"));
 
         var response = GeneralResponse<List<HealthCaresListDto>>.SuccessResponse(healthCareCenters);
 
@@ -67,7 +68,7 @@ public class CityAdminController
             .FindAsync(hc => hc.HealthCareCenterId == id, false, ["Inventories"]);
 
         if (healthCareCenter is null)
-            throw new NotFoundBadRequest("لا توجد وحده صحيه بهذا الرقم");
+            return NotFound(GeneralResponse<string>.FailureResponse("لا توجد وحده صحيه بهذا الرقم"));
 
         var healthCareStaff =
             unitOfWork.StaffRepo.FindByCondition(staff => staff.HCCenterId == healthCareCenter.HealthCareCenterId, false, ["User"])
@@ -97,7 +98,7 @@ public class CityAdminController
     public async Task<IActionResult> AddMedicalPostion(AddMedicalStaffDto model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+            return UnprocessableEntity(GeneralResponse<object>.FailureResponse(ModelState));
 
         var adminId = User.FindFirst("id")!.Value;
 
@@ -105,14 +106,14 @@ public class CityAdminController
             await unitOfWork.HealthCareCenterRepo.FindAsync(hc => hc.HealthCareCenterId == model.HealthCareCenterId, false);
 
         if (healthCare is null)
-            throw new BadRequestException("لم يتم العثور علي هذه الوحده الصحيه");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم العثور علي هذه الوحده الصحيه"));
 
         var user = model.Adapt<ApplicationUser>();
 
         var result = await userManager.CreateAsync(user, model.Password);
 
         if (!result.Succeeded)
-            throw new BadRequestException("لم يتم انشاء هذا المستخدم");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم انشاء هذا المستخدم حاول مره اخري"));
 
         await userManager.AddToRoleAsync(user, model.StaffRole);
 
@@ -125,7 +126,7 @@ public class CityAdminController
         var dbResult = await unitOfWork.SaveAsync();
 
         if (dbResult == 0)
-            throw new BadRequestException("لم يتم حفظ الباينات اللرجاء المحاوله مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ الباينات اللرجاء المحاوله مره اخري"));
 
         var response = GeneralResponse<string>.SuccessResponse("تم اضافه هذا المستخدم بنجاح");
 
@@ -137,7 +138,7 @@ public class CityAdminController
     public async Task<IActionResult> AddHealthCareCenter(AddHealthCareDto model)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity( GeneralResponse<string>.FailureResponse("الرجاء التاكد ان جميع المدخلات صحيحه"));
+            return UnprocessableEntity(GeneralResponse<string>.FailureResponse("الرجاء التاكد ان جميع المدخلات صحيحه"));
 
         var adminId = User.FindFirst("id")!.Value;
 
@@ -149,7 +150,7 @@ public class CityAdminController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم حفظ الوحده الصحيه");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ الوحده الصحيه"));
 
         var response = GeneralResponse<string>.SuccessResponse("تم انشاء الوحده الصحيه بنجاح");
 
@@ -169,7 +170,7 @@ public class CityAdminController
             
 
         if (complaints is null)
-            throw new NotFoundBadRequest("لا توجد شكاوي مسجله");
+            return NotFound(GeneralResponse<string>.FailureResponse("لا توجد شكاوي مسجله"));
 
         var response = GeneralResponse<List<ComplaintsDto>>.SuccessResponse(complaints);
 
@@ -184,7 +185,7 @@ public class CityAdminController
             await unitOfWork.ComplaintRepo.FindAsync(c => c.Id == id, false, "User");
 
         if (complaint is null)
-            throw new NotFoundBadRequest("لا توجد شكاوي مسجله لهذا المستخدم");
+            return NotFound(GeneralResponse<string>.FailureResponse("لا توجد شكاوي مسجله لهذا المستخدم"));
 
         var healthCare = 
             await unitOfWork.HealthCareCenterRepo.FindAsync(hc => hc.HealthCareCenterId == complaint.User.HealthCareCenterId, false);
@@ -204,7 +205,7 @@ public class CityAdminController
             await unitOfWork.ComplaintRepo.FindAsync(C => C.Id == complaintId, false, "User");
 
         if (complaint is null)
-            throw new NotFoundException("هذه الشكوي غير موجوده او تم حذفها");
+            return NotFound(GeneralResponse<string>.FailureResponse("هذه الشكوي غير موجوده او تم حذفها"));
 
         var notification = Utility.CreateNotification("الشكاوي", "تم حل الشكوي الخاص بك الرجاء التوجه للوحد الصحيه لاستكمال", complaint.UserId);
 
@@ -217,7 +218,7 @@ public class CityAdminController
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0) 
-            throw new BadRequestException("لم يتم حفظ رساله التنبيه الرجاء المحاوله مره اخري");
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم حفظ رساله التنبيه الرجاء المحاوله مره اخري"));
 
         var notificationDto = notification.Adapt<NotificationDto>();
 

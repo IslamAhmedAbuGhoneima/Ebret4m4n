@@ -21,7 +21,7 @@ public class PaymentController
         var child = await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false, ["User"]);
 
         if (child is null)
-            throw new BadRequestException("لا يوجد طفل مسجل بهذا الرقم");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لا يوجد طفل مسجل بهذا الرقم"));
 
         var session = await Utility.CreateSessionPayment(parentId, child.User.Email!, childId, child.Name);
 

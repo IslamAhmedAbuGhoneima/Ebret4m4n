@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ebret4m4n.Entities\Ebret4m4n.Entities.csproj" />
+    <ProjectReference Include="..\Ebret4m4n.Repository\Ebret4m4n.Repository.csproj" />
   </ItemGroup>
 
 </Project>

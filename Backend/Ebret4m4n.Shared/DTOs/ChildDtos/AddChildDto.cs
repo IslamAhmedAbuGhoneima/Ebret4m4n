@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Ebret4m4n.Shared.CutomAttribute;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace Ebret4m4n.Shared.DTOs.ChildDtos;
@@ -6,7 +7,7 @@ namespace Ebret4m4n.Shared.DTOs.ChildDtos;
 public record AddChildDto
 {
     [Required(ErrorMessage = "يجب ادخال الرقم القومي للطفل")]
-    [MinLength(14, ErrorMessage = "يجب ان يكون الرقم القومي للطفل مكن من 14 رقم")]
+    [NationalId]
     public string Id { get; init; } = null!;
 
     [Required(ErrorMessage = "يجب ادخال اسم للطفل")]

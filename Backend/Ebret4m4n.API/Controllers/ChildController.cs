@@ -1,10 +1,8 @@
-﻿using Ebret4m4n.Entities.Exceptions;
-using Ebret4m4n.Entities.Models;
+﻿using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.API.Utilites;
@@ -23,10 +21,10 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         var child = await unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false, ["Vaccines", "Transaction"]);
 
         if (child is null)
-            throw new NotFoundBadRequest($"لا يوجد طفل مسجل بهذا الرقم : {id}");
+            return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد طفل مسجل بهذا الرقم : {id}"));
 
-        if(child.Transaction is null || !child.Transaction.Paid)
-            throw new BadRequestException("لم يتم دفع رسوم تسجيل الطفل");
+        if (child.Transaction is null || !child.Transaction.Paid)
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم دفع رسوم تسجيل الطفل"));
 
         var childDto = child.Adapt<ChildDto>();
 
@@ -40,12 +38,9 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     {
         var parentId = User.FindFirst("id")!.Value;
 
-        var children = 
-            await unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, false, ["Vaccines"]).ToListAsync();
-
-        if (children is null)
-            throw new NotFoundBadRequest("you don not have any child");
-
+        var children =
+            await unitOfWork.ChildRepo.FindByCondition(Child => Child.UserId == parentId, false, ["Vaccines"])
+            .ToListAsync() ?? [];
 
         var childrenDtos = children.Adapt<List<ChildrenDto>>();
 
@@ -61,14 +56,13 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
             return UnprocessableEntity(
                 GeneralResponse<object>.FailureResponse(ModelState));
 
+        var parentId = User.FindFirst("id")!.Value;
+
         var checkUniqNameIdentifier =
             await unitOfWork.ChildRepo.FindAsync(C => C.Id == dto.Id, false);
 
         if (checkUniqNameIdentifier != null)
-            throw new BadRequestException("من فضلك ادخل رقم الطفل القومي الصحيح");
-
-        var parentId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-
+            return BadRequest(GeneralResponse<string>.FailureResponse("من فضلك ادخل رقم الطفل القومي الصحيح"));
 
         var child = (dto,parentId).Adapt<Child>();
 
@@ -89,7 +83,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم حفظ الطفل الرجاء المحاوله مره اخري");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ الطفل الرجاء المحاوله مره اخري"));
 
         var response = GeneralResponse<string>.FailureResponse("تم اضافه الطفل بنجاح");
 
@@ -100,12 +94,12 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     public async Task<IActionResult> UpdateChild(string id, [FromBody] UpdateChildDto dto)
     {
         if (!ModelState.IsValid)
-            return UnprocessableEntity(ModelState);
+            return UnprocessableEntity(GeneralResponse<object>.FailureResponse(ModelState));
 
         var child = await unitOfWork.ChildRepo.FindAsync(e => e.Id == id, true);
 
         if (child is null)
-            throw new NotFoundBadRequest($"Child with {id} Not found"); 
+            return NotFound(GeneralResponse<string>.FailureResponse($"لايوجد طفل مسجل بهذا الرقم القومي : {id} ")); 
 
         dto.Adapt(child);
 
@@ -119,7 +113,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم تحديث بيانات هذا الطفل");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث بيانات هذا الطفل حاول مره اخري"));
 
         return NoContent();
     }
@@ -129,13 +123,13 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     {
         var child = await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false);
         if (child is null)
-            throw new BadRequestException("لم يتم ايجاد هذا الطفل");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم ايجاد هذا الطفل"));
 
         unitOfWork.ChildRepo.Remove(child);
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)
-            throw new BadRequestException("لم يتم حذف هذا الطفل");
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حذف هذا الطفل حاول مره اخري"));
 
         return NoContent();
     }
