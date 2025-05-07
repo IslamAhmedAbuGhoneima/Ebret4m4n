@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { Login } from '../../../core/models/login';
+import { Login } from '../../../core/interfaces/login';
 import { Observable, of, switchMap, tap } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
-import { ChangePassword } from '../../../core/models/changePassword';
+import { ChangePassword } from '../../../core/interfaces/changePassword';
+import { Register } from '../../../core/interfaces/register';
 
 @Injectable({
   providedIn: 'root',
@@ -158,5 +159,31 @@ export class AuthService {
       `${environment.apiUrl}/Authentication/reset-password`,
       model
     );
+  }
+
+  signUp(model: Register): Observable<any> {
+    return this.http
+      .post<any>(`${environment.apiUrl}/Authentication/register`, model)
+      .pipe(
+        tap((response) => {
+          const accessToken = response.data.accessToken;
+          const refreshToken = response.data.refreshToken;
+
+          if (accessToken) {
+            this.cookies.set(this.tokenKey, accessToken, {
+              path: '/',
+              sameSite: 'Lax',
+              secure: true,
+            });
+          }
+          if (refreshToken) {
+            this.cookies.set(this.refreshKey, refreshToken, {
+              path: '/',
+              sameSite: 'Lax',
+              secure: true,
+            });
+          }
+        })
+      );
   }
 }

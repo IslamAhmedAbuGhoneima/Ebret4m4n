@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AddAdmin } from '../../models/AddAdmin';
+import { AddAdmin } from '../../interfaces/AddAdmin';
 import { environment } from '../../../../environments/environment';
 
 @Injectable({

@@ -2,6 +2,9 @@ import { Component, OnInit, ViewEncapsulation, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { passwordMatch } from '../../../../core/customValidation/passwordMatch.validator';
+import { AuthService } from '../../services/auth.service';
+import { Register } from '../../../../core/interfaces/register';
+import { JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-register',
@@ -15,8 +18,13 @@ export class RegisterComponent implements OnInit {
   secondFormGroup!: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
+  errorMessage: any;
 
-  constructor(private fb: FormBuilder, private route: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private route: Router,
+    private _AuthService: AuthService
+  ) {}
 
   ngOnInit() {
     this.createForm();
@@ -57,34 +65,19 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  signUp() {
+  register() {
     if (this.secondFormGroup.valid) {
-      console.log('valid');
-      this.route.navigate(['/parent/home']); // this._apiService.signIn(this.formLogin.value).subscribe({
-
-      // let model: VMHttp = {
-      //   username: this.firstFormGroup.value['username'],
-      //   email: this.firstFormGroup.value['email'],
-      //   password: this.firstFormGroup.value['password'],
-      //   role: 'user',
-      // };
-      // this._apiService.createAccount(model).subscribe({
-      //   next: (response: any) => {
-      //     // Use translation keys for Toastr messages
-      //     this.toastr.success(
-      //       this.translate.instant('REGISTER.SUCCESS_MESSAGE'),
-      //       this.translate.instant('REGISTER.GREETING', {
-      //         username: model.username,
-      //       })
-      //     );
-      //     localStorage.setItem('user_token', response.token);
-      //     this.router.navigate(['/tasks']);
-      //   },
-      // });
-
-      this.route.navigate(['/parent/dashboard']);
+      const model: Register = this.formatData();
+      console.log(JSON.stringify(model));
+      this._AuthService.signUp(model).subscribe({
+        next: (res) => {
+          this.route.navigate(['/parent']);
+        },
+        error: (error) => {
+          this.errorMessage = error.error.message;
+        },
+      });
     } else {
-      console.log('InValid');
       this.secondFormGroup.setErrors({ mismatch: true });
       this.secondFormGroup.markAllAsTouched();
     }
@@ -126,5 +119,20 @@ export class RegisterComponent implements OnInit {
   }
   toggleConfirmPassword() {
     this.showConfirmPassword = !this.showConfirmPassword;
+  }
+  formatData(): Register {
+    return {
+      firstName: this.firstFormGroup.value.firstName,
+      lastName: this.firstFormGroup.value.secondName,
+      email: this.firstFormGroup.value.email,
+      password: this.firstFormGroup.value.password,
+      phoneNumber: this.firstFormGroup.value.phone,
+
+      governorate: this.secondFormGroup.value.city,
+      city: this.secondFormGroup.value.town,
+      village: this.secondFormGroup.value.healthUnit,
+      role: 'parent',
+      healthCareCenterId: 'F51D0B28-172B-4591-97E0-9E0D203CD3CA',
+    };
   }
 }
