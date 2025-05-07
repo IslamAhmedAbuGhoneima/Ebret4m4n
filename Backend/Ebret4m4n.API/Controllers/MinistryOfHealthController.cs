@@ -1,12 +1,13 @@
-﻿using Ebret4m4n.Shared.DTOs.AdminsDto.GovernorateAdminDtos;
+﻿using Ebret4m4n.Shared.DTOs.AdminsDto.MinistryOfHealthAdminDtos;
+using Ebret4m4n.Shared.DTOs.AdminsDto.GovernorateAdminDtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.Shared.DTOs;
 using Microsoft.AspNetCore.Identity;
 using Ebret4m4n.Entities.Models;
-using Ebret4m4n.Entities.Exceptions;
 using Ebret4m4n.Contracts;
 using Mapster;
+
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -34,7 +35,7 @@ public class MinistryOfHealthController
     public async Task<IActionResult> GovernorateDetails([FromQuery] string governorateName)
     {
         var governorate =
-            await unitOfWork.GovernorateAdminRepo.FindAsync(gov => gov.Governorate == governorateName, false, ["User", "MainInventories", "CityAdminStaffs"]);
+            await unitOfWork.GovernorateAdminRepo.FindAsync(gov => gov.Governorate == governorateName, false, ["User", "MainInventories", "CityAdminStaffs.HealthCareCenters"]);
 
         var governorateDetails = governorate.Adapt<GovernorateDetailsDto>();
 
@@ -42,6 +43,23 @@ public class MinistryOfHealthController
 
         return Ok(response);
     }
+
+    [HttpGet("{cityAdminId}/cities-healthcares-datails")]
+    public async Task<IActionResult> GetCityHealthCareDetails([FromRoute] string cityAdminId)
+    {
+        var healthcaresCityAdmins =
+            await unitOfWork.CityAdminStaffRepo.FindAsync(c => c.UserId == cityAdminId, false, ["MainInventories", "User", "HealthCareCenters"]);
+            
+        if(healthcaresCityAdmins is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد ادمن لهذه المدينه"));
+
+        var healthcaresCityAdminsDto = healthcaresCityAdmins.Adapt<HealthCaresCityDto>();
+
+        var response = GeneralResponse<HealthCaresCityDto>.SuccessResponse(healthcaresCityAdminsDto);
+
+        return Ok(response);   
+    }
+
 
     [HttpPost("add-governorate-admin")]
     public async Task<IActionResult> AddGovernorateAdmin([FromBody] AddGovernorateAdminDto model)
