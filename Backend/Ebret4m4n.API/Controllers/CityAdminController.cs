@@ -49,7 +49,7 @@ public class CityAdminController
 
         var healthCareCenters = unitOfWork.HealthCareCenterRepo
             .FindByCondition(hc => hc.City == targetCity, false)
-            .Select(hc => new HealthCaresListDto(hc.HealthCareCenterId, hc.HealthCareCenterName))
+            .Select(hc => hc.Adapt<HealthCaresListDto>())
             .ToList();
 
         if (healthCareCenters is null)

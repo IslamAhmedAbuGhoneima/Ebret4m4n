@@ -13,6 +13,8 @@ using Ebret4m4n.Shared.DTOs.ChatDtos;
 using Ebret4m4n.Entities.Models;
 using Stripe.Checkout;
 using Mapster;
+using Ebret4m4n.Shared.DTOs.AdminsDto.MinistryOfHealthAdminDtos;
+using Ebret4m4n.Shared.DTOs.InventoriesDtos;
 
 
 
@@ -125,8 +127,9 @@ public static class MapsterConfig
 
 
         TypeAdapterConfig<GovernorateAdminStaff, GovernorateDetailsDto>.NewConfig()
-            .Map(dest => dest.Cities, src => src.CityAdminStaffs.Select(city => city.City))
+            .Map(dest => dest.Cities, src => src.CityAdminStaffs.Select(city => city.Adapt<CitiesDto>()).ToList())
             .Map(dest => dest.CityCounts, src => src.CityAdminStaffs.Count)
+            .Map(dest => dest.HealthCareCount, src => src.CityAdminStaffs.Sum(city => city.HealthCareCenters.Count))
             .Map(dest => dest, src => src.User);
 
         TypeAdapterConfig<HealthCareCenter, HealthCareDetailsDto>.NewConfig()
@@ -144,5 +147,11 @@ public static class MapsterConfig
             .Map(dest => dest.ChildId, src => src.childId)
             .Map(dest => dest.ParentId, src => src.parentId)
             .Map(dest => dest.SessionId, src => src.session.Id);
+
+        TypeAdapterConfig<CityAdminStaff, HealthCaresCityDto>.NewConfig()
+            .Map(dest => dest.HealthCaresList, src => src.HealthCareCenters.Adapt<List<HealthCaresListDto>>())
+            .Map(dest => dest.CityRecordDetails.healthCareCount, src => src.HealthCareCenters.Count)
+            .Map(dest => dest.CityRecordDetails, src => src.User.Adapt<CityRecordDetailsDto>())
+            .Map(dest => dest.CityRecordDetails.MainInventories, src => src.MainInventories.Adapt<List<InventoryDto>>());
     }
 }

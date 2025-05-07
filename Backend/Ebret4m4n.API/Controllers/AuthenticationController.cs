@@ -44,7 +44,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         var result = await userManager.CreateAsync(user, model.Password);
 
         if (!result.Succeeded)
-            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم انشاء مستخدم الرجاء التاكد من ان البيانات صحيحه"));
+            return BadRequest(GeneralResponse<List<string>>.FailureResponse(["لم يتم انشاء مستخدم الرجاء التاكد من ان البيانات صحيحه","يجب ان تتكون كلمه المرور علي الاقل من حرف من 8 ارقام وحروف انجليزيه صغيره وكبيره"]));
         
 
         await userManager.AddToRoleAsync(user, model.Role);
@@ -150,7 +150,8 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
             return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد مستخدم بهذا الرقم : {_user.Id}"));
 
 
-        string decodedToken = WebUtility.UrlDecode(model.Token);
+        string decodedToken = model.Token;
+
         string newPassword = model.NewPassword;
 
         var result = await userManager.ResetPasswordAsync(_user, decodedToken, newPassword);
