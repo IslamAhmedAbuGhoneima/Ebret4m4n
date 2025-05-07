@@ -27,13 +27,4 @@ export class HealthMinistryService {
   getStatisticsOfAdmin() {
     return this.http.get<any>(`${environment.apiUrl}/Statistics/admin`);
   }
-
-
-
-
-
-
-
-
-  
 }

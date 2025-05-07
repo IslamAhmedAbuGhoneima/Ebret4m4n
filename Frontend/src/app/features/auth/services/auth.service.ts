@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Login } from '../../../core/models/login';
-import { Observable, Subject, tap } from 'rxjs';
+import { Observable, of, switchMap, tap } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
@@ -12,8 +12,8 @@ import { ChangePassword } from '../../../core/models/changePassword';
   providedIn: 'root',
 })
 export class AuthService {
-  user = new Subject();
   private tokenKey = 'auth_token';
+  private refreshKey = 'refresh_token';
 
   constructor(
     private http: HttpClient,
@@ -26,58 +26,124 @@ export class AuthService {
       .post<any>(`${environment.apiUrl}/Authentication/login`, model)
       .pipe(
         tap((response) => {
-          const token = response.data.accessToken;
-          if (token) {
-            // تخزين التوكن فقط داخل الكوكي
-            this.cookies.set(this.tokenKey, token);
+          const accessToken = response.data.accessToken;
+          const refreshToken = response.data.refreshToken;
+
+          if (accessToken) {
+            this.cookies.set(this.tokenKey, accessToken, {
+              path: '/',
+              sameSite: 'Lax',
+              secure: true,
+            });
+          }
+          if (refreshToken) {
+            this.cookies.set(this.refreshKey, refreshToken, {
+              path: '/',
+              sameSite: 'Lax',
+              secure: true,
+            });
           }
         })
       );
   }
 
-  getRole(): string | null {
+  logout(): void {
+    this.cookies.delete(this.tokenKey, '/');
+    this.cookies.delete(this.refreshKey, '/');
+    this.router.navigate(['/auth/login']);
+  }
+
+  getToken(): string | null {
+    return this.cookies.get(this.tokenKey);
+  }
+
+  isLoggedIn(): boolean {
+    const accessToken = this.cookies.get(this.tokenKey);
+    const refreshToken = this.cookies.get('refresh_token');
+
+    // لو فيه refresh token نعتبر المستخدم لسه ممكن يجدد الدخول
+    return !!accessToken || !!refreshToken;
+  }
+
+  isTokenExpired(): boolean {
     const token = this.cookies.get(this.tokenKey);
+    if (!token) return true;
+
+    try {
+      const decoded: any = jwtDecode(token);
+      const exp = decoded.exp;
+      const now = Math.floor(Date.now() / 1000);
+
+      // هامش أمان 60 ثانية
+      return exp < now + 60;
+    } catch {
+      return true;
+    }
+  }
+
+  refreshToken(): Observable<string> {
+    const accessToken = this.getToken();
+    const refreshToken = this.cookies.get(this.refreshKey);
+
+    if (!accessToken || !refreshToken) {
+      this.logout();
+      return of('');
+    }
+
+    const body = {
+      accessToken,
+      refreshToken,
+    };
+
+    return this.http
+      .post<any>(`${environment.apiUrl}/Authentication/refresh`, body)
+      .pipe(
+        tap((response) => {
+          const newAccessToken = response.accessToken;
+          const newRefreshToken = response.refreshToken;
+
+          if (newAccessToken) {
+            this.cookies.set(this.tokenKey, newAccessToken);
+          }
+          if (newRefreshToken) {
+            this.cookies.set(this.refreshKey, newRefreshToken);
+          }
+        }),
+        switchMap((response) => of(response.accessToken))
+      );
+  }
+
+  getRole(): string | null {
+    const token = this.getToken();
     if (!token) return null;
     try {
       const decoded: any = jwtDecode(token);
       return decoded.role || null;
-    } catch (e) {
+    } catch {
       return null;
     }
   }
 
   getUserEmail(): string | null {
-    const token = this.cookies.get(this.tokenKey);
+    const token = this.getToken();
     if (!token) return null;
     try {
       const decoded: any = jwtDecode(token);
       return decoded.email || null;
-    } catch (e) {
+    } catch {
       return null;
     }
   }
 
   getUserName(): string | null {
-    const token = this.cookies.get(this.tokenKey);
+    const token = this.getToken();
     if (!token) return null;
     try {
       const decoded: any = jwtDecode(token);
       return decoded.name || null;
-    } catch (e) {
+    } catch {
       return null;
     }
-  }
-
-  logout(): void {
-    this.cookies.delete(this.tokenKey, '/');
-
-    this.router.navigate(['/home']).then(() => {
-      window.location.reload();
-    });
-  }
-
-  isLoggedIn(): boolean {
-    return !!this.cookies.get(this.tokenKey);
   }
 
   forgetPassword(model: { email: string }) {
