@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { AddAdmin } from '../../../core/models/AddAdmin';
+import { AddAdmin } from '../../../core/interfaces/AddAdmin';
 
 @Injectable({
   providedIn: 'root',

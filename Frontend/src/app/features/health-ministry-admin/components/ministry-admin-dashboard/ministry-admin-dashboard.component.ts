@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { HealthMinistryService } from '../../services/health-ministry.service';
-import { StatisticsAdmin } from '../../../../core/models/statisticsAdmin';
+import { StatisticsAdmin } from '../../../../core/interfaces/statisticsAdmin';
 
 @Component({
   selector: 'app-ministry-admin-dashboard',

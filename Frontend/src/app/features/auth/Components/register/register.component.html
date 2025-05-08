@@ -355,7 +355,7 @@
                 حدد موقعك وإختر الوحدة الصحية المناسبة لك
               </p>
             </div>
-            <form (ngSubmit)="signUp()" [formGroup]="secondFormGroup">
+            <form (ngSubmit)="register()" [formGroup]="secondFormGroup">
               <div class="flex flex-row-reverse gap-5 mb-6">
                 <div class="flex-1">
                   <div class="relative">
@@ -483,6 +483,12 @@
                       يجب إختيار جنس الطفل.
                     </small>
                   </div>
+                </div>
+                <div
+                  class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                  *ngIf="errorMessage"
+                >
+                  <small> {{ errorMessage }} </small>
                 </div>
               </div>
 

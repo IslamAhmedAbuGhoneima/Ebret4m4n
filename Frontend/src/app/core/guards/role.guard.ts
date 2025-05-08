@@ -8,40 +8,21 @@ export const roleGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
-  const accessToken = authService.getToken();
-
-  if (!accessToken) {
-    // نحاول نعمل refresh قبل ما نرميه للّوج إن
-    try {
-      await authService.refreshToken().toPromise();
-    } catch (e) {
-      router.navigate(['/auth/login']);
-      return false;
-    }
-  } else if (authService.isTokenExpired()) {
-    try {
-      await authService.refreshToken().toPromise();
-    } catch (e) {
-      router.navigate(['/auth/login']);
-      return false;
-    }
-  }
-
-  const updatedToken = authService.getToken();
-  if (!updatedToken) {
+  const token = authService.getToken();
+  if (!token || authService.isTokenExpired()) {
     router.navigate(['/auth/login']);
     return false;
   }
 
   try {
-    const decoded: any = jwtDecode(updatedToken);
+    const decoded: any = jwtDecode(token);
     const userRole = decoded?.role || null;
     const expectedRole = route.data['role'];
     const expectedRoles = route.data['roles'];
 
     if (expectedRoles?.includes(userRole)) return true;
     if (expectedRole && userRole === expectedRole) return true;
-  } catch (error) {
+  } catch {
     router.navigate(['/auth/login']);
     return false;
   }

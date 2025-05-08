@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Order } from '../../../../core/models/order';
+import { Order } from '../../../../core/interfaces/order';
 import { CommonModule } from '@angular/common';
 
 @Component({

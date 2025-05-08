@@ -9,7 +9,7 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { passwordMatch } from '../../../../core/customValidation/passwordMatch.validator';
 import { AuthService } from '../../../../features/auth/services/auth.service';
-import { AddAdmin } from '../../../../core/models/AddAdmin';
+import { AddAdmin } from '../../../../core/interfaces/AddAdmin';
 import { BaseApiService } from '../../../../core/services/APIs/base-api.service';
 
 @Component({
@@ -90,14 +90,9 @@ export class AddAdministratorComponent implements OnInit {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
   getService(model: AddAdmin) {
-    
     if (this.role === 'admin') {
       this._BaseApiService.addAdmin(model).subscribe({
-        next: (res) => {
-
-
-
-        },
+        next: (res) => {},
         error: (err) => {
           this.errorMessage = err.error.Message;
         },
