@@ -28,5 +28,5 @@ public record AddChildDto
 
     public List<IFormFile>? ReportFiles { get; init; }
 
-    public List<string>? Vaccines { get; init; }
+    public List<string>? TakedVaccines { get; init; }
 }

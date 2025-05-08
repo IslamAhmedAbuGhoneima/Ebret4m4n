@@ -1,12 +1,14 @@
 ﻿using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs.ChildDtos;
 using Microsoft.AspNetCore.Authorization;
+using Ebret4m4n.API.ChildBaseVaccines;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.API.Utilites;
 using Mapster;
+
 
 namespace Ebret4m4n.API.Controllers;
 
@@ -15,6 +17,24 @@ namespace Ebret4m4n.API.Controllers;
 [ApiController]
 public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 {
+
+    [AllowAnonymous]
+    [HttpGet("child-vaccines")]
+    public IActionResult GetChildVaccines()
+    {
+        try
+        {
+            var vaccines = Utility.ReadBaseVaccineFromJson();
+            var response = GeneralResponse<List<BaseVaccine>>.SuccessResponse(vaccines);
+            return Ok(response);
+        }
+        catch(Exception ex)
+        {
+            return BadRequest(GeneralResponse<string>.FailureResponse(ex.Message));
+        }
+        
+    }
+
     [HttpGet("{id}/child")]
     public async Task<IActionResult> GetChild(string id)
     {
@@ -56,6 +76,9 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
             return UnprocessableEntity(
                 GeneralResponse<object>.FailureResponse(ModelState));
 
+        if (dto.BirthDate > DateTime.Now)
+            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكن اختيار هذا التاريخ اكبر من التارخ الحالي"));
+
         var parentId = User.FindFirst("id")!.Value;
 
         var checkUniqNameIdentifier =
@@ -68,7 +91,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         if(dto.ReportFiles == null && dto.PatientHistory == null)
         {
-            var vaccines = Utility.ChildVaccines(dto.Vaccines, child.Id);
+            var vaccines = Utility.ChildVaccines(dto.TakedVaccines, child.Id);
             await unitOfWork.VaccineRepo.AddRangeAsync(vaccines);
         }
 
@@ -85,7 +108,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         if (result == 0)
             return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ الطفل الرجاء المحاوله مره اخري"));
 
-        var response = GeneralResponse<string>.FailureResponse("تم اضافه الطفل بنجاح");
+        var response = GeneralResponse<string>.SuccessResponse("تم اضافه الطفل بنجاح");
 
         return Ok(response);
     }
