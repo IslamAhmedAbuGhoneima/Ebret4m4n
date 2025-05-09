@@ -8,6 +8,7 @@ using Ebret4m4n.Contracts;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.API.Utilites;
 using Mapster;
+using System.Threading.Tasks;
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -129,7 +130,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     }
 
     [HttpPut("{id}/child-update")]
-    public async Task<IActionResult> UpdateChild(string id, [FromBody] UpdateChildDto dto)
+    public async Task<IActionResult> UpdateChild(string id, [FromForm] UpdateChildDto dto)
     {
         if (!ModelState.IsValid)
             return UnprocessableEntity(GeneralResponse<object>.FailureResponse(ModelState));
@@ -168,6 +169,30 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 
         if (result == 0)
             return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حذف هذا الطفل حاول مره اخري"));
+
+        return NoContent();
+    }
+
+    [HttpDelete("delete-file")]
+    public async Task<IActionResult> RemoveReportFile([FromBody] RemoveFileDto model)
+    {
+        var file = await unitOfWork.HealthyReportRepo.FindAsync(file => file.FilePath == model.Path, true);
+
+        if (file is null)
+        return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم ايجاد هذا الملف"));
+
+        string relativePath = model.Path.TrimStart('/');
+        string filePath = Path.Combine(Directory.GetCurrentDirectory(), relativePath);
+
+        if (System.IO.File.Exists(filePath)) 
+            System.IO.File.Delete(filePath);
+
+        unitOfWork.HealthyReportRepo.Remove(file);
+
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حذف هذا الملف حاول مره اخري"));
 
         return NoContent();
     }
