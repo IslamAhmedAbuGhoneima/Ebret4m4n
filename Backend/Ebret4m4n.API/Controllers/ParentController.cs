@@ -1,6 +1,9 @@
-﻿using Ebret4m4n.Shared.DTOs.ComplaintDtos;
+﻿using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
+using Ebret4m4n.Shared.DTOs.HealthCareDtos;
+using Ebret4m4n.Shared.DTOs.ComplaintDtos;
 using Microsoft.AspNetCore.Authorization;
 using Ebret4m4n.Shared.DTOs.ParentDtos;
+using Ebret4m4n.Shared.DTOs.ChildDtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Ebret4m4n.Entities.Models;
@@ -8,6 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Mapster;
+
+
 
 
 namespace Ebret4m4n.API.Controllers;
@@ -18,6 +23,25 @@ namespace Ebret4m4n.API.Controllers;
 public class ParentController
     (IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager) : ControllerBase
 {
+
+    [HttpGet("healthcare-details")]
+    public async Task<IActionResult> HealthCareDetails()
+    {
+        var parentId = User.FindFirst("id")!.Value;
+
+        var user = await userManager.Users
+            .Include(U => U.HealthCareCenter)
+            .FirstOrDefaultAsync(U => U.Id == parentId);
+
+        if (user?.HealthCareCenter is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("هذا المستخدم لا ينتمي الي اي وحده صحيه"));
+
+        var healthCareDetailsDto = user.HealthCareCenter.Adapt<HealthCareDetailsDto>();
+
+        var response = GeneralResponse<HealthCareDetailsDto>.SuccessResponse(healthCareDetailsDto);
+
+        return Ok(response);
+    }
 
     [HttpGet("children-reservations")]
     public IActionResult ParentReservations()
@@ -159,6 +183,32 @@ public class ParentController
             return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم ارسال الشكوي الخاص بك الرجاء المحاوله مره اخري"));
 
         var response = GeneralResponse<string>.SuccessResponse("شكرا لتعونك معنا سيتم حل الشكوي الخاص بك في اقرب وقت");
+
+        return Ok(response);
+    }
+
+    [HttpGet("{id:guid}/user-profile")]
+    public async Task<IActionResult> UserProfile(Guid id)
+    {
+        string userId = id.ToString();
+        ApplicationUser? _user = await userManager.Users
+            .Include(U => U.Children.Where(C => C.UserId == userId))
+            .FirstOrDefaultAsync(U => U.Id == userId);
+
+        if (_user is null)
+            return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد مستخدم بهذا الرقم : {_user.Id}"));
+
+
+        var userChildren = new List<ChildDto>();
+        foreach (var child in _user.Children)
+        {
+            var childDto = child.Adapt<ChildDto>();
+            userChildren.Add(childDto);
+        }
+
+        var userDto = _user.Adapt<UserDataDto>();
+
+        var response = GeneralResponse<UserDataDto>.SuccessResponse(userDto);
 
         return Ok(response);
     }

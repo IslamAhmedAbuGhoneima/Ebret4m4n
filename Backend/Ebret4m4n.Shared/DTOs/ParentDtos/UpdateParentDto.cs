@@ -13,7 +13,8 @@ public record UpdateParentDto(
     [MinLength(11, ErrorMessage = "من فضلك ادخل رقم هاتف مكون من 11 رقم")]
     string PhoneNumber,
     [Required(ErrorMessage = "من فضلك ادخل المحافظه التابع لها")]
-    string Governorate, 
+    string Governorate,
+    [Required(ErrorMessage = "من فضلك ادخل المركز التابع له")]
     string City, 
     string? Village,
     [Required(ErrorMessage = "يجب اختيار وحده صحيه يتبع لها المستخدم لاكمال التحديث")]

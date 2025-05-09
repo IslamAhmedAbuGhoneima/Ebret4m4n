@@ -1,7 +1,9 @@
-﻿using Ebret4m4n.Shared.DTOs.AdminsDto.GovernorateAdminDtos;
+﻿using Ebret4m4n.Shared.DTOs.AdminsDto.MinistryOfHealthAdminDtos;
+using Ebret4m4n.Shared.DTOs.AdminsDto.GovernorateAdminDtos;
 using Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
 using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 using Ebret4m4n.Shared.DTOs.MedicalStaffDtos;
+using Ebret4m4n.Shared.DTOs.InventoriesDtos;
 using Ebret4m4n.Shared.DTOs.AppointmentDtos;
 using Ebret4m4n.Shared.DTOs.HealthCareDtos;
 using Ebret4m4n.Shared.DTOs.ComplaintDtos;
@@ -13,9 +15,6 @@ using Ebret4m4n.Shared.DTOs.ChatDtos;
 using Ebret4m4n.Entities.Models;
 using Stripe.Checkout;
 using Mapster;
-using Ebret4m4n.Shared.DTOs.AdminsDto.MinistryOfHealthAdminDtos;
-using Ebret4m4n.Shared.DTOs.InventoriesDtos;
-
 
 
 namespace Ebret4m4n.API.Mapping;
@@ -44,6 +43,9 @@ public static class MapsterConfig
             .Map(dest => dest.UserId, src => src.parentId);
 
         TypeAdapterConfig<Child, ChildDto>.NewConfig()
+        .Map(dest => dest.FilePath, src => src.HealthReportFiles.Select(f => f.FilePath).ToList());
+
+        TypeAdapterConfig<Child, ChildDataDto>.NewConfig()
         .Map(dest => dest.FilePath, src => src.HealthReportFiles.Select(f => f.FilePath).ToList());
 
         TypeAdapterConfig<BaseVaccine, Vaccine>.NewConfig()

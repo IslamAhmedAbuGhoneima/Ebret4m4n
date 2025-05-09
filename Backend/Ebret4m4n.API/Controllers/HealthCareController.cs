@@ -50,24 +50,4 @@ public class HealthCareController(IUnitOfWork unitOfWork,
         return Ok(response);
 
     }
-
-    [HttpGet("healthcare-details")]
-    [Authorize(Roles = "parent")]
-    public async Task<IActionResult> HealthCareDetails()
-    {
-        var parentId = User.FindFirst("id")!.Value;
-
-        var user = await userManager.Users
-            .Include(U => U.HealthCareCenter)
-            .FirstOrDefaultAsync(U => U.Id == parentId);
-
-        if (user?.HealthCareCenter is null)
-            return NotFound(GeneralResponse<string>.FailureResponse("هذا المستخدم لا ينتمي الي اي وحده صحيه"));
-
-        var healthCareDetailsDto = user.HealthCareCenter.Adapt<HealthCareDetailsDto>();
-
-        var response = GeneralResponse<HealthCareDetailsDto>.SuccessResponse(healthCareDetailsDto);
-
-        return Ok(response);
-    }
 }

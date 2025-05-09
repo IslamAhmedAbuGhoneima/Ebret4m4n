@@ -19,7 +19,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
 {
 
     [AllowAnonymous]
-    [HttpGet("child-vaccines")]
+    [HttpGet("child-base-vaccines")]
     public IActionResult GetChildVaccines()
     {
         try
@@ -49,6 +49,21 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         var childDto = child.Adapt<ChildDto>();
 
         var response = GeneralResponse<ChildDto>.SuccessResponse(childDto);
+
+        return Ok(response);
+    }
+
+    [HttpGet("{id}/child-data")]
+    public async Task<IActionResult> ChildData(string id)
+    {
+        var child = await unitOfWork.ChildRepo.FindAsync(child => child.Id == id, false, ["HealthReportFiles"]);
+
+        if (child is null)
+            return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد طفل مسجل بهذا الرقم : {id}"));
+
+        var childDto = child.Adapt<ChildDataDto>();
+
+        var response = GeneralResponse<ChildDataDto>.SuccessResponse(childDto);
 
         return Ok(response);
     }

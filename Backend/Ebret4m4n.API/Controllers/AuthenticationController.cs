@@ -219,32 +219,6 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         return Ok(response);
     }
 
-    [HttpGet("{id:guid}/user-profile")]
-    public async Task<IActionResult> UserProfile(Guid id)
-    {
-        string userId = id.ToString();
-        _user = await userManager.Users
-            .Include(U => U.Children.Where(C => C.UserId == userId))
-            .FirstOrDefaultAsync(U => U.Id == userId);
-
-        if (_user is null)
-            return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد مستخدم بهذا الرقم : {_user.Id}"));
-
-
-        var userChildren = new List<ChildDto>();
-        foreach(var child in _user.Children)
-        {
-            var childDto = child.Adapt<ChildDto>();
-            userChildren.Add(childDto);
-        }
-
-        var userDto = _user.Adapt<UserDataDto>();
-
-        var response = GeneralResponse<UserDataDto>.SuccessResponse(userDto);
-
-        return Ok(response);
-    }
-
     #region Private actions
 
     private async Task<TokenDto> GenerateToken(bool populateExp)
