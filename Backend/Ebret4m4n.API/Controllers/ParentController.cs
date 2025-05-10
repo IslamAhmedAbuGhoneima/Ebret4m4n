@@ -228,10 +228,10 @@ public class ParentController
 
         if(!healthCareCenter)
             return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد وحده صحيه بهذا الرقم"));
-        
-        var Updatedparent = model.Adapt<ApplicationUser>();
 
-        var result = await userManager.UpdateAsync(Updatedparent);
+        model.Adapt(parent);
+
+        var result = await userManager.UpdateAsync(parent);
 
         if(!result.Succeeded)
             return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث بياناتك الرجاء التاكد من ادخال بيانات صحيحه"));

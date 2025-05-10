@@ -36,7 +36,6 @@ public static class MapsterConfig
         TypeAdapterConfig<AddGovernorateAdminDto, ApplicationUser>.NewConfig()
             .Map(dest => dest.UserName, src => src.Email);
 
-
         TypeAdapterConfig<(AddChildDto childDtod, string parentId), Child>
             .NewConfig()
             .Map(dest => dest, src => src.childDtod)

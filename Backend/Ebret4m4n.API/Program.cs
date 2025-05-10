@@ -1,10 +1,12 @@
 using Ebret4m4n.Repository.Configuration.DataSeed;
+using Microsoft.Extensions.FileProviders;
 using Ebret4m4n.API.BackgroundService;
 using Ebret4m4n.API.Extenstions;
 using Ebret4m4n.API.Mapping;
 using Ebret4m4n.API.Hubs;
 using Hangfire;
 using Stripe;
+
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +61,13 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "Files")),
+    RequestPath = "/Files"
+});
 
 app.UseCors("CorsPolicy");
 
