@@ -53,7 +53,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
 
         var response = GeneralResponse<UserDataDto>.SuccessResponse(userDto);
 
-        return CreatedAtAction("UserProfile", new { id = user.Id }, response);
+        return Ok(response);
     }
 
     [HttpPost("login")]

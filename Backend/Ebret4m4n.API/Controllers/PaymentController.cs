@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Shared.DTOs;

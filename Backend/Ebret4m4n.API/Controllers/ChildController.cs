@@ -91,7 +91,7 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
             return UnprocessableEntity(
                 GeneralResponse<object>.FailureResponse(ModelState));
 
-        if (dto.BirthDate > DateTime.Now)
+        if (dto.BirthDate > DateTime.UtcNow)
             return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكن اختيار هذا التاريخ اكبر من التارخ الحالي"));
 
         var parentId = User.FindFirst("id")!.Value;
