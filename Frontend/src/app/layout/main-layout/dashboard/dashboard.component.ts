@@ -15,6 +15,7 @@ export class DashboardComponent implements OnInit {
   role: string | null = null;
   email: string | null = null;
   userName: string | null = null;
+  userId:any
 
   constructor(private authService: AuthService) {}
 
@@ -22,6 +23,7 @@ export class DashboardComponent implements OnInit {
     this.role = this.authService.getRole();
     this.email = this.authService.getUserEmail();
     this.userName = this.authService.getUserName();
+    this.userId = this.authService.getUserId();
   }
 
   hasRole(allowedRoles: string[]): boolean {

@@ -215,7 +215,7 @@
 
     <!-- admin name -->
     <a
-      routerLink="/parent/dashboard/profile"
+      [routerLink]="['/parent/dashboard/user-profile', userId]"
       matTooltipClass="logout-tooltip-style"
       matTooltip="ملفي الشخصي"
       class="flex items-center gap-4"

@@ -3,121 +3,38 @@
     <h3 class="text-[28px] font-semibold text-[#51419]">أطفالى</h3>
     <div class="mt-16 max-w-[850px] mx-auto">
       <ul class="space-y-4">
+        @if(data){ @for (item of data; track $index) {
         <li
           class="bg-white rounded-t-md flex justify-between items-center px-6 py-[11px]"
         >
-          <h6 class="text-lg font-semibold text-[#151419]">إسم الطفل</h6>
-          <div class="flex gap-2">
-            <a
-              routerLink="/parent/my-children/child-vaccine-schedule"
+          <h6 class="text-lg font-semibold text-[#151419]">
+            {{ item.name }}
+          </h6>
+          <div class="flex items-center gap-2">
+            <button
+              (click)="onNavigateToVaccineSchedule(item.name, item.id)"
               matTooltip="جدول تطعيمات الطفل"
               matTooltipClass="my-children-home-page-tooltip-style"
               matTooltipPosition="above"
             >
               <img src="/icons/mdi_table-clock.svg" alt="" />
-            </a>
+            </button>
+
             <a
-              routerLink="/parent/my-children/child-edit-profile"
+              [routerLink]="['/parent/my-children/child-edit-profile', item.id]"
               matTooltip="تعديل الملف الشخصي للطفل"
               matTooltipClass="my-children-home-page-tooltip-style"
               matTooltipPosition="above"
             >
               <img src="/icons/edit.svg" alt="" />
             </a>
+
+            <button (click)="deleteChild(item.id)">
+              <img src="/icons/delete.svg" alt="" />
+            </button>
           </div>
         </li>
-        <li
-          class="bg-white rounded-t-md flex justify-between items-center px-6 py-[11px]"
-        >
-          <h6 class="text-lg font-semibold text-[#151419]">إسم الطفل</h6>
-          <div class="flex gap-2">
-            <a
-              routerLink="/parent/my-children/child-vaccine-schedule"
-              matTooltip="جدول تطعيمات الطفل"
-              matTooltipClass="my-children-home-page-tooltip-style"
-              matTooltipPosition="above"
-            >
-              <img src="/icons/mdi_table-clock.svg" alt="" />
-            </a>
-            <a
-              routerLink="/parent/my-children/child-edit-profile"
-              matTooltip="تعديل الملف الشخصي للطفل"
-              matTooltipClass="my-children-home-page-tooltip-style"
-              matTooltipPosition="above"
-            >
-              <img src="/icons/edit.svg" alt="" />
-            </a>
-          </div>
-        </li>
-        <li
-          class="bg-white rounded-t-md flex justify-between items-center px-6 py-[11px]"
-        >
-          <h6 class="text-lg font-semibold text-[#151419]">إسم الطفل</h6>
-          <div class="flex gap-2">
-            <a
-              routerLink="/parent/my-children/child-vaccine-schedule"
-              matTooltip="جدول تطعيمات الطفل"
-              matTooltipClass="my-children-home-page-tooltip-style"
-              matTooltipPosition="above"
-            >
-              <img src="/icons/mdi_table-clock.svg" alt="" />
-            </a>
-            <a
-              routerLink="/parent/my-children/child-edit-profile"
-              matTooltip="تعديل الملف الشخصي للطفل"
-              matTooltipClass="my-children-home-page-tooltip-style"
-              matTooltipPosition="above"
-            >
-              <img src="/icons/edit.svg" alt="" />
-            </a>
-          </div>
-        </li>
-        <li
-          class="bg-white rounded-t-md flex justify-between items-center px-6 py-[11px]"
-        >
-          <h6 class="text-lg font-semibold text-[#151419]">إسم الطفل</h6>
-          <div class="flex gap-2">
-            <a
-              routerLink="/parent/my-children/child-vaccine-schedule"
-              matTooltip="جدول تطعيمات الطفل"
-              matTooltipClass="my-children-home-page-tooltip-style"
-              matTooltipPosition="above"
-            >
-              <img src="/icons/mdi_table-clock.svg" alt="" />
-            </a>
-            <a
-              routerLink="/parent/my-children/child-edit-profile"
-              matTooltip="تعديل الملف الشخصي للطفل"
-              matTooltipClass="my-children-home-page-tooltip-style"
-              matTooltipPosition="above"
-            >
-              <img src="/icons/edit.svg" alt="" />
-            </a>
-          </div>
-        </li>
-        <li
-          class="bg-white rounded-t-md flex justify-between items-center px-6 py-[11px]"
-        >
-          <h6 class="text-lg font-semibold text-[#151419]">إسم الطفل</h6>
-          <div class="flex gap-2">
-            <a
-              routerLink="/parent/my-children/child-vaccine-schedule"
-              matTooltip="جدول تطعيمات الطفل"
-              matTooltipClass="my-children-home-page-tooltip-style"
-              matTooltipPosition="above"
-            >
-              <img src="/icons/mdi_table-clock.svg" alt="" />
-            </a>
-            <a
-              routerLink="/parent/my-children/child-edit-profile"
-              matTooltip="تعديل الملف الشخصي للطفل"
-              matTooltipClass="my-children-home-page-tooltip-style"
-              matTooltipPosition="above"
-            >
-              <img src="/icons/edit.svg" alt="" />
-            </a>
-          </div>
-        </li>
+        }}
       </ul>
 
       <a

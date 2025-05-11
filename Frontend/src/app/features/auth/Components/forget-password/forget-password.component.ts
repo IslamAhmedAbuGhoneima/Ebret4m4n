@@ -11,7 +11,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class ForgetPasswordComponent {
   forgetPasswordForm!: FormGroup;
-  errorMessage: string ='';
+  errorMessage: string = '';
   constructor(
     private fb: FormBuilder,
     private router: Router,

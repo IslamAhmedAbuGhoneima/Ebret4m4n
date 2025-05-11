@@ -10,7 +10,7 @@ import { CommonModule, Location } from '@angular/common';
 import { passwordMatch } from '../../../../core/customValidation/passwordMatch.validator';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { AddAdmin } from '../../../../core/interfaces/AddAdmin';
-import { BaseApiService } from '../../../../core/services/APIs/base-api.service';
+import { GlobalService } from '../../../../core/services/APIs/global.service';
 
 @Component({
   selector: 'app-add-administrator',
@@ -29,7 +29,7 @@ export class AddAdministratorComponent implements OnInit {
     private fb: FormBuilder,
     private route: Router,
     private location: Location,
-    private _BaseApiService: BaseApiService,
+    private _GlobalService: GlobalService,
     private _AuthService: AuthService
   ) {}
 
@@ -91,7 +91,7 @@ export class AddAdministratorComponent implements OnInit {
   }
   getService(model: AddAdmin) {
     if (this.role === 'admin') {
-      this._BaseApiService.addAdmin(model).subscribe({
+      this._GlobalService.addAdmin(model).subscribe({
         next: (res) => {},
         error: (err) => {
           this.errorMessage = err.error.Message;

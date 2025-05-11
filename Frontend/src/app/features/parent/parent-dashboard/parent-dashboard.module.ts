@@ -10,8 +10,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   { path: '', component: ParentHomePageComponent },
-  { path: 'profile/edit', component: ParentProfileEditComponent },
-  { path: 'profile', component: ParentProfileComponent },
+  { path: 'edit-user-profile/:id', component: ParentProfileEditComponent },
+  { path: 'user-profile/:id', component: ParentProfileComponent },
 ];
 
 @NgModule({

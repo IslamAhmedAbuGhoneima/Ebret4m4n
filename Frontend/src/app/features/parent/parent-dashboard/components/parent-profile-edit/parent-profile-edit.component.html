@@ -288,9 +288,9 @@
               id="healthUnit"
             >
               <option value="" disabled>إختر الوحدة الصحية</option>
-              <option value="القاهرة">القاهرة</option>
-              <option value="المنيا">المنيا</option>
-              <option value="الإسكندرية">الإسكندرية</option>
+              <option [value]="heathCareId">
+                {{ healthcareDetails?.healthCareCenterName }}
+              </option>
             </select>
 
             <img

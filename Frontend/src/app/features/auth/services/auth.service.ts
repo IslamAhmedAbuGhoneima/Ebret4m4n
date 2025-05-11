@@ -147,6 +147,17 @@ export class AuthService {
     }
   }
 
+  getUserId(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.id || null;
+    } catch {
+      return null;
+    }
+  }
+
   forgetPassword(model: { email: string }) {
     return this.http.post(
       `${environment.apiUrl}/Authentication/forget-password`,

@@ -22,7 +22,7 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private route: Router,
+    private router: Router,
     private _AuthService: AuthService
   ) {}
 
@@ -68,10 +68,9 @@ export class RegisterComponent implements OnInit {
   register() {
     if (this.secondFormGroup.valid) {
       const model: Register = this.formatData();
-      console.log(JSON.stringify(model));
       this._AuthService.signUp(model).subscribe({
         next: (res) => {
-          this.route.navigate(['/parent']);
+          this.router.navigate(['/auth/login']);
         },
         error: (error) => {
           this.errorMessage = error.error.message;

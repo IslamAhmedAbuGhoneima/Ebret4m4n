@@ -3,6 +3,8 @@ import { VaccinationEditComponent } from '../../../../../standalone/components/d
 import { MatDialog } from '@angular/material/dialog';
 import { VaccinationBookingComponent } from '../../../../../standalone/components/dialogs/vaccination-booking/vaccination-booking.component';
 import { SideEffectsComponent } from '../../../../../standalone/components/dialogs/side-effects/side-effects.component';
+import { ActivatedRoute } from '@angular/router';
+import { ParentService } from '../../../services/parent.service';
 
 @Component({
   selector: 'app-child-vaccination-schedule',
@@ -11,11 +13,34 @@ import { SideEffectsComponent } from '../../../../../standalone/components/dialo
   styleUrl: './child-vaccination-schedule.component.css',
 })
 export class ChildVaccinationScheduleComponent implements OnInit {
-  takeVaccine: boolean = true;
-  nextVaccine: boolean = false;
+  childId: any;
+  childName: any;
+  msgError: any;
+  data: any;
+  constructor(
+    private matDialog: MatDialog,
+    private _ActivatedRoute: ActivatedRoute,
+    private _ParentService: ParentService
+  ) {}
+  ngOnInit(): void {
+    this._ActivatedRoute.paramMap.subscribe((params) => {
+      this.childId = params.get('id');
+      this.childName = params.get('name');
+    });
+    this.getChildVaccines();
+  }
 
-  constructor(private matDialog: MatDialog) {}
-  ngOnInit(): void {}
+  getChildVaccines() {
+    this._ParentService.childVaccines().subscribe({
+      next: (res) => {
+        this.data = res.data;
+        console.log(this.data);
+      },
+      error: (err) => {
+        this.msgError = err.error.message;
+      },
+    });
+  }
 
   editVaccine() {
     (document.activeElement as HTMLElement)?.blur();
@@ -44,6 +69,7 @@ export class ChildVaccinationScheduleComponent implements OnInit {
       });
     }, 0);
   }
+
   expectedSideEffects() {
     (document.activeElement as HTMLElement)?.blur();
 

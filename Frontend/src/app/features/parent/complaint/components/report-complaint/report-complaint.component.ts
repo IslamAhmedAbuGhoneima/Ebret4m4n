@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ParentService } from '../../../services/parent.service';
 
 @Component({
   selector: 'app-report-complaint',
@@ -9,26 +10,28 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class ReportComplaintComponent implements OnInit {
   formComplaint!: FormGroup;
-  constructor(private fb: FormBuilder) {}
+  errorMessage: any;
+  constructor(private fb: FormBuilder, private _ParentService: ParentService) {}
   ngOnInit() {
     this.createForm();
   }
   createForm() {
     this.formComplaint = this.fb.group({
-      heathCareUnit: ['', [Validators.required]],
+      heathCareUnit: [''],
       complaint: ['', [Validators.required]],
-      // role: ['user'],
     });
   }
   submit() {
     if (this.formComplaint.valid) {
-      console.log('valid');
-      // this._apiService.signIn(this.formComplaint.value).subscribe({
-      //   next: (response: any) => {
-      //     localStorage.setItem('user_token', response.token);
-      //     this.router.navigate(['/tasks']);
-      //   },
-      // });
+      const model = { message: this.formComplaint.value.complaint };
+      this._ParentService.addComplaint(model).subscribe({
+        next: (res) => {
+          this.errorMessage = res.data;
+        },
+        error: (error) => {
+          this.errorMessage = error.error.Message;
+        },
+      });
     } else {
       this.markAllAsDirty(this.formComplaint);
     }

@@ -1,0 +1,29 @@
+/* حوار التطعيم فقط */
+.dialog-delete-container .mat-mdc-dialog-surface {
+  padding: 12px 12px 16px 12px !important;
+  background-color: #f9fafb !important;
+  border-radius: 12px !important;
+}
+
+/* أزرار الراديو داخل حوار التطعيم */
+.dialog-delete-container
+  .mat-mdc-radio-button
+  .mdc-radio__native-control:enabled:checked
+  + .mdc-radio__background
+  .mdc-radio__outer-circle,
+.dialog-delete-container
+  .mat-mdc-radio-button
+  .mdc-radio__native-control:enabled:checked
+  + .mdc-radio__background
+  .mdc-radio__inner-circle {
+  border-color: #127453 !important;
+}
+
+.dialog-delete-container
+  .mat-mdc-radio-button.mat-mdc-radio-checked
+  .mat-ripple-element,
+.dialog-delete-container
+  .mat-mdc-radio-button.mat-mdc-radio-checked
+  .mdc-radio__background::before {
+  background-color: transparent !important;
+}

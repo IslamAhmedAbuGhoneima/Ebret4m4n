@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ParentService } from '../../../services/parent.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-parent-profile-edit',
@@ -11,22 +13,25 @@ import { Router } from '@angular/router';
 })
 export class ParentProfileEditComponent implements OnInit {
   formEditProfile!: FormGroup;
-
+  userId: any;
+  data: any;
+  msgError: any;
+  healthcareDetails: any;
+  heathCareId: any;
   constructor(
     private fb: FormBuilder,
     private route: Router,
-    private location: Location
+    private location: Location,
+    private _ParentService: ParentService,
+    private _ActivatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit() {
     this.createForm();
+    this._ActivatedRoute.paramMap.subscribe((params) => {
+      this.userId = params.get('id');
+    });
     this.loadUserData();
-    /*
-    call API to fill Exist Email
-     لو مستني حاجة من ايه بي اي يبقي لازم اعمل
-     Async ValidatorFn
-
-    */
   }
 
   createForm() {
@@ -57,23 +62,51 @@ export class ParentProfileEditComponent implements OnInit {
     });
   }
   loadUserData() {
-    const userData = {
-      firstName: 'محمد',
-      secondName: 'أحمد',
-      phone: '+20 123 456 7890',
-      email: 'someone@example.com',
-      city: 'المنيا',
-      town: 'المنيا',
-      healthUnit: 'المنيا',
-    };
-
-    this.formEditProfile.patchValue(userData);
+    forkJoin({
+      profile: this._ParentService.parentProfile(this.userId),
+      healthcare: this._ParentService.ParentHealthcareDetails(),
+    }).subscribe({
+      next: (res) => {
+        this.data = res.profile.data;
+        this.healthcareDetails = res.healthcare.data;
+        this.heathCareId = this.data.healthCareCenterId;
+        const model = {
+          firstName: this.data?.firstName,
+          secondName: this.data?.lastName,
+          email: this.data?.email,
+          phone: this.data?.phoneNumber,
+          governorate: this.data?.governorate,
+          city: this.data?.city,
+          town: this.data?.village,
+          healthUnit: this.data?.healthCareCenterId,
+        };
+        this.formEditProfile.patchValue(model);
+      },
+      error: (err) => {
+        this.msgError = err.error.message;
+      },
+    });
   }
 
   saveNewData() {
     if (this.formEditProfile.valid && this.formEditProfile.dirty) {
-      console.log('valid');
-    } else {
+      const model = {
+        firstName: this.firstName?.value,
+        lastName: this.secondName?.value,
+        phoneNumber: this.phone?.value,
+        governorate: this.city?.value,
+        city: this.town?.value,
+        village: this.town?.value,
+        healthCareCenterId: this.heathCareId,
+      };
+      this._ParentService.updateParentProfile(model).subscribe({
+        next: (res) => {
+          this.route.navigate(['/parent/dashboard/user-profile', this.userId]);
+        },
+        error: (err) => {
+          this.msgError = err.error.message;
+        },
+      });
     }
   }
   goBack() {

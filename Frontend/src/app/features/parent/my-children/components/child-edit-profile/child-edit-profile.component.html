@@ -111,6 +111,7 @@
                   name="day"
                   id="day"
                   placeholder="اليوم"
+                  (input)="onDayInput($event)"
                 />
 
                 <div
@@ -143,18 +144,9 @@
                     id="months"
                   >
                     <option value="" disabled selected>الشهر</option>
-                    <option value="يناير">يناير</option>
-                    <option value="فبرايل">فبرايل</option>
-                    <option value="مارس">مارس</option>
-                    <option value="أبريل">أبريل</option>
-                    <option value="مايو">مايو</option>
-                    <option value="يونيو">يونيو</option>
-                    <option value="يوليو">يوليو</option>
-                    <option value="أغسطس">أغسطس</option>
-                    <option value="سبتمبر">سبتمبر</option>
-                    <option value="أكتوبر">أكتوبر</option>
-                    <option value="نوفمبر">نوفمبر</option>
-                    <option value="ديسمبر">ديسمبر</option>
+                    @for (item of months; track $index) {
+                    <option [value]="$index + 1">{{ item }}</option>
+                    }
                   </select>
 
                   <img
@@ -191,7 +183,7 @@
                   name="year"
                   id="year"
                   placeholder="عام "
-                  (input)="year?.setValue($any($event.target).valueAsNumber)"
+                  (input)="onDayInput($event)"
                 />
 
                 <div
@@ -216,6 +208,21 @@
                 </div>
               </div>
             </div>
+
+            <div
+              class="text-red-700 -mt-2 ml-2 font-semibold font-arabic text-sm flex items-center gap-1"
+              *ngIf="(birthday.dirty || birthday.touched) && 
+         (birthday.errors?.['futureDate'] || 
+          birthday.errors?.['invalidDate'] || 
+          birthday.errors?.['invalidMonth'])"
+            >
+              <img
+                src="./icons/si_warning-fill.svg"
+                alt=""
+                class="w-4 h-4 mt-[1px]"
+              />
+              <small>ادخل تاريخ ميلاد صحيح.</small>
+            </div>
           </div>
           <!-- gender -->
           <div class="mb-4 flex-1 font-arabic">
@@ -232,8 +239,8 @@
                 id="gender"
               >
                 <option value="" disabled>النوع</option>
-                <option value="ذكر">ذكر</option>
-                <option value="انثى">انثى</option>
+                <option value="m">ذكر</option>
+                <option value="f">انثى</option>
               </select>
               <img
                 class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
@@ -332,18 +339,51 @@
             <div class="flex">
               <label
                 for="medical-images"
-                class="font-semibold text-[#121212] underline"
+                class="font-semibold text-[#121212] underline cursor-pointer"
                 >إضافة صور</label
               >
               <input
                 type="file"
                 id="medical-images"
                 name="medical-images"
+                (change)="getImagePath($event)"
                 class="shadow-none hidden"
-                formControlName="medicalImages"
+                multiple
               />
             </div>
           </div>
+          <ul
+            class="flex flex-col px-4 gap-2 w-full text-sm font-normal font-arabic text-third-txt"
+          >
+            <li
+              *ngFor="let file of medicalImagesFromApi; let i = index"
+              class="flex items-center gap-2"
+            >
+              <ng-container [ngSwitch]="file.type">
+                <!-- إذا كانت صورة -->
+                <img
+                  *ngSwitchCase="'image'"
+                  [src]="file.preview"
+                  alt="صورة"
+                  class="w-20 h-20 object-cover rounded-md"
+                />
+                <div *ngSwitchCase="'file'" class="flex items-center gap-2">
+                  <span class="text-xl">📄</span>
+                  <span class="truncate w-40">{{ file.name }}</span>
+                </div>
+              </ng-container>
+
+              <button
+                type="button"
+                (click)="removeImage(i)"
+                class="text-red-500 hover:text-red-700"
+                title="حذف الملف"
+              >
+                ❌
+              </button>
+            </li>
+          </ul>
+
           <div class="flex justify-between items-center mt-5">
             <button
               (click)="goBack()"

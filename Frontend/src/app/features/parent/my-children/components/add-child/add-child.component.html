@@ -9,7 +9,7 @@
       </p>
     </div>
 
-    <div class="max-w-[520px] mx-auto">
+    <div class="max-w-[530px] mx-auto">
       <form [formGroup]="formAddChild" (ngSubmit)="addChild()">
         <mat-stepper linear #stepper class="custom-stepper-add-child-style">
           <mat-step>
@@ -117,6 +117,7 @@
                     name="day"
                     id="day"
                     placeholder="اليوم"
+                    (input)="onDayInput($event)"
                   />
 
                   <div
@@ -149,18 +150,9 @@
                       id="months"
                     >
                       <option value="" disabled selected>الشهر</option>
-                      <option value="يناير">يناير</option>
-                      <option value="فبرايل">فبرايل</option>
-                      <option value="مارس">مارس</option>
-                      <option value="أبريل">أبريل</option>
-                      <option value="مايو">مايو</option>
-                      <option value="يونيو">يونيو</option>
-                      <option value="يوليو">يوليو</option>
-                      <option value="أغسطس">أغسطس</option>
-                      <option value="سبتمبر">سبتمبر</option>
-                      <option value="أكتوبر">أكتوبر</option>
-                      <option value="نوفمبر">نوفمبر</option>
-                      <option value="ديسمبر">ديسمبر</option>
+                      @for (item of months; track $index) {
+                      <option [value]="$index + 1">{{ item }}</option>
+                      }
                     </select>
 
                     <img
@@ -197,7 +189,7 @@
                     name="year"
                     id="year"
                     placeholder="عام "
-                    (input)="year?.setValue($any($event.target).valueAsNumber)"
+                    (input)="onDayInput($event)"
                   />
 
                   <div
@@ -214,13 +206,28 @@
                         إدخل سنه ميلاد الطفل.
                       </small>
                       <small
-                        *ngIf="year?.errors?.['min'] || year?.errors?.['pattern']"
+                        *ngIf="year?.errors?.['min'] ||year?.errors?.['max']"
                       >
-                        إدخل سنه صحيحه.
+                        ادخل سنة صحيحًا.
                       </small>
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div
+                class="text-red-700 -mt-2 ml-2 font-semibold font-arabic text-sm flex items-center gap-1"
+                *ngIf="(birthday.dirty || birthday.touched) && 
+         (birthday.errors?.['futureDate'] || 
+          birthday.errors?.['invalidDate'] || 
+          birthday.errors?.['invalidMonth'])"
+              >
+                <img
+                  src="./icons/si_warning-fill.svg"
+                  alt=""
+                  class="w-4 h-4 mt-[1px]"
+                />
+                <small>ادخل تاريخ ميلاد صحيح.</small>
               </div>
             </div>
             <!-- gender -->
@@ -238,8 +245,8 @@
                   id="gender"
                 >
                   <option value="" disabled>النوع</option>
-                  <option value="ذكر">ذكر</option>
-                  <option value="انثى">انثى</option>
+                  <option value="m">ذكر</option>
+                  <option value="f">أنثى</option>
                 </select>
                 <img
                   class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
@@ -347,21 +354,46 @@
             >
               <p>هل تريد إضافة صور تحاليل أو إشاعات</p>
 
-              <div class="flex">
+              <div class="flex items-center gap-2">
                 <label
                   for="medical-images"
-                  class="font-semibold text-[#121212] underline"
+                  class="font-semibold text-[#121212] underline cursor-pointer"
                   >إضافة صور</label
                 >
+
                 <input
                   type="file"
                   id="medical-images"
                   name="medical-images"
+                  (change)="getImagePath($event)"
                   class="shadow-none hidden"
-                  formControlName="medicalImages"
+                  multiple
                 />
               </div>
             </div>
+            <ul
+              class="flex flex-col px-4 gap-2 w-full text-sm font-normal font-arabic text-third-txt"
+            >
+              <li
+                *ngFor="let file of medicalImagesFiles; let i = index"
+                class="flex items-center gap-2"
+              >
+                <ng-container [ngSwitch]="file.type">
+                  <img
+                    *ngSwitchCase="'image'"
+                    [src]="file.preview"
+                    alt="صورة"
+                    class="w-20 h-20 object-cover rounded-md"
+                  />
+                  <div *ngSwitchCase="'file'" class="flex items-center gap-2">
+                    <span class="text-xl">📄</span>
+                    <span class="truncate w-40">{{ file.name }}</span>
+                  </div>
+                </ng-container>
+                <button type="button" (click)="removeImage(i)">❌</button>
+              </li>
+            </ul>
+
             <div
               class="px-4 py-3 flex gap-2 w-full text-lg font-normal font-arabic text-third-txt"
             >
@@ -369,12 +401,27 @@
 
               <button
                 type="button"
-                (click)="addVaccine()"
-                class="font-semibold text-[#121212] underline"
+                (click)="addVaccines()"
+                class="font-semibold text-[#121212] underline cursor-pointer"
               >
                 إضافة لقاحات
               </button>
             </div>
+
+            <ul
+              *ngIf="vaccines.controls.length > 0"
+              class="flex px-4 gap-2 w-full text-sm font-normal font-arabic text-third-txt"
+            >
+              [
+              <li
+                *ngFor="let vaccine of vaccines.controls; let i = index"
+                class="flex items-center gap-2"
+              >
+                {{ vaccine.value }}
+                <span *ngIf="i < vaccines.controls.length - 1">-</span>
+              </li>
+              ]
+            </ul>
 
             <div class="flex justify-between mt-9 font-arabic">
               <button
@@ -397,6 +444,12 @@
                 <span class="inline-block"> إضافة طفل</span>
                 <img src="/icons/lets-icons_user-add.svg" alt="" />
               </button>
+            </div>
+            <div
+              class="text-red-700 mt-4 font-semibold font-arabic font-base flex items-center justify-center"
+              *ngIf="errorMessage"
+            >
+              {{ errorMessage }}
             </div>
           </mat-step>
         </mat-stepper>
