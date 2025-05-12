@@ -81,12 +81,12 @@ public class ParentController
     [HttpGet("{childId}/{vaccineName}/appointment-exists")]
     public async Task<IActionResult> AppointmentExists(string childId, string vaccineName)
     {
-        var appointment = await unitOfWork.AppointmentRepo.ExistsAsync(a => a.ChildId == childId && a.VaccineName == vaccineName);
+        var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.ChildId == childId && a.VaccineName == vaccineName,false);
 
-        if (!appointment)
+        if (appointment is null)
             return NotFound(GeneralResponse<object>.FailureResponse(new { IsReserved = false }));
 
-        var response = GeneralResponse<object>.SuccessResponse(new { IsReserved = true });
+        var response = GeneralResponse<object>.SuccessResponse(new { IsReserved = true, AppointmentId = appointment.Id });
 
         return Ok(response);
     }
