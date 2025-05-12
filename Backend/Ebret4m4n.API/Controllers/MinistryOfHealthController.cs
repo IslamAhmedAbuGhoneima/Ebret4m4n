@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Contracts;
 using Mapster;
+using System.Threading.Tasks;
 
 
 
@@ -116,6 +117,47 @@ public class MinistryOfHealthController
 
         var response = GeneralResponse<List<GovernorateAdminsDto>>.SuccessResponse(admins);
 
+        return Ok(response);
+    }
+
+    [HttpGet("{governorateAdminId:guid}/governorate-admin-details")]
+    public async Task<IActionResult> GovernorateAdminDetails(Guid governorateAdminId)
+    {
+        var admin = await unitOfWork.GovernorateAdminRepo.FindAsync(admin => admin.UserId == governorateAdminId.ToString(), false, ["User"]);
+
+        if (admin is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد ادمن بهذا الرقم"));
+
+        var adminDetails = admin.Adapt<GovernorateAdminsDto>();
+
+        var response = GeneralResponse<GovernorateAdminsDto>.SuccessResponse(adminDetails);
+
+        return Ok(response);
+    }
+
+    [HttpPut("{governorateAdminId:guid}/update-governorate-admins")]
+    public async Task<IActionResult> UpdateGovernorateAdmin(Guid governorateAdminId, [FromBody] UpdateGovernorateAdminDto model)
+    {
+        //var admin = await userManager.FindByIdAsync(governorateAdminId.ToString());
+        var admin  = await unitOfWork.GovernorateAdminRepo.FindAsync(admin => admin.UserId == governorateAdminId.ToString(), true, ["User"]);
+
+        if (admin is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد ادمن بهذا الرقم"));
+
+        model.Adapt(admin.User);
+
+        var result = await userManager.UpdateAsync(admin.User);
+
+        if (!result.Succeeded)
+            return BadRequest(GeneralResponse<string>.FailureResponse("الرجاء التاكد من ان البريد الالكتروني صحيح او هذا الايميل موجود بالفعل"));
+
+        admin.Governorate = model.Governorate;
+        unitOfWork.GovernorateAdminRepo.Update(admin);
+        var dbResult = await unitOfWork.SaveAsync();
+        if (dbResult == 0)
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات حاول مره اخري"));
+
+        var response = GeneralResponse<string>.SuccessResponse("تم تعديل البيانات بنجاح");
         return Ok(response);
     }
 }

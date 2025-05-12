@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Mapster;
+using Ebret4m4n.API.Utilites;
+using System.Threading.Tasks;
+using Ebret4m4n.Shared.DTOs.AppointmentDtos;
 
 
 
@@ -63,14 +66,27 @@ public class ParentController
     [HttpGet("{id:guid}/appointment-details")]
     public async Task<IActionResult> AppointmentDetails(Guid id)
     {
-        var appointment = await unitOfWork.AppointmentRepo.FindAsync(app => app.Id == id, false);
+        var appointment = await unitOfWork.AppointmentRepo.FindAsync(app => app.Id == id, false, ["Child"]);
 
         if (appointment is null)
             return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور علي اي حجز"));
 
-        var appointmentDto = appointment.Adapt<AppointmentDto>();
+        var appointmentDto = (appointment,appointment.Child.Name).Adapt<AppointmentDto>();
 
         var response = GeneralResponse<AppointmentDto>.SuccessResponse(appointmentDto);
+
+        return Ok(response);
+    }
+
+    [HttpGet("{childId}/{vaccineName}/appointment-exists")]
+    public async Task<IActionResult> AppointmentExists(string childId, string vaccineName)
+    {
+        var appointment = await unitOfWork.AppointmentRepo.ExistsAsync(a => a.ChildId == childId && a.VaccineName == vaccineName);
+
+        if (!appointment)
+            return NotFound(GeneralResponse<object>.FailureResponse(new { IsReserved = false }));
+
+        var response = GeneralResponse<object>.SuccessResponse(new { IsReserved = true });
 
         return Ok(response);
     }
@@ -81,45 +97,56 @@ public class ParentController
         if (!ModelState.IsValid)
             return UnprocessableEntity(GeneralResponse<string>.FailureResponse("تاكد ان جميع مدخلات الحجز صحيحه"));
 
-        if (model.Date <= DateTime.UtcNow)
-            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكن حجز هذ الموعد"));
+        try
+        {
+            var date = Utility.GetDateOfNextDay(model.Day);
 
-        var appointmentExists =
-            await unitOfWork.AppointmentRepo.ExistsAsync(appointment => appointment.VaccineName == model.VaccineName && appointment.ChildId == model.ChildId);
+            if (date <= DateTime.UtcNow)
+                return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكن حجز هذ الموعد"));
 
-        if (appointmentExists)
-            return BadRequest(GeneralResponse<string>.FailureResponse("تم حجز معاد لهذا اللقاح من قبل"));
+            var appointmentExists =
+                await unitOfWork.AppointmentRepo.ExistsAsync(appointment => appointment.VaccineName == model.VaccineName && appointment.ChildId == model.ChildId);
 
-        var parentId = User.FindFirst("id")!.Value;
+            if (appointmentExists)
+                return BadRequest(GeneralResponse<string>.FailureResponse("تم حجز معاد لهذا اللقاح من قبل"));
 
-        var user = await userManager.Users
-            .Include(U => U.HealthCareCenter)
-            .Include(U => U.Children.Where(c => c.Id == model.ChildId && c.UserId == parentId))
-            .FirstOrDefaultAsync(U => U.Id == parentId);
+            var parentId = User.FindFirst("id")!.Value;
 
-
-        if (user?.Children is null)
-            return BadRequest(GeneralResponse<string>.FailureResponse("ليس لديك اي اطفال لتتمكن من حجز تطعيم اضف طفل اولا"));
-
-        if (user?.HealthCareCenterId == null)
-            return NotFound(GeneralResponse<string>.FailureResponse("هذا المستخدم لا ينتمي الي اي وحده صحيه"));
-
-        var appointment = (model, user.HealthCareCenter, parentId).Adapt<Appointment>();
-
-        await unitOfWork.AppointmentRepo.AddAsync(appointment);
-        var result = await unitOfWork.SaveAsync();
-
-        if (result == 0)
-            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ الحجز الخاص بك الرجاء المحاوله مره اخري"));
+            var user = await userManager.Users
+                .Include(U => U.HealthCareCenter)
+                .Include(U => U.Children.Where(c => c.Id == model.ChildId && c.UserId == parentId))
+                .FirstOrDefaultAsync(U => U.Id == parentId);
 
 
-        string childName = user.Children.FirstOrDefault()!.Name;
+            if (user?.Children is null)
+                return BadRequest(GeneralResponse<string>.FailureResponse("ليس لديك اي اطفال لتتمكن من حجز تطعيم اضف طفل اولا"));
 
-        var appointmentDto = (appointment, childName).Adapt<AppointmentDto>();
+            if (user?.HealthCareCenterId == null)
+                return NotFound(GeneralResponse<string>.FailureResponse("هذا المستخدم لا ينتمي الي اي وحده صحيه"));
 
-        var response = GeneralResponse<AppointmentDto>.SuccessResponse(appointmentDto);
+            var appointment = (model, user.HealthCareCenter, parentId).Adapt<Appointment>();
+            appointment.Date = date;
 
-        return Ok(response);
+            await unitOfWork.AppointmentRepo.AddAsync(appointment);
+            var result = await unitOfWork.SaveAsync();
+
+            if (result == 0)
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ الحجز الخاص بك الرجاء المحاوله مره اخري"));
+
+
+            string childName = user.Children.FirstOrDefault()!.Name;
+
+            var appointmentDto = (appointment, childName).Adapt<AppointmentDto>();
+
+            var response = GeneralResponse<AppointmentDto>.SuccessResponse(appointmentDto);
+
+            return Ok(response);
+        }
+        catch(Exception ex)
+        {
+            return BadRequest(GeneralResponse<string>.FailureResponse(ex.Message));
+        }
+        
     }
 
     [HttpPut("{childId}/appointment-reschedule")]

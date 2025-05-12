@@ -4,6 +4,7 @@ using Ebret4m4n.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ebret4m4n.Repository.Migrations
 {
     [DbContext(typeof(EbretAmanDbContext))]
-    partial class EbretAmanDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250511152002_editChildRelationship")]
+    partial class editChildRelationship
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -655,9 +658,6 @@ namespace Ebret4m4n.Repository.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<DateTime?>("TakedAt")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ChildId");
@@ -696,37 +696,37 @@ namespace Ebret4m4n.Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bb76f69f-7e1a-46e4-ab39-4827475241ff",
+                            Id = "a14d5168-b3b6-4c27-ad4c-f8d43ef2775b",
                             Name = "parent",
                             NormalizedName = "PARENT"
                         },
                         new
                         {
-                            Id = "678a0581-4aca-4b11-bd3b-43090f53c493",
+                            Id = "52c3f2a1-b076-4369-921b-dbde2acc1abc",
                             Name = "doctor",
                             NormalizedName = "DOCTOR"
                         },
                         new
                         {
-                            Id = "c232a9f6-725c-402d-a725-8959d9d2290c",
+                            Id = "2fa96afd-744d-47fc-b385-445be31e1754",
                             Name = "organizer",
                             NormalizedName = "ORGANIZER"
                         },
                         new
                         {
-                            Id = "de5f4d85-3550-4bc7-9f2b-350a3076921d",
+                            Id = "cb5b2245-eecd-447a-bba4-a69f4b401b26",
                             Name = "governorateAdmin",
                             NormalizedName = "GOVERNORATEADMIN"
                         },
                         new
                         {
-                            Id = "dc0d4e52-1d55-411b-b051-84b09feac46b",
+                            Id = "a5069509-db22-4904-b2a9-29e9abc31e64",
                             Name = "cityAdmin",
                             NormalizedName = "CITYADMIN"
                         },
                         new
                         {
-                            Id = "13ae3542-7439-40a6-a695-5d534eca803e",
+                            Id = "b44675bf-b2f3-404a-b546-73000d75b599",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         });

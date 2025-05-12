@@ -12,6 +12,8 @@ public class Vaccine
 
     public bool IsTaken { get; set; }
 
+    // public DateTime? TakedAt { get; set; }
+
     public int ChildAge { get; set; }
     #endregion
 

@@ -66,17 +66,17 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         _user = await userManager.FindByEmailAsync(model.Email);
 
         if (_user is null)
-            throw new LoginBadRequest();
+            return BadRequest(GeneralResponse<string>.FailureResponse("الرجاء التاكد من ادخال الايميل وكلمه المرور"));
 
         bool checkPassword = await userManager.CheckPasswordAsync(_user, model.Password);
 
         if (await userManager.IsLockedOutAsync(_user!))
-            throw new LockedOutBadRequest();
+            return BadRequest(GeneralResponse<string>.FailureResponse("تم حظر هذا الحساب من الدخول الرجاء المحاوله لاحقا"));
 
         if (!checkPassword)
         {
             await userManager.AccessFailedAsync(_user!);
-            throw new LoginBadRequest();
+            return BadRequest(GeneralResponse<string>.FailureResponse("الرجاء التاكد من ادخال الايميل وكلمه المرور"));
         }
 
         await userManager.ResetAccessFailedCountAsync(_user!);

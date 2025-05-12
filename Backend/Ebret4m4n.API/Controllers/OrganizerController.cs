@@ -77,6 +77,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 					return NotFound(GeneralResponse<string>.FailureResponse($"لايوجد تطيعم بهذا الاسم: {data.VaccineName}"));
 
                 vaccine.IsTaken = true;
+				// vaccine.TakedAt = DateTime.UtcNow;
 
                 unitOfWork.ChildRepo.Update(child);
             }

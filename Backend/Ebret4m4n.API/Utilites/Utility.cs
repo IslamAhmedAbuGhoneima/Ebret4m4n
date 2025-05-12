@@ -4,7 +4,7 @@ using Ebret4m4n.Entities.Models;
 using System.Text.Json;
 using Stripe.Checkout;
 using Mapster;
-using Stripe;
+
 
 namespace Ebret4m4n.API.Utilites;
 
@@ -174,7 +174,7 @@ public class Utility
                 { "childName", childName },
                 { "parentEmail", parentEmail}
             },
-            SuccessUrl = "http://localhost:4200/payment/success",
+            SuccessUrl = $"http://localhost:4200/payment/success/{childId}",
             CancelUrl = "http://localhost:4200/payment/cancel"
         };
 
@@ -182,5 +182,27 @@ public class Utility
         var session = await service.CreateAsync(options);
 
         return session;
+    }
+
+    public static DateTime GetDateOfNextDay(string dayName)
+    {
+        if(!Enum.TryParse(dayName, out DayOfWeek targetDay))
+        {
+            throw new BadRequestException("اسم يوم غير صحيح");
+        }
+
+        var today = DateTime.Today;
+
+        // Calculate days to add to get to the target day
+        int daysUntilTargetDay = ((int)targetDay - (int)today.DayOfWeek + 7) % 7;
+
+        // If today is the target day, we want next week's occurrence
+        if (daysUntilTargetDay == 0) 
+            daysUntilTargetDay = 7;
+
+        // Calculate the next occurrence of the target day
+        DateTime nextTargetDay = today.AddDays(daysUntilTargetDay);
+
+        return nextTargetDay.Date;
     }
 }

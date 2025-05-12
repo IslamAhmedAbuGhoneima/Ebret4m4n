@@ -12,7 +12,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         builder.HasOne(prop => prop.Child)
             .WithOne(prop => prop.Transaction)
-            .OnDelete(DeleteBehavior.NoAction);
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(builder => builder.Parent)
             .WithMany(builder => builder.Transactions)
