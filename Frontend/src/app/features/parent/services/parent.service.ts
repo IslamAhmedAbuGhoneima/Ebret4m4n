@@ -9,11 +9,6 @@ import { Observable } from 'rxjs';
 export class ParentService {
   constructor(protected http: HttpClient) {}
 
-  reservations() {
-    return this.http.get<any>(
-      `${environment.apiUrl}/Parent/children-reservations`
-    );
-  }
   getMyChildren() {
     return this.http.get<any>(`${environment.apiUrl}/Child/children`);
   }
@@ -74,10 +69,55 @@ export class ParentService {
       model
     );
   }
-
   ParentHealthcareDetails() {
     return this.http.get<any>(
       `${environment.apiUrl}/Parent/healthcare-details`
     );
   }
+  childVaccineSchedule(childId: any) {
+    return this.http.get<any>(`${environment.apiUrl}/Child/${childId}/child`);
+  }
+  payment(childId: any, model: {}) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Payment/${childId}/process-payment`,
+      model
+    );
+  }
+  getBookingDates() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/Parent/healthcare-details`
+    );
+  }
+  appointmentExists(childId: any, vaccineName: any) {
+    return this.http.get<any>(
+      `${environment.apiUrl}/Parent/${childId}/${vaccineName}/appointment-exists`
+    );
+  }
+  appointmentBook(model: {
+    childId: string;
+    vaccineName: string;
+    day: string;
+  }) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Parent/appointment-book`,
+      model
+    );
+  }
+  appointmentReBook(
+    appointmentId: any,
+    model: {
+      day: string;
+    }
+  ) {
+    return this.http.put<any>(
+      `${environment.apiUrl}/Parent/${appointmentId}/appointment-reschedule`,
+      model
+    );
+  }
+  childrenReservations() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/Parent/children-reservations`
+    );
+  }
+
 }

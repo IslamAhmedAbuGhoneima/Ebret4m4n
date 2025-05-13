@@ -5,6 +5,8 @@ import { NotFoundComponent } from './standalone/pages/not-found/not-found.compon
 import { ContactUsComponent } from './standalone/pages/contact-us/contact-us.component';
 import { VaccinationScheduleComponent } from './standalone/pages/vaccination-schedule/vaccination-schedule.component';
 import { roleGuard } from './core/guards/role.guard';
+import { PaymentSuccessComponent } from './standalone/components/payment-success/payment-success.component';
+import { PaymentCancelComponent } from './standalone/components/payment-cancel/payment-cancel.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -161,6 +163,8 @@ export const routes: Routes = [
     ],
   },
 
+  { path: 'payment/success', component: PaymentSuccessComponent },
+  { path: 'payment/cancel', component: PaymentCancelComponent },
   { path: 'not-found', component: NotFoundComponent },
   { path: '**', component: NotFoundComponent },
 ];

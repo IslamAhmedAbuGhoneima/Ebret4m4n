@@ -11,7 +11,6 @@ import { MatStepperModule } from '@angular/material/stepper';
 import { MatButtonModule } from '@angular/material/button';
 import { ForgetPasswordComponent } from './components/forget-password/forget-password.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
-import { jwtDecode } from 'jwt-decode';
 const routes: Routes = [
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
@@ -37,7 +36,6 @@ const routes: Routes = [
     MatInputModule,
     MatOption,
     ReactiveFormsModule,
-   
   ],
   exports: [],
 })

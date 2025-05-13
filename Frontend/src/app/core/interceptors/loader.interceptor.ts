@@ -9,7 +9,6 @@ export const loaderInterceptor: HttpInterceptorFn = (req, next) => {
   counter++;
   spinner.show();
   return next(req).pipe(
-    //request
     finalize(() => {
       counter--;
       if (counter == 0) spinner.hide();

@@ -2,6 +2,8 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Route, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { GoToMailComponent } from '../../../../standalone/components/dialogs/go-to-mail/go-to-mail.component';
 
 @Component({
   selector: 'app-forget-password',
@@ -15,7 +17,8 @@ export class ForgetPasswordComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private matDialog: MatDialog
   ) {}
   ngOnInit() {
     this.createForm();
@@ -29,10 +32,16 @@ export class ForgetPasswordComponent {
     if (this.forgetPasswordForm.valid) {
       this.authService.forgetPassword(this.forgetPasswordForm.value).subscribe({
         next: (res) => {
-          console.log(res);
+          (document.activeElement as HTMLElement)?.blur();
+          this.matDialog.open(GoToMailComponent, {
+            width: '400px',
+            disableClose: true,
+            data: res,
+            panelClass: 'dialog-goto-mail-container',
+          });
         },
         error: (err) => {
-          this.errorMessage = err.error.Message || 'حدث خطأ أثناء إرسال الطلب';
+          this.errorMessage = err.error.Message ;
         },
       });
     } else {

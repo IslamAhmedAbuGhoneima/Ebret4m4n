@@ -1,0 +1,21 @@
+<section class="container">
+  <div class="text-center font-arabic mt-20">
+    <img
+      src="/images/payment-failed.png"
+      alt="فشل العملية"
+      class="block mx-auto"
+    />
+
+    <h6 class="text-4xl font-bold text-error mb-1">عملية غير ناجحة</h6>
+    <span class="block text-sm font-normal text-third-txt"
+      >حدث خطأ أثناء تنفيذ الدفع</span
+    >
+
+    <button
+      (click)="paymentPage()"
+      class="w-fit mx-auto mt-6 cursor-pointer flex justify-center font-arabic gap-[10px] py-[9px] px-[24px] rounded-lg font-bold bg-error text-mainBg-100 transition duration-200 hover:bg-errorHov"
+    >
+      <span class="inline-block"> الرجوع لصفحة الدفع </span>
+    </button>
+  </div>
+</section>

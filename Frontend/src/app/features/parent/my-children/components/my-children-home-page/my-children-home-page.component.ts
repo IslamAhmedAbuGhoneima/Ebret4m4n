@@ -2,7 +2,6 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { ParentService } from '../../../services/parent.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../../../standalone/components/dialogs/confirm/confirm.component';
-import { PaymentService } from '../../../../../core/services/payment/payment.service';
 import { Router } from '@angular/router';
 import { PaymentRequiredComponent } from '../../../../../standalone/components/dialogs/payment-required/payment-required.component';
 
@@ -19,13 +18,11 @@ export class MyChildrenHomePageComponent {
   constructor(
     private _ParentService: ParentService,
     private matDialog: MatDialog,
-    private paymentService: PaymentService,
     private router: Router
   ) {}
   ngOnInit(): void {
     this.getAllChildren();
   }
-
   getAllChildren() {
     this._ParentService.getMyChildren().subscribe({
       next: (res) => {
@@ -56,22 +53,24 @@ export class MyChildrenHomePageComponent {
         });
     }, 0);
   }
-  onNavigateToVaccineSchedule(name: string, id: string) {
+  onNavigateToVaccineSchedule(id: any) {
+    const childId = id;
     (document.activeElement as HTMLElement)?.blur();
-
-    if (this.paymentService.isPaid()) {
-      this.router.navigate([
-        '/parent/my-children/child-vaccine-schedule',
-        name,
-        id,
-      ]);
-    } else {
-      this.matDialog.open(PaymentRequiredComponent, {
-        width: '400px',
-        disableClose: true,
-        data: [name, id],
-        panelClass: 'dialog-payment-container',
-      });
-    }
+    this._ParentService.childVaccineSchedule(childId).subscribe({
+      next: (res) => {
+        this.router.navigate([
+          '/parent/my-children/child-vaccine-schedule',
+          childId,
+        ]);
+      },
+      error: (error) => {
+        this.matDialog.open(PaymentRequiredComponent, {
+          width: '400px',
+          disableClose: true,
+          data: childId,
+          panelClass: 'dialog-payment-container',
+        });
+      },
+    });
   }
 }

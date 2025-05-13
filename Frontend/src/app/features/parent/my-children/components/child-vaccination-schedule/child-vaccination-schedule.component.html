@@ -8,7 +8,7 @@
         alt=""
         class="rotate-90 h-3 w-3 mt-[6px]"
       />
-      <a routerLink="/parent/my-children/child-vaccine-schedule"
+      <a [routerLink]="['/parent/my-children/child-vaccine-schedule', childId]"
         >جدول طفلك {{ childName }}</a
       >
     </div>
@@ -62,92 +62,58 @@
         </tr>
       </thead>
       <tbody>
-        <!-- <tr
-          class="border border-[#E5E7EB] border-t-transparent"
-          [ngClass]="{
-            'text-third-txt': takeVaccine == false,
-            'text-[#151419]': takeVaccine == true
-          }"
-        >
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <div class="h-10 w-10 flex items-center justify-center">
-              @if (!takeVaccine) {
-              <img
-                src="/icons/Icon-checked.svg"
-                alt=""
-                class="w-[22px] h-[22px]"
-              />
+        @for (item of vaccines; track $index) {
 
-              } @else {
-              <span
-                class="block w-[22px] h-[22px] rounded border-[#121212] border-[2px]"
-              ></span
-              >}
-            </div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">الميلاد</span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">أول 24 ساعة</span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">تم أخذ اللقاح</span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <button (click)="expectedSideEffects()">
-              <span class="inline-block text-base underline"
-                >الأعراض الجانبية المتوقعة</span
-              >
-            </button>
-          </td>
-
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            @if (!nextVaccine) {
-
-            <button
-              (click)="bookingVaccine()"
-              class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100  transition duration-200 hover:bg-[#0B4632]"
-            >
-              <span class="inline- text-sm"> حجز موعد</span>
-              <img src="/icons/icon-park-outline_appointment.svg" alt="" />
-            </button>
-
-            }
-          </td>
-        </tr>
         <tr
           class="border border-[#E5E7EB] border-t-transparent"
           [ngClass]="{
-            'text-third-txt': takeVaccine == false,
-            'text-[#151419]': takeVaccine == true
+            'text-third-txt':
+              item.isTaken && getDaysDifference(item.takedAt) <= 0,
+            'text-[#151419]':
+              item.isTaken && getDaysDifference(item.takedAt) > 0
           }"
+          [ngStyle]="
+            item.isTaken && getDaysDifference(item.takedAt) < 0
+              ? { 'pointer-events': 'none' }
+              : {}
+          "
         >
           <td class="px-6 py-4 whitespace-nowrap text-center">
             <div class="h-10 w-10 flex items-center justify-center">
-              @if (!takeVaccine) {
+              @if (!item.isTaken) {
+              <span
+                class="block w-[22px] h-[22px] rounded border-[#121212] border-[2px]"
+              ></span>
+              } @if (item.isTaken && getDaysDifference(item.takedAt) <= 0) {
+              <img
+                src="/icons/Icon-checked-gray.svg"
+                alt=""
+                class="w-[22px] h-[22px]"
+              />
+              } @if (item.isTaken && getDaysDifference(item.takedAt) > 0) {
               <img
                 src="/icons/Icon-checked.svg"
                 alt=""
                 class="w-[22px] h-[22px]"
               />
-
-              } @else {
-              <span
-                class="block w-[22px] h-[22px] rounded border-[#121212] border-[2px]"
-              ></span
-              >}
+              }
             </div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">الميلاد</span>
+            <span class="inline-block text-base">{{ item.name }}</span>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">أول 24 ساعة</span>
+            <span class="inline-block text-base"
+              >{{ item.childAgeDetails }}
+            </span>
           </td>
+
           <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">تم أخذ اللقاح</span>
+            <span class="inline-block text-base">
+              {{ item.isTaken == true ? "تم أخذ اللقاح" : "يمكنك الحجز الآن" }}
+            </span>
           </td>
+
           <td class="px-6 py-4 whitespace-nowrap text-center">
             <button (click)="expectedSideEffects()">
               <span class="inline-block text-base underline"
@@ -157,87 +123,54 @@
           </td>
 
           <td class="px-6 py-4 whitespace-nowrap text-center">
-            @if (!nextVaccine) {
-
+            @if(!item.isTaken && ageInMonth===item.childAge){ @if(!bookingOrNot)
+            {
             <button
-              (click)="editVaccine()"
-              class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100  transition duration-200 hover:bg-[#0B4632]"
+              (click)="bookingVaccine(item.id)"
+              class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+            >
+              <span class="inline- text-sm"> حجز موعد</span>
+              <img
+                src="/icons/icon-park-outline_appointment.svg"
+                alt=""
+              /></button
+            >} @else {
+            <button
+              (click)="bookingVaccine(item.id)"
+              class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
             >
               <span class="inline- text-sm"> تعديل موعد</span>
               <img src="/icons/icon-park-outline_appointment.svg" alt="" />
             </button>
-
-            }
-          </td>
-        </tr>
-        <tr
-          class="border border-[#E5E7EB] border-t-transparent"
-          [ngClass]="{
-            'text-third-txt': takeVaccine == false,
-            'text-[#151419]': takeVaccine == true
-          }"
-        >
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <div class="h-10 w-10 flex items-center justify-center">
-              @if (!takeVaccine) {
-              <img
-                src="/icons/Icon-checked.svg"
-                alt=""
-                class="w-[22px] h-[22px]"
-              />
-
-              } @else {
-              <span
-                class="block w-[22px] h-[22px] rounded border-[#121212] border-[2px]"
-              ></span
-              >}
-            </div>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">الميلاد</span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">أول 24 ساعة</span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <span class="inline-block text-base">تم أخذ اللقاح</span>
-          </td>
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            <button (click)="expectedSideEffects()">
-              <span class="inline-block text-base underline"
-                >الأعراض الجانبية المتوقعة</span
-              >
-            </button>
-          </td>
-
-          <td class="px-6 py-4 whitespace-nowrap text-center">
-            @if (!nextVaccine) {
-
+            }} @else if (item.isTaken && ageInMonth===item.childAge &&
+            getDaysDifference(item.takedAt)<= 0) {
             <a
               routerLink="/chat"
-              class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100  transition duration-200 hover:bg-[#0B4632]"
+              class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
             >
               <span class="inline- text-sm"> إبلاغ عن أعراض جانبية</span>
-              <img src="/icons/mingcute_warning-line.svg" alt="" />
+              <img src="/icons/side effect.svg" alt="" />
             </a>
 
             }
           </td>
-        </tr> -->
+        </tr>
+        }
       </tbody>
     </table>
     }
 
     <div class="flex justify-center items-center gap-6 mt-6">
+      @if (allVaccinesTaken) {
       <a
         routerLink="#"
         class="w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-6 rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
       >
         <span class="inline- text-sm"> عرض الشهادة</span>
-        <img src="/icons/humbleicons_certificate.svg" alt="" />
-      </a>
-      <a
-        routerLink="/parent/my-children"
+        <img src="/icons/humbleicons_certificate.svg" alt="" /> </a
+      >}
+      <button
+        (click)="goBack()"
         class="flex w-fit items-center justify-center gap-2 bg-[#151419] text-mainBg-100 px-6 py-[9px] rounded-lg transition duration-200 hover:opacity-80"
         role="button"
       >
@@ -247,7 +180,7 @@
           class="w-6 h-6"
         />
         <span class="text-base font-semibold">رجوع</span>
-      </a>
+      </button>
     </div>
   </div>
 </section>

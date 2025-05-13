@@ -1,7 +1,7 @@
 /* حوار التطعيم فقط */
 .dialog-vaccination-booking-container .mat-mdc-dialog-surface {
-  padding: 12px 12px 16px 12px !important;
   background-color: #f9fafb !important;
+  padding: 12px 12px 16px 12px !important;
   border-radius: 12px !important;
 }
 
@@ -27,3 +27,4 @@
   .mdc-radio__background::before {
   background-color: transparent !important;
 }
+

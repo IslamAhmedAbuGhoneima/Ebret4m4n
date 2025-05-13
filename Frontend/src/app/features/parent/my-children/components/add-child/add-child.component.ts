@@ -92,7 +92,7 @@ export class AddChildComponent implements OnInit {
   addChild() {
     if (this.formAddChild.valid) {
       const model = this.formDataFormate();
-   
+
       this._ParentService.addChild(model).subscribe({
         next: (response) => {
           this.router.navigate(['/parent/my-children']);
@@ -206,11 +206,8 @@ export class AddChildComponent implements OnInit {
       formValue.vaccines &&
       Array.isArray(formValue.vaccines) &&
       formValue.vaccines.length > 0
-        ? formValue.vaccines.map((vaccine: any) => vaccine)
+        ? formValue.vaccines.map((vaccine: any) => vaccine.name) 
         : [];
-    if (vaccinesArray.length > 0) {
-      formData.append('TakedVaccines', JSON.stringify(vaccinesArray));
-    }
 
     return formData;
   }

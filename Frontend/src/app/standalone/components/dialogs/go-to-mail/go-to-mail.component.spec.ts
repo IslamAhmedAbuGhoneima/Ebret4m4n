@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { VaccinationEditComponent } from './vaccination-edit.component';
+import { GoToMailComponent } from './go-to-mail.component';
 
-describe('VaccinationEditComponent', () => {
-  let component: VaccinationEditComponent;
-  let fixture: ComponentFixture<VaccinationEditComponent>;
+describe('GoToMailComponent', () => {
+  let component: GoToMailComponent;
+  let fixture: ComponentFixture<GoToMailComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [VaccinationEditComponent]
+      imports: [GoToMailComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(VaccinationEditComponent);
+    fixture = TestBed.createComponent(GoToMailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

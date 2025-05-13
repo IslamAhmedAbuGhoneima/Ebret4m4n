@@ -360,47 +360,6 @@
                 <div class="flex-1">
                   <div class="relative">
                     <select
-                      formControlName="city"
-                      [ngClass]="{
-                        'border-red-700':
-                          city?.invalid && (city?.touched || city?.dirty),
-                        'border-third-border': city?.valid || city?.untouched
-                      }"
-                      class="w-full px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
-                      name="city"
-                      id="city"
-                    >
-                      <option value="" disabled>اختر محافظة</option>
-                      <option value="القاهرة">القاهرة</option>
-                      <option value="المنيا">المنيا</option>
-                      <option value="الإسكندرية">الإسكندرية</option>
-                    </select>
-
-                    <img
-                      class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
-                      src="/icons/Caret Down.svg"
-                      alt=""
-                    />
-                  </div>
-                  <div
-                    class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
-                    *ngIf="city?.invalid && (city?.touched || city?.dirty)"
-                  >
-                    <img
-                      src="./icons/si_warning-fill.svg"
-                      alt=""
-                      class="w-4 h-4 mt-[1px]"
-                    />
-                    <div>
-                      <small *ngIf="city?.errors?.['required']">
-                        إختر المحافظة.
-                      </small>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex-1">
-                  <div class="relative">
-                    <select
                       formControlName="town"
                       [ngClass]="{
                         'border-red-700':
@@ -412,8 +371,10 @@
                       id="town"
                     >
                       <option value="" disabled>اختر مركز</option>
-                      <option value="سمالوط">سمالوط</option>
-                      <option value="المنيا">المنيا</option>
+
+                      @for (item of egyptCityCenter; track $index) {
+                      <option [value]="item">{{ item }}</option>
+                      }
                     </select>
 
                     <img
@@ -438,10 +399,51 @@
                     </div>
                   </div>
                 </div>
+                <div class="flex-1">
+                  <div class="relative">
+                    <select
+                      formControlName="city"
+                      [ngClass]="{
+                        'border-red-700':
+                          city?.invalid && (city?.touched || city?.dirty),
+                        'border-third-border': city?.valid || city?.untouched
+                      }"
+                      class="w-full px-3 py-4 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
+                      name="city"
+                      id="city"
+                    >
+                      <option value="" disabled>اختر محافظة</option>
+                      @for (item of egyptGovernorates; track $index) {
+                      <option [value]="item">{{ item }}</option>
+                      }
+                    </select>
+
+                    <img
+                      class="block absolute top-1/2 -translate-y-1/2 left-6 cursor-pointer"
+                      src="/icons/Caret Down.svg"
+                      alt=""
+                    />
+                  </div>
+                  <div
+                    class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                    *ngIf="city?.invalid && (city?.touched || city?.dirty)"
+                  >
+                    <img
+                      src="./icons/si_warning-fill.svg"
+                      alt=""
+                      class="w-4 h-4 mt-[1px]"
+                    />
+                    <div>
+                      <small *ngIf="city?.errors?.['required']">
+                        إختر المحافظة.
+                      </small>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="flex-1">
-                <div class="relative">
+                <div class="relative" *ngIf="city?.value && town?.value">
                   <select
                     formControlName="healthUnit"
                     [ngClass]="{
@@ -456,9 +458,13 @@
                     id="healthUnit"
                   >
                     <option value="" disabled>إختر الوحدة الصحية</option>
-                    <option value="F51D0B28-172B-4591-97E0-9E0D203CD3CA">
-                      الوحدة الصحية بملوى
+                    @for (item of healthUnits; track $index) {
+
+                    <option [value]="item.healthCareCenterId">
+                      {{ item.healthCareCenterName }}
                     </option>
+
+                    }
                   </select>
 
                   <img
@@ -481,16 +487,16 @@
                   />
                   <div>
                     <small *ngIf="healthUnit?.errors?.['required']">
-                      يجب إختيار جنس الطفل.
+                      إختر الوحدة الصحية.
                     </small>
                   </div>
                 </div>
-                <div
-                  class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
-                  *ngIf="errorMessage"
-                >
-                  <small> {{ errorMessage }} </small>
-                </div>
+              </div>
+              <div
+                class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+                *ngIf="errorMessage"
+              >
+                <small> {{ errorMessage }} </small>
               </div>
 
               <div class="flex justify-between mt-9 px-3">

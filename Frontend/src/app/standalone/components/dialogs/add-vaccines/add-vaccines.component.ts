@@ -56,7 +56,7 @@ export class AddVaccinesComponent implements OnInit {
 
     if (Array.isArray(birthday)) {
       [day, month, year] = birthday;
-      month = Number(month) - 1; // شهر 1 = index 0
+      month = Number(month) - 1;
     } else {
       throw new Error('قيمة تاريخ الميلاد غير صالحة');
     }

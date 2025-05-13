@@ -14,7 +14,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChildEditProfileComponent } from './components/child-edit-profile/child-edit-profile.component';
 import localeAr from '@angular/common/locales/ar';
-import { paidGuard } from '../../../core/guards/paid.guard';
 
 registerLocaleData(localeAr);
 
@@ -22,10 +21,9 @@ const routes: Routes = [
   { path: '', component: MyChildrenHomePageComponent },
   { path: 'add-child', component: AddChildComponent },
   {
-    path: 'child-vaccine-schedule/:name/:id',
+    path: 'child-vaccine-schedule/:id',
     component: ChildVaccinationScheduleComponent,
-    canActivate: [paidGuard],
-    runGuardsAndResolvers: 'always',
+ 
   },
   {
     path: 'child-edit-profile/:id',

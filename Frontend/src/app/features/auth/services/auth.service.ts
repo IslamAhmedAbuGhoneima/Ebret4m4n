@@ -62,7 +62,6 @@ export class AuthService {
     const accessToken = this.cookies.get(this.tokenKey);
     const refreshToken = this.cookies.get('refresh_token');
 
-    // لو فيه refresh token نعتبر المستخدم لسه ممكن يجدد الدخول
     return !!accessToken || !!refreshToken;
   }
 
@@ -196,5 +195,10 @@ export class AuthService {
           }
         })
       );
+  }
+  getHealthUnits(governorate: any, cityCenter: any) {
+    return this.http.get<any>(
+      `${environment.apiUrl}/HealthCare/healthCares?Governorate=${governorate}&City=${cityCenter}`
+    );
   }
 }

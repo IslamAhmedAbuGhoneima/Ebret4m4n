@@ -1,9 +1,11 @@
-import { Component, Inject, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { ParentService } from '../../../../features/parent/services/parent.service';
 import { Router } from '@angular/router';
-import { PaymentService } from '../../../../core/services/payment/payment.service';
-import { Location } from '@angular/common';
 @Component({
   selector: 'app-payment-required',
   imports: [],
@@ -11,22 +13,22 @@ import { Location } from '@angular/common';
   styleUrl: './payment-required.component.css',
   encapsulation: ViewEncapsulation.None,
 })
-export class PaymentRequiredComponent {
+export class PaymentRequiredComponent implements OnInit {
   errorMessage: any;
   constructor(
-    private dialog: MatDialogRef<PaymentRequiredComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
+    private dialog: MatDialogRef<PaymentRequiredComponent>,
     private router: Router,
-    private paymentService: PaymentService,
-    private location: Location
+    private _ParentService: ParentService
   ) {}
+  ngOnInit(): void {}
 
   confirm() {
-    this.paymentService.ParentPayment(this.data[1], {}).subscribe({
+    this._ParentService.payment(this.data, {}).subscribe({
       next: (res) => {
         const url = res.data;
         if (url) {
-          window.open(url, '_blank');
+          window.open(url, '_self');
         }
       },
       error: (err) => {
