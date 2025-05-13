@@ -8,12 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
+using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Mapster;
-using Ebret4m4n.API.Utilites;
-using System.Threading.Tasks;
-using Ebret4m4n.Shared.DTOs.AppointmentDtos;
 
 
 
@@ -149,32 +147,40 @@ public class ParentController
         
     }
 
-    [HttpPut("{childId}/appointment-reschedule")]
-    public async Task<IActionResult> RescheduleAppointment([FromRoute] string childId, AppointmentRescheduleDto model)
+    [HttpPut("{appointmentId:guid}/appointment-reschedule")]
+    public async Task<IActionResult> AppointmentReschedule([FromRoute] Guid appointmentId, AppointmentRescheduleDto model)
     {
-        var parentId = User.FindFirst("id")!.Value;
+        try
+        {
+            var date = Utility.GetDateOfNextDay(model.Day);
 
-        if (model.Date <= DateTime.UtcNow)
-            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكن اضافه هذا المعاد"));
+            if (date <= DateTime.UtcNow)
+                return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكن اضافه هذا المعاد"));
 
-        var appointment = 
-            await unitOfWork.AppointmentRepo.FindAsync(appointment => appointment.ChildId == childId && appointment.UserId == parentId, true);
+            var appointment =
+                await unitOfWork.AppointmentRepo.FindAsync(appointment => appointment.Id == appointmentId, true);
 
-        if (appointment is null)
-            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم ايجاد اي حجز لهذا الطفل"));
+            if (appointment is null)
+                return NotFound(GeneralResponse<string>.FailureResponse("لم يتم ايجاد اي حجز لهذا الطفل"));
 
-        appointment.Date = model.Date;
+            appointment.Date = date;
 
-        unitOfWork.AppointmentRepo.Update(appointment);
+            unitOfWork.AppointmentRepo.Update(appointment);
 
-        var result = await unitOfWork.SaveAsync();
+            var result = await unitOfWork.SaveAsync();
 
-        if (result == 0)
-            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم اعاده جدوله هذا الحجز"));
+            if (result == 0)
+                return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم اعاده جدوله هذا الحجز"));
 
-        var response = GeneralResponse<string>.SuccessResponse("تم اعاده الجدوله بنجاح");
+            var response = GeneralResponse<string>.SuccessResponse("تم اعاده الجدوله بنجاح");
 
-        return StatusCode(StatusCodes.Status204NoContent, response);
+            return StatusCode(StatusCodes.Status204NoContent, response);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(GeneralResponse<string>.FailureResponse(ex.Message));
+        }
+        
     }
 
     [HttpDelete("{id:guid}/appointment-cancle")]

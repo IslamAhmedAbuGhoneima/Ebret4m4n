@@ -8,7 +8,7 @@ public record ChildVaccinDto
 
     public bool IsTaken { get; init; }
 
-    // public DateTime? TakedAt { get; init; }
+    public DateTime? TakedAt { get; init; }
 
     public int ChildAge { get; init; }
 }
