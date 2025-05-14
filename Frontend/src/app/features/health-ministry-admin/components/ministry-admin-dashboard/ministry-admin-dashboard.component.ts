@@ -52,7 +52,6 @@ export class MinistryAdminDashboardComponent implements OnInit {
       },
     });
   }
-
   // Pie
   public pieChartOptions: ChartConfiguration['options'] = {
     responsive: true,

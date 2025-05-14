@@ -1,82 +1,56 @@
 <section class="min-h-screen font-arabic bg-mainBg-200">
   <div class="flex">
     <div class="flex-1 pt-6 pb-5 container">
-      <h5 class="text-[28px] font-semibold text-[#51419]">وحدات مركز المنيا</h5>
+      <h5 class="text-[28px] font-semibold text-[#51419]">
+        وحدات مركز {{ centerName }}
+      </h5>
       <div class="flex items-center gap-1 mt-3">
-        <a routerLink="/health-ministry/governorates">الصفحة الرئيسية</a>
+        <a [routerLink]="['/health-ministry/governorates']">الصفحة الرئيسية</a>
         <img
           src="/icons/Caret Down.svg"
           alt=""
           class="rotate-90 h-3 w-3 mt-[6px]"
         />
-        <a routerLink="/health-ministry/governorates/governorate">
-          محافظة المنيا</a
+        <a [routerLink]="['/health-ministry/governorates', governorateName]">
+          محافظة {{ governorateName }}</a
         >
         <img
           src="/icons/Caret Down.svg"
           alt=""
           class="rotate-90 h-3 w-3 mt-[6px]"
         />
-        <a routerLink="/health-ministry/governorates/center"> مركز المنيا</a>
+        <a
+          [routerLink]="[
+            '/health-ministry/governorates',
+            governorateName,
+            centerName,
+            centerId
+          ]"
+        >
+          مركز {{ centerName }}</a
+        >
       </div>
 
       <ul class="flex gap-4 flex-wrap mt-6">
+        @for (item of data?.healthCaresList; track $index) {
         <li>
           <a
-            routerLink="/health-ministry/governorates/health-unit"
+            [routerLink]="[
+              '/health-ministry/governorates',
+              governorateName,
+              centerName,
+              centerId,
+              item.healthCareCenterName,
+              item.healthCareCenterId
+            ]"
             class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
           >
-            <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
+            <p class="break-words line-clamp-2">
+              {{ item.healthCareCenterName }}
+            </p>
           </a>
         </li>
-        <li>
-          <a
-            routerLink="/health-ministry/governorates/health-unit"
-            class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-          >
-            <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-          </a>
-        </li>
-        <li>
-          <a
-            routerLink="/health-ministry/governorates/health-unit"
-            class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-          >
-            <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-          </a>
-        </li>
-        <li>
-          <a
-            routerLink="/health-ministry/governorates/health-unit"
-            class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-          >
-            <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-          </a>
-        </li>
-        <li>
-          <a
-            routerLink="/health-ministry/governorates/health-unit"
-            class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-          >
-            <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-          </a>
-        </li>
-        <li>
-          <a
-            routerLink="/health-ministry/governorates/health-unit"
-            class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-          >
-            <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-          </a>
-        </li>
-        <li>
-          <a
-            routerLink="/health-ministry/governorates/health-unit"
-            class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-          >
-            <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-          </a>
-        </li>
+        }
       </ul>
 
       <button
@@ -92,28 +66,34 @@
     <div
       class="w-[313px] min-h-screen bg-white p-6 border-t border-r border-third-border"
     >
-      <h6 class="mb-6 font-semibold text-lg">مركز المنيا</h6>
+      <h6 class="mb-6 font-semibold text-lg">مركز {{ centerName }}</h6>
       <div>
         <div class="mb-6">
           <img class="inline" src="/icons/city-admin.svg" alt="" />
           <span class="mr-1 text-third-txt font-normal">المسئول</span>
-          <p class="font-semibold mt-1">محمد سيد</p>
+          <p class="font-semibold mt-1">
+            {{ data?.cityRecordDetails.firstName }}
+            {{ data?.cityRecordDetails.lastName }}
+          </p>
         </div>
         <div class="mb-6">
           <img class="inline" src="/icons/fluent_call-28-filled.svg" alt="" />
-          <span class="mr-1 text-third-txt font-normal">رقم الهاتف</span>
-          <p class="font-semibold mt-1">+20 123 456 7890</p>
+
+          <span class="mr-1 text-third-txt font-normal">
+            البريد الالكتروني
+          </span>
+          <p class="font-semibold mt-1">{{ data?.cityRecordDetails.email }}</p>
         </div>
         <div class="mb-6">
           <img class="inline" src="/icons/location.svg" alt="" />
           <span class="mr-1 text-third-txt font-normal">العنوان</span>
-          <p class="font-semibold mt-1">محافظة المنيا</p>
+          <p class="font-semibold mt-1">محافظة {{ governorateName }}</p>
         </div>
         <div class="mb-6">
           <span class="mr-1 text-third-txt font-normal"
             >عدد الوحدات الصحية</span
           >
-          <p class="font-semibold mt-1">30</p>
+          <p class="font-semibold mt-1">{{ data?.healthCaresList.length }}</p>
         </div>
       </div>
     </div>

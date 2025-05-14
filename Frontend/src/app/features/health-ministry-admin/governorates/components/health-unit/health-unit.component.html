@@ -1,7 +1,7 @@
 <section class="bg-mainBg-200 min-h-screen">
   <div class="container pt-6 pb-5">
     <h6 class="text-[28px] font-semibold text-[#51419]">
-      الوحدة الصحية بقرية البرجاية
+      {{ healthCareCenterName }}
     </h6>
     <div class="flex items-center gap-1 mt-3">
       <a routerLink="/health-ministry/governorates">الصفحة الرئيسية</a>
@@ -10,22 +10,40 @@
         alt=""
         class="rotate-90 h-3 w-3 mt-[6px]"
       />
-      <a routerLink="/health-ministry/governorates/governorate">
-        محافظة المنيا</a
+      <a [routerLink]="['/health-ministry/governorates', governorateName]">
+        محافظة {{ governorateName }}</a
       >
       <img
         src="/icons/Caret Down.svg"
         alt=""
         class="rotate-90 h-3 w-3 mt-[6px]"
       />
-      <a routerLink="/health-ministry/governorates/center"> مركز المنيا</a>
+      <a
+        [routerLink]="[
+          '/health-ministry/governorates',
+          governorateName,
+          centerName,
+          centerId
+        ]"
+      >
+        مركز {{ centerName }}</a
+      >
       <img
         src="/icons/Caret Down.svg"
         alt=""
         class="rotate-90 h-3 w-3 mt-[6px]"
       />
-      <a routerLink="/health-ministry/governorates/health-unit">
-        الوحدة الصحية بقرية البرجاية</a
+      <a
+        [routerLink]="[
+          '/health-ministry/governorates',
+          governorateName,
+          centerName,
+          centerId,
+          healthCareCenterName,
+          healthCareCenterId
+        ]"
+      >
+        {{ healthCareCenterName }}</a
       >
     </div>
 
@@ -33,29 +51,43 @@
       <div
         class="bg-white rounded-lg px-6 pt-4 pb-8 mb-8 border border-third-border"
       >
-        <h6 class="font-semibold text-lg mb-6">معلومات الوحدة</h6>
+        <h6 class="font-semibold text-lg mb-6">
+          معلومات {{ data?.healthCareCenterName }}
+        </h6>
         <div class="flex mb-6 pr-4">
           <div class="w-1/2">
             <img class="inline" src="/icons/location.svg" alt="" />
             <span class="mr-1 text-third-txt font-normal">العنوان</span>
-            <p class="font-semibold mt-1">مركز المنيا - محافظة المنيا</p>
+            <p class="font-semibold mt-1">
+              محافظة {{ data?.governorate }}
+
+              -مركز {{ data?.city }} - قرية {{ data?.village }}
+            </p>
           </div>
           <div class="w-1/2">
             <img class="inline" src="/icons/city-admin.svg" alt="" />
             <span class="mr-1 text-third-txt font-normal">المسئول</span>
-            <p class="font-semibold mt-1">محمد سيد</p>
+            <p class="font-semibold mt-1">
+              {{
+                data?.organizerName == null ? "غير مسجل" : data?.organizerName
+              }}
+            </p>
           </div>
         </div>
         <div class="flex mb-6 pr-4">
           <div class="w-1/2">
             <img class="inline" src="/icons/lucide_calendar-days.svg" alt="" />
             <span class="mr-1 text-third-txt font-normal">أيام العمل</span>
-            <p class="font-semibold mt-1">الثلاثاء - الأربعاء</p>
+            <p class="font-semibold mt-1">
+              {{ data?.firstDayAr }} - {{ data?.secondDayAr }}
+            </p>
           </div>
           <div class="w-1/2">
             <img class="inline" src="/icons/doctor.svg" alt="" />
             <span class="mr-1 text-third-txt font-normal">الدكتور</span>
-            <p class="font-semibold mt-1">محمد سيد</p>
+            <p class="font-semibold mt-1">
+              {{ data?.doctorName == null ? "غير مسجل" : data?.doctorName }}
+            </p>
           </div>
         </div>
       </div>

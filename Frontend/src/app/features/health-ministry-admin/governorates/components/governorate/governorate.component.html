@@ -12,12 +12,7 @@
           alt=""
           class="rotate-90 h-3 w-3 mt-[6px]"
         />
-        <a
-          [routerLink]="[
-            '/health-ministry/governorates/governorate',
-            governorateName
-          ]"
-        >
+        <a [routerLink]="['/health-ministry/governorates', governorateName]">
           محافظة {{ data.governorate }}
         </a>
       </div>
@@ -25,10 +20,15 @@
       <ul class="flex gap-4 flex-wrap mt-6">
         <li *ngFor="let item of data.cities; index as i">
           <a
-            [routerLink]="['/health-ministry/governorates/center', item]"
+            [routerLink]="[
+              '/health-ministry/governorates',
+              governorateName,
+              item.city,
+              item.userId
+            ]"
             class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
           >
-            <p class="break-words line-clamp-2">مركز {{ item }}</p>
+            <p class="break-words line-clamp-2">مركز {{ item.city }}</p>
           </a>
         </li>
       </ul>

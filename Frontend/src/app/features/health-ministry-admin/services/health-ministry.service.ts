@@ -1,7 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { AddAdmin } from '../../../core/interfaces/AddAdmin';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +20,11 @@ export class HealthMinistryService {
     return this.http.get<any>(
       `${environment.apiUrl}/MinistryOfHealth/governorate-details`,
       { params }
+    );
+  }
+  getCityCenterDetails(cityAdminId: string) {
+    return this.http.get<any>(
+      `${environment.apiUrl}/MinistryOfHealth/${cityAdminId}/cities-healthcares-datails`
     );
   }
 

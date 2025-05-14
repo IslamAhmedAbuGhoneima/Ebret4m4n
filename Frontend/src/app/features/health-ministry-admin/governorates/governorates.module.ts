@@ -8,15 +8,15 @@ import { HealthUnitComponent } from './components/health-unit/health-unit.compon
 const routes: Routes = [
   { path: '', component: GovernoratesListComponent },
   {
-    path: 'governorate/:governorateName',
+    path: ':governorateName',
     component: GovernorateComponent,
   },
   {
-    path: 'center',
+    path: ':governorateName/:centerName/:centerId',
     component: CenterComponent,
   },
   {
-    path: 'health-unit',
+    path: ':governorateName/:centerName/:centerId/:healthCareCenterName/:healthCareCenterId',
     component: HealthUnitComponent,
   },
 ];
