@@ -1,10 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
+import { AuthService } from '../../../../features/auth/services/auth.service';
 @Component({
   selector: 'app-edit-admin',
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './edit-administrator.component.html',
   styleUrl: './edit-administrator.component.css',
 })
@@ -12,15 +19,55 @@ export class EditAdministratorComponent implements OnInit {
   formEditProfileAdmin!: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
-
+  egyptGovernorates: string[] = [
+    'القاهرة',
+    'الجيزة',
+    'الإسكندرية',
+    'الدقهلية',
+    'البحر الأحمر',
+    'البحيرة',
+    'الفيوم',
+    'الغربية',
+    'الإسماعيلية',
+    'المنوفية',
+    'المنيا',
+    'القليوبية',
+    'الوادي الجديد',
+    'السويس',
+    'أسوان',
+    'أسيوط',
+    'بني سويف',
+    'بورسعيد',
+    'دمياط',
+    'جنوب سيناء',
+    'كفر الشيخ',
+    'مطروح',
+    'الأقصر',
+    'قنا',
+    'شمال سيناء',
+    'سوهاج',
+    'الشرقية',
+  ];
+  userId: any;
+  data: any;
+  msgError: any;
+  role: any;
+  errorMessage: any;
   constructor(
     private fb: FormBuilder,
     private route: Router,
-    private location: Location
+    private location: Location,
+    private _ActivatedRoute: ActivatedRoute,
+    private _HealthMinistryService: HealthMinistryService,
+    private _AuthService: AuthService
   ) {}
 
   ngOnInit() {
+    this.role = this._AuthService.getRole();
     this.createForm();
+    this._ActivatedRoute.paramMap.subscribe((params) => {
+      this.userId = params.get('userId');
+    });
     this.loadUserData();
   }
 
@@ -45,55 +92,78 @@ export class EditAdministratorComponent implements OnInit {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      center: ['', [Validators.required]],
+      governorate: [''],
+      center: [''],
     });
-  }
-
-  addAdmin() {
-    if (this.formEditProfileAdmin.valid) {
-      console.log('valid');
-      // let model: VMHttp = {
-      //   username: this.formEditProfileAdmin.value['username'],
-      //   email: this.formEditProfileAdmin.value['email'],
-      //   password: this.formEditProfileAdmin.value['password'],
-      //   role: 'user',
-      // };
-      // this._apiService.createAccount(model).subscribe({
-      //   next: (response: any) => {
-      //     // Use translation keys for Toastr messages
-      //     this.toastr.success(
-      //       this.translate.instant('REGISTER.SUCCESS_MESSAGE'),
-      //       this.translate.instant('REGISTER.GREETING', {
-      //         username: model.username,
-      //       })
-      //     );
-      //     localStorage.setItem('user_token', response.token);
-      //     this.router.navigate(['/tasks']);
-      //   },
-      // });
-    } else {
-      console.log('InValid');
-    }
-  }
-
-  loadUserData() {
-    const userData = {
-      firstName: 'محمد',
-      secondName: 'أحمد',
-      email: 'someone@example.com',
-      center: 'المنيا',
-    };
-
-    this.formEditProfileAdmin.patchValue(userData);
+    this.setValidatorsByUserType();
   }
 
   saveNewData() {
     if (this.formEditProfileAdmin.valid && this.formEditProfileAdmin.dirty) {
-      console.log('valid');
-    } else {
+      this.getService();
+    }
+  }
+  setValidatorsByUserType() {
+    this.governorate?.clearValidators();
+    this.center?.clearValidators();
+
+    switch (this.role) {
+      case 'admin':
+        this.governorate?.setValidators([Validators.required]);
+        break;
+      case 'center-admin':
+        this.center?.setValidators([Validators.required]);
+        break;
+    }
+
+    this.governorate?.updateValueAndValidity();
+    this.center?.updateValueAndValidity();
+  }
+
+  loadUserData() {
+    if (this.role === 'admin') {
+      this._HealthMinistryService
+        .getGovernorateAdminDetails(this.userId)
+        .subscribe({
+          next: (res) => {
+            this.data = res.data;
+            const userData = {
+              firstName: this.data.firstName,
+              secondName: this.data.lastName,
+              email: this.data.email,
+              governorate: this.data.governorate,
+            };
+
+            this.formEditProfileAdmin.patchValue(userData);
+          },
+          error: (err) => {
+            this.msgError = err.error.message;
+          },
+        });
     }
   }
 
+  getService() {
+    if (this.role === 'admin') {
+      const MODEL = {
+        firstName: this.formEditProfileAdmin.value.firstName,
+        lastName: this.formEditProfileAdmin.value.secondName,
+        email: this.formEditProfileAdmin.value.email,
+        password: this.formEditProfileAdmin.value.password,
+        governorate: this.formEditProfileAdmin.value.governorate,
+      };
+      this._HealthMinistryService
+        .editGovernorateAdmin(this.userId, MODEL)
+        .subscribe({
+          next: (res) => {
+            this.route.navigate(['/admins']);
+          },
+          error: (err) => {
+            this.errorMessage = err.error.Message;
+          },
+        });
+    }
+  }
   get firstName() {
     return this.formEditProfileAdmin.get('firstName');
   }
@@ -103,6 +173,9 @@ export class EditAdministratorComponent implements OnInit {
 
   get center() {
     return this.formEditProfileAdmin.get('center');
+  }
+  get governorate() {
+    return this.formEditProfileAdmin.get('governorate');
   }
   get email() {
     return this.formEditProfileAdmin.get('email');

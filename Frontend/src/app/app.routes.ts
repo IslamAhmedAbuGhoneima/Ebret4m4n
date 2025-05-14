@@ -150,7 +150,7 @@ export const routes: Routes = [
         },
       },
       {
-        path: 'admins/edit-admin',
+        path: 'admins/edit-admin/:userId',
         loadComponent: () =>
           import(
             './standalone/components/administrator/edit-administrator/edit-administrator.component'

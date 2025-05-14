@@ -11,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { GlobalService } from '../../../../core/services/APIs/global.service';
+import { ParentService } from '../../../../features/parent/services/parent.service';
 
 @Component({
   selector: 'app-add-vaccines',
@@ -30,14 +31,14 @@ export class AddVaccinesComponent implements OnInit {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private _GlobalService: GlobalService,
+    private _ParentService: ParentService,
     private dialog: MatDialogRef<AddVaccinesComponent>
   ) {}
 
   ngOnInit(): void {
     this.ageInMonths = this.calculateAgeInMonths(this.data);
 
-    this._GlobalService.getVaccines().subscribe({
+    this._ParentService.getVaccines().subscribe({
       next: (res) => {
         this.vaccines = this.formateData(
           this.filterVaccinesByAge(res.data, this.ageInMonths)

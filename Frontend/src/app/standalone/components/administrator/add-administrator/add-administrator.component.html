@@ -148,24 +148,31 @@
             </div>
           </div>
         </div>
+
+        @if (role==='admin') {
         <div class="mb-4 flex-1 font-arabic">
           <div class="relative">
             <select
-              formControlName="center"
+              formControlName="governorate"
               [ngClass]="{
                 'border-red-700':
-                  center?.invalid && (center?.touched || center?.dirty),
-                'border-third-border': center?.valid || center?.untouched
+                  governorate?.invalid &&
+                  (governorate?.touched || governorate?.dirty),
+                'border-third-border':
+                  governorate?.valid || governorate?.untouched
               }"
               class="w-full text-third-txt px-3 py-4 rounded-md border border-third-border appearance-none text-right outline-none cursor-pointer"
-              name="center"
-              id="center"
+              name="governorate"
+              id="governorate"
             >
-              <option value="" disabled>المركز</option>
-              <option value="المنيا">المنيا</option>
-              <option value="ابو قرقاص">ابو قرقاص</option>
-              <option value="مغاغه">مغاغه</option>
+              <option value="" disabled>إختر محافظة</option>
+              @for (item of egyptGovernorates; track $index) {
+
+              <option [value]="item">{{ item }}</option>
+
+              }
             </select>
+
             <img
               class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
               src="icons/Caret Down.svg"
@@ -174,7 +181,10 @@
           </div>
           <div
             class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
-            *ngIf="center?.invalid && (center?.touched || center?.dirty)"
+            *ngIf="
+              governorate?.invalid &&
+              (governorate?.touched || governorate?.dirty)
+            "
           >
             <img
               src="./icons/si_warning-fill.svg"
@@ -182,12 +192,14 @@
               class="w-4 h-4 mt-[1px]"
             />
             <div>
-              <small *ngIf="center?.errors?.['required']">
-                يجب إختيار المركز .
+              <small *ngIf="governorate?.errors?.['required']">
+                يجب إختيار المحافظة .
               </small>
             </div>
           </div>
         </div>
+        }
+
         <div class="mb-4">
           <label class="block text-xl font-semibold mb-2 mr-2" for="password"
             >كلمة المرور</label
@@ -314,6 +326,7 @@
 
         <div class="flex justify-between mt-9 font-arabic">
           <button
+            type="button"
             (click)="goBack()"
             class="flex items-center justify-center gap-2 text-base font-semibold bg-[#151419] text-mainBg-100 px-6 py-[9px] rounded-lg transition duration-200 hover:opacity-80"
             role="button"
@@ -323,8 +336,8 @@
 
           <button
             type="submit"
-            [disabled]="addAdminForm.invalid"
-            class="disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer flex font-arabic gap-2 py-[9px] px-6 rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+            *ngIf="addAdminForm.valid"
+            class="cursor-pointer flex font-arabic gap-2 py-[9px] px-6 rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
           >
             إنشاء حساب
           </button>

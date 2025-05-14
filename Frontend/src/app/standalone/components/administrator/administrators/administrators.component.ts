@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { GlobalService } from '../../../../core/services/APIs/global.service';
+import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 
 @Component({
   selector: 'app-administrators',
@@ -15,7 +16,7 @@ export class AdministratorsComponent {
   data: any;
   constructor(
     private authService: AuthService,
-    private _GlobalService: GlobalService
+    private _HealthMinistryService: HealthMinistryService
   ) {}
 
   ngOnInit(): void {
@@ -26,7 +27,7 @@ export class AdministratorsComponent {
   //all function to health ministry
   getAdmins() {
     if (this.role === 'admin') {
-      this._GlobalService.getAdmins().subscribe({
+      this._HealthMinistryService.getGovernoratesAdmins().subscribe({
         next: (res: { data: any }) => {
           this.data = res.data;
         },

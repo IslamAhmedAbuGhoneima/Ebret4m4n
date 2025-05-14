@@ -1,7 +1,8 @@
-import { Component, Input, OnInit, model } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -9,12 +10,11 @@ import { Router, RouterLink } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { passwordMatch } from '../../../../core/customValidation/passwordMatch.validator';
 import { AuthService } from '../../../../features/auth/services/auth.service';
-import { AddAdmin } from '../../../../core/interfaces/AddAdmin';
-import { GlobalService } from '../../../../core/services/APIs/global.service';
+import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 
 @Component({
   selector: 'app-add-administrator',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './add-administrator.component.html',
   styleUrl: './add-administrator.component.css',
 })
@@ -24,12 +24,40 @@ export class AddAdministratorComponent implements OnInit {
   showConfirmPassword: boolean = false;
   role: string | null | undefined;
   errorMessage: string = '';
-
+  egyptGovernorates: string[] = [
+    'القاهرة',
+    'الجيزة',
+    'الإسكندرية',
+    'الدقهلية',
+    'البحر الأحمر',
+    'البحيرة',
+    'الفيوم',
+    'الغربية',
+    'الإسماعيلية',
+    'المنوفية',
+    'المنيا',
+    'القليوبية',
+    'الوادي الجديد',
+    'السويس',
+    'أسوان',
+    'أسيوط',
+    'بني سويف',
+    'بورسعيد',
+    'دمياط',
+    'جنوب سيناء',
+    'كفر الشيخ',
+    'مطروح',
+    'الأقصر',
+    'قنا',
+    'شمال سيناء',
+    'سوهاج',
+    'الشرقية',
+  ];
   constructor(
     private fb: FormBuilder,
     private route: Router,
     private location: Location,
-    private _GlobalService: GlobalService,
+    private _HealthMinistryService: HealthMinistryService,
     private _AuthService: AuthService
   ) {}
 
@@ -60,48 +88,58 @@ export class AddAdministratorComponent implements OnInit {
           ],
         ],
         email: ['', [Validators.required, Validators.email]],
-        center: ['', [Validators.required]],
+        governorate: [''],
+        center: [''],
         password: ['', [Validators.required, Validators.minLength(8)]],
         confirmPassword: ['', [Validators.required]],
       },
       { validators: passwordMatch }
     );
+    this.setValidatorsByUserType();
   }
 
+  setValidatorsByUserType() {
+    this.governorate?.clearValidators();
+    this.center?.clearValidators();
+
+    switch (this.role) {
+      case 'admin':
+        this.governorate?.setValidators([Validators.required]);
+        break;
+      case 'center-admin':
+        this.center?.setValidators([Validators.required]);
+        break;
+    }
+
+    this.governorate?.updateValueAndValidity();
+    this.center?.updateValueAndValidity();
+  }
   addAdmin() {
     if (this.addAdminForm.valid) {
-      const model = {
+      this.getService();
+    }
+  }
+
+  getService() {
+    if (this.role === 'admin') {
+      const MODEL = {
         firstName: this.addAdminForm.value.firstName,
         lastName: this.addAdminForm.value.lastName,
         email: this.addAdminForm.value.email,
         password: this.addAdminForm.value.password,
-        governorate: this.addAdminForm.value.center,
+        governorate: this.addAdminForm.value.governorate,
       };
-
-      this.getService(model);
-      this.goBack();
-    }
-  }
-
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
-  toggleConfirmPassword() {
-    this.showConfirmPassword = !this.showConfirmPassword;
-  }
-  getService(model: AddAdmin) {
-    if (this.role === 'admin') {
-      this._GlobalService.addAdmin(model).subscribe({
-        next: (res) => {},
+      this._HealthMinistryService.addGovernorateAdmin(MODEL).subscribe({
+        next: (res) => {
+          this.route.navigate(['/admins']);
+        },
         error: (err) => {
           this.errorMessage = err.error.Message;
         },
       });
     }
   }
-  goBack() {
-    this.location.back();
-  }
+
   get firstName() {
     return this.addAdminForm.get('firstName');
   }
@@ -112,6 +150,10 @@ export class AddAdministratorComponent implements OnInit {
   get center() {
     return this.addAdminForm.get('center');
   }
+  get governorate() {
+    return this.addAdminForm.get('governorate');
+  }
+
   get email() {
     return this.addAdminForm.get('email');
   }
@@ -122,5 +164,14 @@ export class AddAdministratorComponent implements OnInit {
 
   get confirmPassword() {
     return this.addAdminForm.get('confirmPassword');
+  }
+  togglePassword() {
+    this.showPassword = !this.showPassword;
+  }
+  toggleConfirmPassword() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+  goBack() {
+    this.location.back();
   }
 }

@@ -24,7 +24,11 @@ export class ParentService {
       model
     );
   }
-
+  getVaccines() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/Child/child-base-vaccines`
+    );
+  }
   deleteChild(childId: any) {
     return this.http.delete<any>(
       `${environment.apiUrl}/Child/${childId}/child-remove`
@@ -119,5 +123,4 @@ export class ParentService {
       `${environment.apiUrl}/Parent/children-reservations`
     );
   }
-
 }
