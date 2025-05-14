@@ -63,4 +63,20 @@ export class HealthMinistryService {
       model
     );
   }
+  getOrders() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/Order/requested-governorate-orders`
+    );
+  }
+  getOrderDetails(orderId: any) {
+    return this.http.get<any>(
+      `${environment.apiUrl}/Order/${orderId}/order-details`
+    );
+  }
+  acceptGovernorateOrder(orderId: any) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Order/${orderId}/accept-governorate-order-request`,
+      {}
+    );
+  }
 }

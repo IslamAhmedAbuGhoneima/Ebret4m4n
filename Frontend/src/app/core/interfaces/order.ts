@@ -1,6 +1,8 @@
 export interface Order {
-  id: number;
-  status: 'قيد الإنتظار' | 'مستلمة' | 'غير مستلمة' | 'جارى التوصيل';
+  id: string;
+  status: string;
   center?: string;
   order?: string;
+  governorate?: string;
+  dateRequested: string;
 }

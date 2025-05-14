@@ -9,6 +9,5 @@ import { HttpClient } from '@angular/common/http';
 export class GlobalService {
   constructor(protected http: HttpClient) {}
 
- 
 
 }

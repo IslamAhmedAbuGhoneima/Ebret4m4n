@@ -122,7 +122,7 @@ export const routes: Routes = [
           ).then((c) => c.MyOrdersComponent),
         canActivate: [roleGuard],
         data: {
-          roles: ['governorateAdmin', 'organizer', 'cityAdmin', 'admin'],
+          roles: ['governorateAdmin', 'organizer', 'cityAdmin'],
         },
       },
 

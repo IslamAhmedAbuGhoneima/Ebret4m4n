@@ -33,10 +33,10 @@ export class MyOrdersComponent implements OnInit {
     //   this.applyFilters();
     // });
     this.allOrders = [
-      { id: 1, status: 'قيد الإنتظار', order: 'أوردر#11' },
-      { id: 2, status: 'مستلمة', order: 'أوردر#11' },
-      { id: 3, status: 'غير مستلمة', order: 'أوردر#11' },
-      { id: 4, status: 'جارى التوصيل', order: 'أوردر#11' },
+      // { id: 1, status: 'قيد الإنتظار', order: 'أوردر#11' },
+      // { id: 2, status: 'مستلمة', order: 'أوردر#11' },
+      // { id: 3, status: 'غير مستلمة', order: 'أوردر#11' },
+      // { id: 4, status: 'جارى التوصيل', order: 'أوردر#11' },
     ];
     this.filteredOrders = [...this.allOrders]; // مبدئيًا نعرض الكل
   }
