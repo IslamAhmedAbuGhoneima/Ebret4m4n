@@ -1,7 +1,6 @@
 ﻿using Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
 using Ebret4m4n.Entities.Models;                    
 using Microsoft.AspNetCore.Mvc;                                                                 
 using Ebret4m4n.Shared.DTOs;                        
@@ -12,32 +11,19 @@ using Mapster;
 namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
-[Authorize(Roles = "governorateAdmin,admin")]
+[Authorize(Roles = "governorateAdmin")]
 [ApiController]
 public class GovernorateAdminController
     (IUnitOfWork unitOfWork, 
     UserManager<ApplicationUser> userManager) : ControllerBase
 {
     [HttpGet("cities")]
-    public IActionResult GetCities([FromQuery] string? governorate)
+    public IActionResult GetCities()
     {
-        string adminGovernorate = string.Empty;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
-
-        if (adminRole == "governorateAdmin")
-            adminGovernorate = User.FindFirst("governorate")!.Value;
-
-        if (adminRole == "admin" && governorate == null)
-            return BadRequest(GeneralResponse<string>.FailureResponse("من فظلك ادخل اسم المحافظه لتحميل المراكز الخاصه بها"));
-
-        var targetGovernorate = adminRole == "admin" ? governorate : adminGovernorate;
-
-        if (governorate is not null && adminGovernorate != governorate && adminRole != "admin")
-            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكنك عرض مدن محافظه اخري"));
-
+        string adminGovernorate = User.FindFirst("governorate")!.Value;
 
         var cities = unitOfWork.CityAdminStaffRepo
-            .FindByCondition(hc => hc.Governorate == targetGovernorate, false)
+            .FindByCondition(hc => hc.Governorate == adminGovernorate, false)
             .Select(hc => hc.City)
             .Distinct()
             .ToList() ?? [];
@@ -51,7 +37,7 @@ public class GovernorateAdminController
     public async Task<IActionResult> CityDetails([FromQuery] string cityName)
     {
         var cityAdminStaff =
-             await unitOfWork.CityAdminStaffRepo.FindAsync(C => C.City == cityName, false, ["MainInventories", "User"]);
+             await unitOfWork.CityAdminStaffRepo.FindAsync(C => C.City == cityName, false, ["MainInventories", "User", "HealthCareCenters"]);
 
         if (cityAdminStaff is null)
             return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد ادمن لهذه المدينه"));
@@ -65,7 +51,6 @@ public class GovernorateAdminController
     }
 
     [HttpGet("city-admins")]
-    [Authorize(Roles = "governorateAdmin")]
     public IActionResult CityAdmins()
     {
         var governorateAdminId = User.FindFirst("id")!.Value;
@@ -81,7 +66,6 @@ public class GovernorateAdminController
     }
 
     [HttpPost("city-admin-add")]
-    [Authorize(Roles = "governorateAdmin")]
     public async Task<IActionResult> AddCityAdmin(AddCityAdminDto model)
     {
         if (!ModelState.IsValid)
@@ -124,7 +108,6 @@ public class GovernorateAdminController
         return Ok(response);
     }
 
-
     [HttpGet("{cityAdminId}/city-admin-data")]
     public async Task<IActionResult> GetCityAdminData(string cityAdminId)
     {
@@ -157,7 +140,7 @@ public class GovernorateAdminController
         var userMangerResult = await userManager.UpdateAsync(cityAdmin.User);
 
         if(!userMangerResult.Succeeded)
-            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث البيانات حاول مره اخري"));
+            return BadRequest(GeneralResponse<string>.FailureResponse("خطا في البيانات المدخله او الايميل موجود من قبل"));
 
         unitOfWork.CityAdminStaffRepo.Update(cityAdmin);
 
@@ -171,9 +154,7 @@ public class GovernorateAdminController
         return Ok(response);
     }
 
-
     [HttpDelete("{cityAdminId:guid}/remove-admin")]
-    [Authorize(Roles = "governorateAdmin")]
     public async Task<IActionResult> DeleteCityAdmin(Guid cityAdminId)
     {
         var adminId = cityAdminId.ToString();

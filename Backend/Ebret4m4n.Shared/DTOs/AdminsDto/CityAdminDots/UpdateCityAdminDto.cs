@@ -12,7 +12,6 @@ public record UpdateCityAdminDto(
     string LastName,
     [Required(ErrorMessage = "من فضلك ادخل عنوان بريد الكتروني")]
     [EmailAddress(ErrorMessage = "من فضلك ادخل بريد الكنروني صحيح")]
-    [UniqueEmail]
     string Email,
     [Required(ErrorMessage = "من فضلك ادخل المركز الذي سيتم ادارته من قبل هذ المستخدم")]
     string City);

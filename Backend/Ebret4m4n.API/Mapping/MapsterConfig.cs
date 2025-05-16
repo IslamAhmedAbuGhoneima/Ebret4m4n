@@ -124,7 +124,9 @@ public static class MapsterConfig
             .Map(dest => dest.UserName, src => $"{src.User.FirstName} {src.User.LastName}");
 
         TypeAdapterConfig<CityAdminStaff, CityRecordDetailsDto>.NewConfig()
-            .Map(dest => dest, src => src.User);
+            .Map(dest => dest, src => src.User)
+            .Map(dest => dest.HealthCares, src => src.HealthCareCenters.Adapt<List<HealthCaresListDto>>())
+            .Map(dest => dest.HealthCareCount, src => src.HealthCareCenters.Count);
 
 
         TypeAdapterConfig<GovernorateAdminStaff, GovernorateDetailsDto>.NewConfig()
@@ -151,7 +153,7 @@ public static class MapsterConfig
 
         TypeAdapterConfig<CityAdminStaff, HealthCaresCityDto>.NewConfig()
             .Map(dest => dest.HealthCaresList, src => src.HealthCareCenters.Adapt<List<HealthCaresListDto>>())
-            .Map(dest => dest.CityRecordDetails.healthCareCount, src => src.HealthCareCenters.Count)
+            .Map(dest => dest.CityRecordDetails.HealthCareCount, src => src.HealthCareCenters.Count)
             .Map(dest => dest.CityRecordDetails, src => src.User.Adapt<CityRecordDetailsDto>())
             .Map(dest => dest.CityRecordDetails.MainInventories, src => src.MainInventories.Adapt<List<InventoryDto>>());
 

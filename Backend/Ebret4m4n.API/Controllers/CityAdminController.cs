@@ -8,13 +8,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.API.Hubs;
 using Mapster;
-
 
 
 
@@ -30,25 +28,13 @@ public class CityAdminController
 {
 
     [HttpGet("healthcareCenter-village")]
-    [Authorize(Roles = "cityAdmin,admin")]
-    public IActionResult GetHealthCareInVillage([FromQuery] string? city)
+    [Authorize(Roles = "cityAdmin")]
+    public IActionResult GetHealthCareInVillage()
     {
-        string adminCity = string.Empty;
-        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
-
-        if (adminRole == "admin" && city == null)
-            return  BadRequest(GeneralResponse<string>.FailureResponse("من فضلك ادخل اسم المدينه لتحميل الوحدات الصحيه الخاصه بها"));
-
-        if (adminRole == "cityAdmin")
-            adminCity = User.FindFirst("city")!.Value;
-
-        var targetCity = adminRole == "admin" ? city : adminCity;
-
-        if (city is not null && adminCity != city && adminRole != "admin")
-            return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكنك عرض وحدات صحيه من مدينه اخري"));
+        string adminCity = User.FindFirst("city")!.Value;
 
         var healthCareCenters = unitOfWork.HealthCareCenterRepo
-            .FindByCondition(hc => hc.City == targetCity, false)
+            .FindByCondition(hc => hc.City == adminCity, false)
             .Select(hc => hc.Adapt<HealthCaresListDto>())
             .ToList();
 
@@ -61,7 +47,7 @@ public class CityAdminController
     }
 
     [HttpGet("{id:guid}/healthCareCenter")]
-    [Authorize(Roles = "cityAdmin,admin")]
+    [Authorize(Roles = "cityAdmin,governorateAdmin,admin")]
     public async Task<IActionResult> HealthCareDetails(Guid id)
     {
         var healthCareCenter = await unitOfWork.HealthCareCenterRepo

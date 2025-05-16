@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Contracts;
 using Mapster;
-using System.Threading.Tasks;
 
 
 
@@ -60,7 +59,6 @@ public class MinistryOfHealthController
 
         return Ok(response);   
     }
-
 
     [HttpPost("add-governorate-admin")]
     public async Task<IActionResult> AddGovernorateAdmin([FromBody] AddGovernorateAdminDto model)
@@ -138,7 +136,6 @@ public class MinistryOfHealthController
     [HttpPut("{governorateAdminId:guid}/update-governorate-admins")]
     public async Task<IActionResult> UpdateGovernorateAdmin(Guid governorateAdminId, [FromBody] UpdateGovernorateAdminDto model)
     {
-        //var admin = await userManager.FindByIdAsync(governorateAdminId.ToString());
         var admin  = await unitOfWork.GovernorateAdminRepo.FindAsync(admin => admin.UserId == governorateAdminId.ToString(), true, ["User"]);
 
         if (admin is null)
