@@ -1,9 +1,10 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChartConfiguration } from 'chart.js';
 import { ChartData, ChartEvent, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart } from 'chart.js';
+import { GovernorateAdminService } from '../../services/governorateAdmin.service';
 
 // تسجيل الـ plugins
 Chart.register(ChartDataLabels);
@@ -13,13 +14,41 @@ Chart.register(ChartDataLabels);
   templateUrl: './city-admin-dashboard.component.html',
   styleUrl: './city-admin-dashboard.component.css',
 })
-export class CityAdminDashboardComponent {
+export class CityAdminDashboardComponent implements OnInit {
   @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
   @ViewChild(BaseChartDirective) chartBar:
     | BaseChartDirective<'bar'>
     | undefined;
+  data: any = {};
+  errorMessage: any;
+  constructor(private _GovernorateAdminService: GovernorateAdminService) {}
 
+  ngOnInit(): void {
+    this.getStatistics();
+  }
+  getStatistics() {
+    this._GovernorateAdminService.getStatisticsOfGovernorateAdmin().subscribe({
+      next: (res) => {
+        this.data = res;
+        const labels = this.data.topCitiesByVaccines.map(
+          (item: any) => item.city
+        );
+        const vaccines = this.data.topCitiesByVaccines.map(
+          (item: any) => item.requestedAmount
+        );
+
+        this.barChartData.labels = labels;
+        this.barChartData.datasets[0].data = vaccines;
+        this.barChartData = { ...this.barChartData };
+      },
+      error: (err) => {
+        this.errorMessage = err.error.Message;
+      },
+    });
+  }
   // Pie
+  public pieChartType: ChartType = 'pie';
+
   public pieChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     plugins: {
@@ -57,18 +86,16 @@ export class CityAdminDashboardComponent {
     },
   };
   public pieChartData: ChartData<'pie', number[], string | string[]> = {
-    labels: ['ذكر', 'أنثى'],
+    labels: ['طفل', 'طفلة'],
     datasets: [
       {
-        data: [300, 500],
+        data: [this.data.maleChildren, this.data.femaleChildren],
         backgroundColor: ['#00ACF8', '#ec4899'], // 💙 ذكر، 💗 أنثى
       },
     ],
   };
-  public pieChartType: ChartType = 'pie';
 
   // bar;
-
   public barChartType = 'bar' as const;
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
@@ -110,36 +137,12 @@ export class CityAdminDashboardComponent {
   };
 
   public barChartData: ChartData<'bar'> = {
-    labels: [
-      'القاهرة',
-      'الجيزة',
-      'الإسكندرية',
-      'البحيرة',
-      'الفيوم',
-      'الغربية',
-      'الإسماعيلية',
-      'المنوفية',
-      'المنيا',
-      'السويس',
-      'أسوان',
-      'أسيوط',
-      'بني سويف',
-      'بورسعيد',
-      'دمياط',
- 
-      'مطروح',
-      'الأقصر',
-      'قنا',
-
-    ],
+    labels: [],
     datasets: [
       {
         label: 'عدد الطلبات',
-        data: [
-          320000, 180000, 370000, 260000, 120000, 210000, 20000, 210000,
-          220000, 210000, 200000, 190000, 180000, 180000, 14000, 180000,
-          15000, 40000,
-        ],
+
+        data: [],
         backgroundColor: '#127453', // اللون الأخضر الداكن كما في الصورة
         borderRadius: 6, // زوايا دائرية
         barThickness: 30, // سمك العمود

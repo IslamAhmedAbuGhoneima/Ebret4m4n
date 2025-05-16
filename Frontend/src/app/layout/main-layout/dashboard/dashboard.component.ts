@@ -15,7 +15,7 @@ export class DashboardComponent implements OnInit {
   role: string | null = null;
   email: string | null = null;
   userName: string | null = null;
-  userId:any
+  userId: any;
 
   constructor(private authService: AuthService) {}
 

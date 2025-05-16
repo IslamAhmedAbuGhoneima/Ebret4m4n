@@ -145,6 +145,16 @@ export class AuthService {
       return null;
     }
   }
+  getUserGovernorate(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.governorate || null;
+    } catch {
+      return null;
+    }
+  }
 
   getUserId(): string | null {
     const token = this.getToken();

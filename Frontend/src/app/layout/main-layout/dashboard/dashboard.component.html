@@ -76,8 +76,6 @@
           >
         </li>
 
-        <!-- Organizer of Healthcare links -->
-
         <li>
           <a
             *ngIf="hasRole(['organizer'])"
@@ -88,17 +86,6 @@
             >
           </a>
         </li>
-        <li>
-          <a
-            *ngIf="hasRole(['governorateAdmin', 'doctor', 'cityAdmin'])"
-            routerLink="/vaccines"
-            routerLinkActive="present"
-            ><img src="/icons/vaccine.svg" alt="" /><span>اللقاحات </span></a
-          >
-        </li>
-
-        <!-- Admin of city links -->
-
         <li>
           <a
             *ngIf="hasRole(['governorateAdmin'])"
@@ -115,13 +102,20 @@
             ><img src="/icons/city.svg" alt="" /><span>المراكز </span></a
           >
         </li>
-
         <li>
           <a
             *ngIf="hasRole(['governorateAdmin', 'cityAdmin', 'admin'])"
             routerLink="/admins"
             routerLinkActive="present"
             ><img src="/icons/Frame (1).svg" alt="" /><span>المسئولين</span></a
+          >
+        </li>
+        <li>
+          <a
+            *ngIf="hasRole(['governorateAdmin', 'doctor', 'cityAdmin'])"
+            routerLink="/vaccines"
+            routerLinkActive="present"
+            ><img src="/icons/vaccine.svg" alt="" /><span>اللقاحات </span></a
           >
         </li>
 
@@ -213,7 +207,7 @@
       <img src="/icons/Vector logout.svg" alt="" />
     </button>
 
-    <!-- admin name -->
+    @if (role=='parent') {
     <a
       [routerLink]="['/parent/dashboard/user-profile', userId]"
       matTooltipClass="logout-tooltip-style"
@@ -225,5 +219,18 @@
         <small class="text-base text-third-txt font-normal"> {{ email }}</small>
       </div>
     </a>
+
+    }@else{
+    <div
+      matTooltipClass="logout-tooltip-style"
+      matTooltip="ملفي الشخصي"
+      class="flex items-center gap-4"
+    >
+      <div>
+        <h5 class="text-lg text-primary-txt200">{{ userName }}</h5>
+        <small class="text-base text-third-txt font-normal"> {{ email }}</small>
+      </div>
+    </div>
+    }
   </div>
 </aside>

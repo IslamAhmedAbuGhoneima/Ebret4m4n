@@ -4,89 +4,18 @@
     <a routerLink="/city-admin/centers" class="block mb-6"> الصفحة الرئيسية </a>
 
     <ul class="flex gap-4 flex-wrap">
+      @for (item of CitiesCentersList; track $index) {
+
       <li>
         <a
-          routerLink="/city-admin/centers/center"
+          [routerLink]="['/city-admin/centers', item]"
           class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
         >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
+          <p class="break-words line-clamp-2">مركز {{ item }}</p>
         </a>
       </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">مركز المنيا</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-admin/centers/center"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">
-            مركز
-            المنياالمنياالمنياالمنياالمنياالمنياالمنياالمنياالمنياالمنياالمنياالمنياالمنياالمنيا
-          </p>
-        </a>
-      </li>
+
+      }
     </ul>
   </div>
 </section>

@@ -21,6 +21,7 @@ export class OrdersComponent implements OnInit {
   role: any;
   pendingOrderCount: any;
   selectedOrderId: any;
+  hasSentDoses: boolean = false;
 
   constructor(
     private router: Router,
@@ -56,10 +57,13 @@ export class OrdersComponent implements OnInit {
 
   sendDoses() {
     if (!this.selectedOrderId) return;
+
     this._HealthMinistryService
       .acceptGovernorateOrder(this.selectedOrderId)
       .subscribe({
         next: () => {
+          this.hasSentDoses = true;
+
           this.loadOrders();
         },
         error: (err) => {},
@@ -89,7 +93,7 @@ export class OrdersComponent implements OnInit {
     });
   }
   selectOrder(orderId: any, orderStatus: any) {
-    this.selectedOrderId = orderId; // خزن الـ ID هنا
+    this.selectedOrderId = orderId;
 
     this._HealthMinistryService.getOrderDetails(orderId).subscribe({
       next: (res) => {

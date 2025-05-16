@@ -5,6 +5,7 @@ import { GovernoratesListComponent } from './components/governorates-list/govern
 import { GovernorateComponent } from './components/governorate/governorate.component';
 import { CenterComponent } from './components/center/center.component';
 import { HealthUnitComponent } from './components/health-unit/health-unit.component';
+
 const routes: Routes = [
   { path: '', component: GovernoratesListComponent },
   {

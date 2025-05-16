@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { HealthMinistryService } from '../../../services/health-ministry.service';
 import { ActivatedRoute } from '@angular/router';
@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './governorate.component.html',
   styleUrl: './governorate.component.css',
 })
-export class GovernorateComponent {
+export class GovernorateComponent implements OnInit{
   data: any;
   governorateName: string | undefined;
 

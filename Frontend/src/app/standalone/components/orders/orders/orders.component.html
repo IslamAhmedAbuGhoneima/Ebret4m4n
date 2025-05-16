@@ -41,7 +41,8 @@
             class="border px-4 py-2 rounded-[42px] hover:bg-primary-hov transition-colors"
           >
             <span> قيد الإنتظار </span>
-            <span *ngIf="pendingOrderCount"
+            <span
+              *ngIf="pendingOrderCount"
               class="inline-block mr-2 bg-error text-white rounded-full px-2 py-0.5 text-center text-sm"
               >+{{ pendingOrderCount }}</span
             >
@@ -76,33 +77,37 @@
             <div class="w-1/2 text-center">المركز</div>
             <div class="w-1/2 text-center">الحالة</div>
           </div>
-          @for (order of filteredOrders; track $index) {
-          <div
-            (click)="selectOrder(order.id, order.status)"
-            class="flex justify-between py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
-            [ngClass]="{
-                'border-transparent border-r-primary-bg border-r-8 ': selectedOrder?.id === order.id,
-              }"
-          >
-            <div class="w-1/2 text-center">{{ order?.governorate }}</div>
-
+          <div class="scroll-container">
+            @for (order of filteredOrders; track $index) {
             <div
-              class="w-fit flex mx-auto px-3 py-1 font-semibold rounded-2xl"
+              (click)="selectOrder(order.id, order.status)"
+              class="flex justify-between py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
               [ngClass]="{
-                'bg-gray-100 text-gray-700': order.status === 'Pending',
-                'bg-primary-light text-primary-txt100':
-                  order.status === 'Recived',
-                'bg-orange-50 text-orange-700': order.status === 'Processing'
-              }"
+        'border-transparent border-r-primary-bg border-r-8 ': selectedOrderId === order?.id,
+      }"
             >
-              <img [src]="getDotIcon(order.status)" class="ml-1" alt="" />
-              <span>{{ order.statusAr }}</span>
+              <div class="w-1/2 text-center">{{ order?.governorate }}</div>
+
+              <div
+                class="w-fit flex mx-auto px-3 py-1 font-semibold rounded-2xl"
+                [ngClass]="{
+                  'bg-gray-100 text-gray-700': order.status === 'Pending',
+                  'bg-primary-light text-primary-txt100':
+                    order.status === 'Recived',
+                  'bg-orange-50 text-orange-700': order.status === 'Processing'
+                }"
+              >
+                <img [src]="getDotIcon(order.status)" class="ml-1" alt="" />
+                <span>{{ order.statusAr }}</span>
+              </div>
             </div>
+            }
           </div>
-          }
         </div>
 
-        <div class="flex-1 min-h-[500px] border rounded-lg bg-white">
+        <div
+          class="flex-1 min-h-[560px] scroll-container border rounded-lg bg-white"
+        >
           @if(selectedOrder){
           <div class="py-4 px-6">
             <h3 class="text-xl text-center font-semibold mb-4">التفاصيل</h3>
@@ -137,7 +142,7 @@
             </table>
 
             <button
-              *ngIf="hasPendingOrder"
+              *ngIf="!hasSentDoses && hasPendingOrder"
               (click)="sendDoses()"
               class="flex items-center w-fit bg-primary-bg px-6 py-3 mx-auto mt-6 rounded-lg hover:bg-primary-hovbtn transition-colors"
             >
@@ -148,7 +153,7 @@
             </button>
           </div>
           }@else {
-          <p class="text-third-txt text-center leading-[500px]">
+          <p class="text-third-txt text-center leading-[560px]">
             إختر أوردر لعرض التفاصيل
           </p>
           }

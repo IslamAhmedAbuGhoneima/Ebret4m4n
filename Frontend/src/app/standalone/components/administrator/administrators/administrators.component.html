@@ -4,9 +4,13 @@
 
     <h3 class="text-2xl font-semibold">مسئولى المحافظات</h3>
 
+    }@else if (role==='governorateAdmin') {
+
+    <h3 class="text-2xl font-semibold">مسئولى المراكز</h3>
+
     }
 
-    <div class="flex justify-start mb-2 mt-5">
+    <div class="flex justify-between mb-2 mt-5">
       <a
         class="block bg-primary-bg px-6 py-3 rounded-lg hover:bg-primary-hovbtn transition-colors"
         routerLink="/admins/add-admin"
@@ -14,23 +18,61 @@
         <span class="text-white ml-2 text-sm font-bold">إضافة مسئول</span>
         <img class="float-left" src="/icons/lets-icons_user-add.svg" alt="" />
       </a>
+
+      @if (role==='admin') {
+      <div class="relative w-64">
+        <input
+          class="w-full placeholder:text-sm py-3 pl-3 pr-9 border border-third-border rounded-lg outline-none placeholder:text-third-txt"
+          type="text"
+          placeholder="بحث عن مسئول محافظة..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="search(searchTerm)"
+        />
+        <img class="absolute top-1/3 right-3" src="/icons/search.svg" alt="" />
+      </div>
+      }@else if (role==='governorateAdmin') {
+
+      <div class="relative w-64">
+        <input
+          class="w-full placeholder:text-sm py-3 pl-3 pr-9 border border-third-border rounded-lg outline-none placeholder:text-third-txt"
+          type="text"
+          placeholder="بحث عن مسئول مركز..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="search(searchTerm)"
+        />
+        <img class="absolute top-1/3 right-3" src="/icons/search.svg" alt="" />
+      </div>
+      }
     </div>
+
     <table
       class="w-full text-center text-lg [&_td]:py-3 [&_tbody_tr]:bg-white [&_tbody_td]:border-b border-separate border-spacing-y-2"
     >
       <thead class="bg-primary-bg text-white">
         <tr>
           <td class="rounded-tr-md">الإسم</td>
-          <td>{{ role == "admin" ? "المحافظة" : "مركز" }}</td>
+
+          @if ( role == "admin") {
+
+          <td>المحافظة"</td>
+
+          }@else if(role==='governorateAdmin'){
+          <td>مركز</td>
+
+          }
           <td>البريد الإلكترونى</td>
           <td class="rounded-tl-md">الإجراءات</td>
         </tr>
       </thead>
       <tbody>
-        @for (item of data; track $index) {
+        @for (item of filteredData; track $index) {
         <tr>
           <td>{{ item.firstName }} {{ item.lastName }}</td>
+          @if ( role == "admin") {
           <td>{{ item.governorate }}</td>
+          }@else if(role==='governorateAdmin'){
+          <td>{{ item.city }}</td>
+          }
           <td>{{ item.email }}</td>
           <td class="flex justify-center">
             <a [routerLink]="['/admins/edit-admin', item.userId]"
@@ -38,8 +80,16 @@
             /></a>
           </td>
         </tr>
+
         }
       </tbody>
     </table>
+
+    <div
+      *ngIf="searchTerm && filteredData.length === 0"
+      class="text-primary-txt100 mt-4 font-semibold text-center w-full"
+    >
+      لا يوجد {{ role === "admin" ? "محافظة" : "مركز" }} بهذا الاسم
+    </div>
   </div>
 </section>

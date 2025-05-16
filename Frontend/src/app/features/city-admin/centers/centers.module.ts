@@ -7,8 +7,11 @@ import { CenterComponent } from './components/center/center.component';
 
 const routes: Routes = [
   { path: '', component: CentersHomePageComponent },
-  { path: 'center', component: CenterComponent },
-  { path: 'health-unit', component: HealthUnitComponent },
+  { path: ':cityName/:cityId', component: CenterComponent },
+  {
+    path: ':cityName/:cityId/:healthCareCenterName/:healthCareCenterId',
+    component: HealthUnitComponent,
+  },
 ];
 
 @NgModule({

@@ -44,16 +44,28 @@
         >
           <thead>
             <tr>
-              <td scope="col" class="border-b-2 border-third-border">
+              <td
+                scope="col"
+                class="border-b-2 border-third-border sticky top-0 bg-white"
+              >
                 المحافظة
               </td>
-              <td scope="col" class="border-b-2 border-third-border">
+              <td
+                scope="col"
+                class="border-b-2 border-third-border sticky top-0 bg-white"
+              >
                 عدد المراكز
               </td>
-              <td scope="col" class="border-b-2 border-third-border">
+              <td
+                scope="col"
+                class="border-b-2 border-third-border sticky top-0 bg-white"
+              >
                 عدد الوحدات الصحية
               </td>
-              <td scope="col" class="border-b-2 border-third-border">
+              <td
+                scope="col"
+                class="border-b-2 border-third-border sticky top-0 bg-white"
+              >
                 عدد اللقاحات المستهلكة
               </td>
             </tr>
@@ -61,15 +73,24 @@
           <tbody>
             @for (item of data.governoratesReport; track $index) {
             <tr>
-              <td class="border-b-2 border-third-border">{{item.governorate}}</td>
-              <td class="border-b-2 border-third-border">{{item.cityCount}}</td>
-              <td class="border-b-2 border-third-border">{{item.healthUnitCount}}</td>
-              <td class="border-b-2 border-third-border">{{item.vaccinesTaken}}</td>
+              <td class="border-b-2 border-third-border">
+                {{ item.governorate }}
+              </td>
+              <td class="border-b-2 border-third-border">
+                {{ item.cityCount }}
+              </td>
+              <td class="border-b-2 border-third-border">
+                {{ item.healthUnitCount }}
+              </td>
+              <td class="border-b-2 border-third-border">
+                {{ item.vaccinesTaken }}
+              </td>
             </tr>
             }
           </tbody>
         </table>
       </div>
+
       <div class="bg-white p-4 w-60 rounded-lg">
         <h6 class="text-[#151419] font-semibold text-xl text-center mb-6">
           الأطفال المسجلين

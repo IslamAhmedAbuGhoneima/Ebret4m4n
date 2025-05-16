@@ -204,6 +204,50 @@
               </div>
             </div>
           </div>
+          }@else if (role==='governorateAdmin') {
+          <div class="mb-4 flex-1 font-arabic">
+            <div class="relative">
+              <select
+                formControlName="city"
+                [ngClass]="{
+                  'border-red-700':
+                    city?.invalid && (city?.touched || city?.dirty),
+                  'border-third-border': city?.valid || city?.untouched
+                }"
+                class="w-full text-third-txt px-3 py-4 rounded-md border border-third-border appearance-none text-right outline-none cursor-pointer"
+                name="city"
+                id="city"
+              >
+                <option value="" disabled>إختر محافظة</option>
+                @for (item of egyptCityCenters; track $index) {
+
+                <option [value]="item">{{ item }}</option>
+
+                }
+              </select>
+
+              <img
+                class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
+                src="icons/Caret Down.svg"
+                alt=""
+              />
+            </div>
+            <div
+              class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+              *ngIf="city?.invalid && (city?.touched || city?.dirty)"
+            >
+              <img
+                src="./icons/si_warning-fill.svg"
+                alt=""
+                class="w-4 h-4 mt-[1px]"
+              />
+              <div>
+                <small *ngIf="city?.errors?.['required']">
+                  يجب إختيار المركز .
+                </small>
+              </div>
+            </div>
+          </div>
           }
 
           <div class="flex justify-between items-center mt-5">

@@ -5,14 +5,14 @@
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الوحدات الصحية</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          5607
+          {{ data.healthCareUnits }}
         </span>
       </div>
 
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الأطفال المسجلة</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          600,000
+          {{ data.registeredChildren }}
         </span>
       </div>
       <div class="bg-white p-4">
@@ -20,19 +20,19 @@
           عدد الأطفال الحاصلة على جميع التطعيمات
         </h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          90,000
+          {{ data.fullyVaccinatedChildren }}
         </span>
       </div>
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد اللقاحات المأخوذة</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          3.5 مليون
+          {{ data.totalVaccinesTaken }}
         </span>
       </div>
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الشكاوى</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          12,000
+          {{ data.totalComplaints }}
         </span>
       </div>
     </div>
@@ -44,46 +44,42 @@
         >
           <thead>
             <tr>
-              <td scope="col" class="border-b-2 border-third-border">الوحدة</td>
-              <td scope="col" class="border-b-2 border-third-border">
+              <td
+                scope="col"
+                class="border-b-2 border-third-border sticky top-0 bg-white"
+              >
+                المركز
+              </td>
+              <td
+                scope="col"
+                class="border-b-2 border-third-border sticky top-0 bg-white"
+              >
                 عدد الوحدات الصحية
               </td>
-              <td scope="col" class="border-b-2 border-third-border">
+              <td
+                scope="col"
+                class="border-b-2 border-third-border sticky top-0 bg-white"
+              >
                 عدد اللقاحات المستهلكة
               </td>
             </tr>
           </thead>
           <tbody>
+            @for (item of data.allCities; track $index) {
+
             <tr>
-              <td class="border-b-2 border-third-border">المنيا</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
+              <td class="border-b-2 border-third-border">
+                {{ item.city }}
+              </td>
+              <td class="border-b-2 border-third-border">
+                {{ item.healthUnitCount }}
+              </td>
+              <td class="border-b-2 border-third-border">
+                {{ item.vaccinesTaken }}
+              </td>
             </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">المنيا</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">المنيا</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">المنيا</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">المنيا</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
-            <tr>
-              <td class="border-b-2 border-third-border">المنيا</td>
-              <td class="border-b-2 border-third-border">120</td>
-              <td class="border-b-2 border-third-border">23,000</td>
-            </tr>
+
+            }
           </tbody>
         </table>
       </div>
