@@ -154,5 +154,10 @@ public static class MapsterConfig
             .Map(dest => dest.CityRecordDetails.healthCareCount, src => src.HealthCareCenters.Count)
             .Map(dest => dest.CityRecordDetails, src => src.User.Adapt<CityRecordDetailsDto>())
             .Map(dest => dest.CityRecordDetails.MainInventories, src => src.MainInventories.Adapt<List<InventoryDto>>());
+
+        TypeAdapterConfig<CityAdminStaff, CityAdminDetailsDto>.NewConfig()
+            .Map(dest => dest.City, src => src.City)
+            .Map(dest => dest.Governorate, src => src.Governorate)
+            .Map(dest => dest, src => src.User);
     }
 }

@@ -36,7 +36,7 @@ public class GovernorateAdminController
             return BadRequest(GeneralResponse<string>.FailureResponse("لا يمكنك عرض مدن محافظه اخري"));
 
 
-        var cities = unitOfWork.HealthCareCenterRepo
+        var cities = unitOfWork.CityAdminStaffRepo
             .FindByCondition(hc => hc.Governorate == targetGovernorate, false)
             .Select(hc => hc.City)
             .Distinct()
@@ -123,6 +123,54 @@ public class GovernorateAdminController
 
         return Ok(response);
     }
+
+
+    [HttpGet("{cityAdminId}/city-admin-data")]
+    public async Task<IActionResult> GetCityAdminData(string cityAdminId)
+    {
+        var cityAdmin = await unitOfWork.CityAdminStaffRepo.FindAsync(admin => admin.UserId == cityAdminId, false, ["User"]);
+
+        if (cityAdmin == null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور علي هذاالمستخدم"));
+
+        var cityAdminData = cityAdmin.Adapt<CityAdminDetailsDto>();
+
+        var response = GeneralResponse<CityAdminDetailsDto>.SuccessResponse(cityAdminData);
+
+        return Ok(response);
+    }
+
+    [HttpPut("{cityAdminId}/update-city-admin")]
+    public async Task<IActionResult> UpdateCityAdmin(string cityAdminId, [FromBody] UpdateCityAdminDto model)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(GeneralResponse<object>.FailureResponse(ModelState));
+
+        var cityAdmin = await unitOfWork.CityAdminStaffRepo.FindAsync(admin => admin.UserId == cityAdminId, true, ["User"]);
+
+        if (cityAdmin == null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور علي هذا المستخدم"));
+
+        cityAdmin.City = model.City;
+        model.Adapt(cityAdmin.User);
+
+        var userMangerResult = await userManager.UpdateAsync(cityAdmin.User);
+
+        if(!userMangerResult.Succeeded)
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث البيانات حاول مره اخري"));
+
+        unitOfWork.CityAdminStaffRepo.Update(cityAdmin);
+
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0) 
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث البيانات حاول مره اخري"));
+
+        var response = GeneralResponse<string>.SuccessResponse("تم تحديث البيانات بنجاح");
+
+        return Ok(response);
+    }
+
 
     [HttpDelete("{cityAdminId:guid}/remove-admin")]
     [Authorize(Roles = "governorateAdmin")]

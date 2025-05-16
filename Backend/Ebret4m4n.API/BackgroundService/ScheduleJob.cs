@@ -9,5 +9,10 @@ public static class ScheduleJob
         RecurringJob.AddOrUpdate<ReservationReminderService>("reservation-reminders",
             service => service.CheckReservationsAndSendNotificationsAsync(),
             Cron.Daily());
+
+        RecurringJob.AddOrUpdate<VaccineReminderService>("vaccine-reminders",
+            service => service.CheckVaccineRemindersAndSendNotificationsAsync(),
+            Cron.Monthly(1));
     }
+ 
 }
