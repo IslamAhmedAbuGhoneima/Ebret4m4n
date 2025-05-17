@@ -1,24 +1,133 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, LOCALE_ID, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Order } from '../../../../core/interfaces/order';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../../../features/auth/services/auth.service';
+import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
+import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
+import { registerLocaleData } from '@angular/common';
+import localeAr from '@angular/common/locales/ar';
+registerLocaleData(localeAr);
 
 @Component({
   selector: 'app-my-orders',
   imports: [CommonModule],
+  providers: [{ provide: LOCALE_ID, useValue: 'ar-EG' }],
+
   templateUrl: './my-orders.component.html',
   styleUrl: './my-orders.component.css',
 })
 export class MyOrdersComponent implements OnInit {
-  allOrders: Order[] = [];
-  filteredOrders: Order[] = [];
+  allOrders: any[] = [];
+  filteredOrders: any[] = [];
   searchTerm: string = '';
-  activeFilter: string = 'الكل'; // مبدئيا الكل هو اللي مفعل
-  selectedOrder: Order | null = null;
+  activeFilter: string = 'all';
+  selectedOrder: any | null = null;
+  role: any;
+  pendingOrderCount: any;
+  selectedOrderId: any;
+  acceptedDoses: boolean = false;
+  governorateName: any;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private _AuthService: AuthService,
+    private _GovernorateAdminService: GovernorateAdminService
+  ) {}
   ngOnInit() {
+    this.role = this._AuthService.getRole();
+    this.governorateName = this._AuthService.getUserGovernorate();
     this.loadOrders();
+  }
+
+  loadOrders() {
+    if (this.role === 'governorateAdmin') {
+      this._GovernorateAdminService.getMyOrders().subscribe({
+        next: (res) => {
+          this.allOrders = this.formateData(res.data);
+          this.filteredOrders = [...this.allOrders];
+
+          this.pendingOrderCount = this.allOrders.filter(
+            (item: any) => item.status === 'Pending'
+          ).length;
+        },
+        error: (err) => {},
+      });
+    }
+  }
+  acceptDoses() {
+    if (!this.selectedOrderId) return;
+    if (this.role == 'governorateAdmin') {
+      this._GovernorateAdminService
+        .markReceivedOrder(this.selectedOrderId)
+        .subscribe({
+          next: () => {
+            this.acceptedDoses = true;
+            this.loadOrders();
+          },
+          error: (err) => {},
+        });
+    }
+  }
+  filterOrders(status: string) {
+    this.activeFilter = status;
+    this.selectedOrder = null;
+    this.applyFilters();
+  }
+  formateData(dataArray: any[]): any[] {
+    if (!Array.isArray(dataArray)) {
+      return [];
+    }
+
+    return dataArray.map((item) => {
+      let st = item.status;
+
+      if (item.status == 'Pending') {
+        st = 'قيد الإنتظار';
+      } else if (item.status == 'Processing') {
+        st = 'جارى التوصيل';
+      } else if (item.status == 'Recived') {
+        st = 'مستلمة';
+      }
+
+      return {
+        ...item,
+        statusAr: st,
+      };
+    });
+  }
+  selectOrder(orderId: any, orderStatus: any) {
+    this.selectedOrderId = orderId;
+    if (this.role == 'governorateAdmin') {
+      this._GovernorateAdminService.getOrderDetails(orderId).subscribe({
+        next: (res) => {
+          this.selectedOrder = res.data.map((item: any) => ({
+            ...item,
+            orderStatus: orderStatus,
+          }));
+        },
+        error: (err) => {},
+      });
+    }
+  }
+  applyFilters() {
+    this.filteredOrders = this.allOrders
+      .filter(
+        (o) => this.activeFilter === 'all' || o.status === this.activeFilter
+      )
+      .filter((o) => !this.searchTerm || o.center?.includes(this.searchTerm));
+  }
+  getDotIcon(status: string): string {
+    switch (status) {
+      case 'Pending':
+        return '/icons/Dot.svg';
+      case 'Recived':
+        return '/icons/Dot2.svg';
+      case 'Processing':
+        return '/icons/Dot4.svg';
+      default:
+        return '';
+    }
   }
   navigateTo(event: any) {
     if (event.target.value === 'all-orders') {
@@ -27,60 +136,14 @@ export class MyOrdersComponent implements OnInit {
       this.router.navigate(['/orders/my-orders']);
     }
   }
-  loadOrders() {
-    // this.orderService.getOrders().subscribe((data) => {
-    //   this.allOrders = data;
-    //   this.applyFilters();
-    // });
-    this.allOrders = [
-      // { id: 1, status: 'قيد الإنتظار', order: 'أوردر#11' },
-      // { id: 2, status: 'مستلمة', order: 'أوردر#11' },
-      // { id: 3, status: 'غير مستلمة', order: 'أوردر#11' },
-      // { id: 4, status: 'جارى التوصيل', order: 'أوردر#11' },
-    ];
-    this.filteredOrders = [...this.allOrders]; // مبدئيًا نعرض الكل
-  }
-
-  filterOrders(status: string) {
-    this.activeFilter = status;
-    this.selectedOrder = null;
-    this.applyFilters();
-  }
-
-  onSearch() {
-    this.applyFilters();
-  }
-
-  applyFilters() {
-    this.filteredOrders = this.allOrders.filter(
-      (o) => this.activeFilter === 'الكل' || o.status === this.activeFilter
+  get hasPendingOrder(): boolean {
+    return this.selectedOrder?.some(
+      (item: any) => item.orderStatus === 'Pending'
     );
-    // .filter((o) => !this.searchTerm || o.center.includes(this.searchTerm));
   }
-
-  selectOrder(order: Order) {
-    this.selectedOrder = order;
-  }
-
-  sendDoses() {
-    //   if (!this.selectedOrder) return;
-    //   this.orderService.sendDoses(this.selectedOrder.id).subscribe(() => {
-    //     this.loadOrders();
-    //   });
-  }
-
-  getDotIcon(status: string): string {
-    switch (status) {
-      case 'قيد الإنتظار':
-        return '/icons/Dot.svg';
-      case 'مستلمة':
-        return '/icons/Dot2.svg';
-      case 'غير مستلمة':
-        return '/icons/Dot3.svg';
-      case 'جارى التوصيل':
-        return '/icons/Dot4.svg';
-      default:
-        return '';
-    }
+  get hasProcessingOrder(): boolean {
+    return this.selectedOrder?.some(
+      (item: any) => item.orderStatus === 'Processing'
+    );
   }
 }

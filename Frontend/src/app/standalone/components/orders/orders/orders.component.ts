@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { Order } from '../../../../core/interfaces/order';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../features/auth/services/auth.service';
-import { GlobalService } from '../../../../core/services/APIs/global.service';
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
+import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 
 @Component({
   selector: 'app-orders',
@@ -16,26 +16,41 @@ export class OrdersComponent implements OnInit {
   allOrders: any[] = [];
   filteredOrders: any[] = [];
   searchTerm: string = '';
-  activeFilter: string = 'all'; // مبدئيا الكل هو اللي مفعل
+  activeFilter: string = 'all';
   selectedOrder: any | null = null;
   role: any;
   pendingOrderCount: any;
   selectedOrderId: any;
   hasSentDoses: boolean = false;
+  governorateName: any;
 
   constructor(
     private router: Router,
     private _AuthService: AuthService,
-    private _HealthMinistryService: HealthMinistryService
+    private _HealthMinistryService: HealthMinistryService,
+    private _GovernorateAdminService: GovernorateAdminService
   ) {}
   ngOnInit() {
     this.role = this._AuthService.getRole();
+    this.governorateName = this._AuthService.getUserGovernorate();
     this.loadOrders();
   }
 
   loadOrders() {
     if (this.role == 'admin') {
       this._HealthMinistryService.getOrders().subscribe({
+        next: (res) => {
+          this.allOrders = this.formateData(res.data);
+          this.filteredOrders = [...this.allOrders];
+
+          this.pendingOrderCount = this.allOrders.filter(
+            (item: any) => item.status === 'Pending'
+          ).length;
+        },
+        error: (err) => {},
+      });
+    } else if (this.role == 'governorateAdmin') {
+      this._GovernorateAdminService.getOrders().subscribe({
         next: (res) => {
           this.allOrders = this.formateData(res.data);
           this.filteredOrders = [...this.allOrders];
@@ -57,17 +72,29 @@ export class OrdersComponent implements OnInit {
 
   sendDoses() {
     if (!this.selectedOrderId) return;
+    if (this.role == 'admin') {
+      this._HealthMinistryService
+        .acceptGovernorateOrder(this.selectedOrderId)
+        .subscribe({
+          next: () => {
+            this.hasSentDoses = true;
 
-    this._HealthMinistryService
-      .acceptGovernorateOrder(this.selectedOrderId)
-      .subscribe({
-        next: () => {
-          this.hasSentDoses = true;
+            this.loadOrders();
+          },
+          error: (err) => {},
+        });
+    } else if (this.role == 'governorateAdmin') {
+      this._GovernorateAdminService
+        .acceptGovernorateOrder(this.selectedOrderId)
+        .subscribe({
+          next: () => {
+            this.hasSentDoses = true;
 
-          this.loadOrders();
-        },
-        error: (err) => {},
-      });
+            this.loadOrders();
+          },
+          error: (err) => {},
+        });
+    }
   }
 
   formateData(dataArray: any[]): any[] {

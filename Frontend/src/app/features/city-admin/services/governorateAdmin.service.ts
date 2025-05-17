@@ -50,4 +50,31 @@ export class GovernorateAdminService {
       model
     );
   }
+  getMyOrders() {
+    return this.http.get<any>(`${environment.apiUrl}/Order/orders`);
+  }
+  getOrderDetails(orderId: any) {
+    return this.http.get<any>(
+      `${environment.apiUrl}/Order/${orderId}/order-details`
+    );
+  }
+  getOrders() {
+    return this.http.get<any>(
+      `${environment.apiUrl}/order/requested-city-orders`
+    );
+  }
+  //
+
+  markReceivedOrder(orderId: any) {
+    return this.http.put<any>(
+      `${environment.apiUrl}/Order/${orderId}/marke-received-order`,
+      {}
+    );
+  }
+  acceptGovernorateOrder(model: any) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Order/request-order`,
+      model
+    );
+  }
 }

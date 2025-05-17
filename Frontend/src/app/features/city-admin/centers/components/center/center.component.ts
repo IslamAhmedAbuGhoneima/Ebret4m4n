@@ -12,7 +12,7 @@ import { AuthService } from '../../../../auth/services/auth.service';
 })
 export class CenterComponent implements OnInit {
   data: any;
-  cityName: string | undefined;
+  cityName: any;
   governorate: any;
   constructor(
     private route: ActivatedRoute,

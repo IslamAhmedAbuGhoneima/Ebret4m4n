@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../../features/auth/services/auth.service';
-import { GlobalService } from '../../../../core/services/APIs/global.service';
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 import { FormsModule } from '@angular/forms';

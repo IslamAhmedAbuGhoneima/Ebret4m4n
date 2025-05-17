@@ -9,7 +9,7 @@
         >
           <option value="" class="text-third-txt">الطلبات المطلوبة</option>
           <option value="all-orders">كل الطلبات</option>
-          <option value="my-orders">طلباتي</option>
+          <option value="my-orders" selected>طلباتي</option>
         </select>
 
         <img
@@ -18,12 +18,12 @@
           alt=""
         />
       </div>
-      <div class="flex justify-between items-center mb-4">
+      <div class="flex justify-start items-center mb-4">
         <div class="flex gap-4">
           <button
-            (click)="filterOrders('الكل')"
+            (click)="filterOrders('all')"
             [ngClass]="{
-              'bg-primary-btn text-white': activeFilter === 'الكل'
+              'bg-primary-btn text-white': activeFilter === 'all',
             }"
             class="border px-4 py-2 rounded-[42px] hover:bg-primary-hov transition-colors"
           >
@@ -32,99 +32,79 @@
 
           <button
             [ngClass]="{
-              'bg-primary-btn text-white': activeFilter === 'قيد الإنتظار ',
+              'bg-primary-btn text-white': activeFilter === 'Pending',
             }"
-            (click)="filterOrders('قيد الإنتظار')"
+            (click)="filterOrders('Pending')"
             class="border px-4 py-2 rounded-[42px] hover:bg-primary-hov transition-colors"
           >
             <span> قيد الإنتظار </span>
             <span
+              *ngIf="pendingOrderCount"
               class="inline-block mr-2 bg-error text-white rounded-full px-2 py-0.5 text-center text-sm"
-              >9+</span
+              >+{{ pendingOrderCount }}</span
             >
           </button>
 
           <button
             [ngClass]="{
-              'bg-primary-btn text-white': activeFilter === 'جارى التوصيل',
+              'bg-primary-btn text-white': activeFilter === 'Processing',
             }"
-            (click)="filterOrders('جارى التوصيل')"
+            (click)="filterOrders('Processing')"
             class="border px-4 py-2 rounded-[42px] hover:bg-primary-hov transition-colors"
           >
             جارى التوصيل
           </button>
-
           <button
             [ngClass]="{
-              'bg-primary-btn text-white': activeFilter === 'غير مستلمة',
+              'bg-primary-btn text-white': activeFilter === 'Recived',
             }"
-            (click)="filterOrders('غير مستلمة')"
-            class="border px-4 py-2 rounded-[42px] hover:bg-primary-hov transition-colors"
-          >
-            الغير مستلمة
-          </button>
-
-          <button
-            [ngClass]="{
-              'bg-primary-btn text-white': activeFilter === 'مستلمة',
-            }"
-            (click)="filterOrders('مستلمة')"
+            (click)="filterOrders('Recived')"
             class="flex gab-2 border px-4 py-2 rounded-[42px] hover:bg-primary-hov transition-colors"
           >
             المستلمة
           </button>
-        </div>
-
-        <div class="relative w-64">
-          <input
-            type="text"
-            placeholder="بحث عن محافظة"
-            class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
-          />
-          <img
-            class="absolute right-4 top-1/2 -translate-y-[calc(50%-2px)] text-sm"
-            src="icons/search.svg"
-            alt=""
-          />
         </div>
       </div>
 
       <div class="flex gap-4">
         <div class="w-1/2">
           <div
-            class="flex justify-between bg-primary-table rounded-t-lg py-3 mb-2 border rounded-lg"
+            class="flex justify-between bg-primary-bg text-white rounded-t-lg py-3 mb-2 border rounded-lg"
           >
-            <div class="w-1/2 text-center">المركز</div>
+            <div class="w-1/2 text-center">تاريخ الطلب</div>
             <div class="w-1/2 text-center">الحالة</div>
           </div>
-          @for (order of filteredOrders; track $index) {
-          <div
-            (click)="selectOrder(order)"
-            class="flex justify-between py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
-            [ngClass]="{
-                'border-transparent border-r-primary-bg border-r-8 ': selectedOrder?.id === order.id,
-              }"
-          >
-            <div class="w-1/2 text-center">{{ order.order }}</div>
-
+          <div class="scroll-container">
+            @for (order of filteredOrders; track $index) {
             <div
-              class="w-fit flex mx-auto px-3 py-1 font-semibold rounded-2xl"
-              [ngClass]="{
-                'bg-gray-100 text-gray-700': order.status === 'قيد الإنتظار',
-                'bg-primary-light text-primary-txt100':
-                  order.status === 'مستلمة',
-                'bg-red-50 text-error': order.status === 'غير مستلمة',
-                'bg-orange-50 text-orange-700': order.status === 'جارى التوصيل'
-              }"
+              (click)="selectOrder(order.id, order.status)"
+              class="flex justify-between py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
+              [ngClass]="{'border-transparent border-r-primary-bg border-r-8 ': selectedOrderId === order?.id,}"
             >
-              <img [src]="getDotIcon(order.status)" class="ml-1" alt="" />
-              <span>{{ order.status }}</span>
+              <div class="w-1/2 text-center">
+                {{ order?.dateRequested | date : "fullDate" : "ar-EG" }}
+              </div>
+
+              <div
+                class="w-fit flex mx-auto px-3 py-1 font-semibold rounded-2xl"
+                [ngClass]="{
+                  'bg-gray-100 text-gray-700': order.status === 'Pending',
+                  'bg-primary-light text-primary-txt100':
+                    order.status === 'Recived',
+                  'bg-orange-50 text-orange-700': order.status === 'Processing'
+                }"
+              >
+                <img [src]="getDotIcon(order.status)" class="ml-1" alt="" />
+                <span>{{ order.statusAr }}</span>
+              </div>
             </div>
+            }
           </div>
-          }
         </div>
 
-        <div class="flex-1 min-h-[500px] border rounded-lg bg-white">
+        <div
+          class="flex-1 min-h-[560px] scroll-container border rounded-lg bg-white"
+        >
           @if(selectedOrder){
           <div class="py-4 px-6">
             <h3 class="text-xl text-center font-semibold mb-4">التفاصيل</h3>
@@ -142,14 +122,14 @@
                 </tr>
               </thead>
               <tbody class="space-y-4">
-                @for (item of selectedOrder.order; track $index) {
+                @for (item of selectedOrder; track $index) {
                 <tr>
                   <td colspan="2">
                     <div
                       class="flex justify-around items-center rounded-lg border px-4 py-3 mb-2"
                     >
-                      <span>إسم اللقاح</span>
-                      <span>150</span>
+                      <span>{{ item.antigen }}</span>
+                      <span>{{ item.amount }}</span>
                     </div>
                   </td>
                 </tr>
@@ -158,28 +138,19 @@
               </tbody>
             </table>
 
-            <div class="flex items-center justify-center gap-4 mt-6">
-              <button
-                *ngIf="selectedOrder?.status === 'مستلمة'"
-                class="flex w-fit bg-primary-bg px-6 py-3 rounded-lg hover:bg-primary-hovbtn transition-colors"
+            <button
+              *ngIf="!acceptedDoses && hasProcessingOrder"
+              (click)="acceptDoses()"
+              class="flex items-center w-fit bg-primary-bg px-6 py-3 mx-auto mt-6 rounded-lg hover:bg-primary-hovbtn transition-colors"
+            >
+              <img src="/icons/game-icons_check-mark (1).svg" alt="" />
+              <span class="text-white mr-2 text-sm font-bold">
+                تم الإستلام</span
               >
-                <img src="/icons/game-icons_check-mark.svg" alt="" />
-
-                <span class="text-white mr-2 text-sm font-bold">
-                  تم الإستلام</span
-                >
-              </button>
-              <button
-                *ngIf="selectedOrder?.status === 'مستلمة'"
-                class="flex w-fit bg-error px-6 py-3 rounded-lg hover:bg-errorHov transition-colors"
-              >
-                <img src="/icons/radix-icons_cross-2.svg" alt="" />
-                <span class="text-white mr-2 text-sm font-bold">لم أستلم </span>
-              </button>
-            </div>
+            </button>
           </div>
           }@else {
-          <p class="text-third-txt text-center leading-[500px]">
+          <p class="text-third-txt text-center leading-[560px]">
             إختر أوردر لعرض التفاصيل
           </p>
           }

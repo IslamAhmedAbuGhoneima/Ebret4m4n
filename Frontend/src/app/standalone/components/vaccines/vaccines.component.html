@@ -2,6 +2,7 @@
   <div class="container pt-6 pb-5">
     <h3 class="text-[28px] font-semibold text-[#51419]">اللقاحات</h3>
     <div class="p-6">
+      @if (data) {
       <div class="relative overflow-x-auto">
         <table
           class="w-full text-center text-lg [&_td]:py-3 [&_tbody_tr]:bg-white [&_tbody_td]:border-b border-separate border-spacing-y-2"
@@ -13,34 +14,23 @@
             </tr>
           </thead>
           <tbody>
+            @for (item of data; track $index) {
+
             <tr>
-              <td class="rounded-r-md">إسم اللقاح</td>
-              <td class="rounded-l-md text-error">20</td>
+              <td class="rounded-r-md">{{ item.antigen }}</td>
+
+              <td
+                [ngClass]="{
+                  'text-error font-bold': item.amount <= 20,
+                  'text-black font-normal': item.amount > 20
+                }"
+                class="rounded-l-md"
+              >
+                {{ item.amount }}
+              </td>
             </tr>
-            <tr>
-              <td class="rounded-r-md">إسم اللقاح</td>
-              <td class="rounded-l-md text-error">20</td>
-            </tr>
-            <tr>
-              <td class="rounded-r-md">إسم اللقاح</td>
-              <td class="rounded-l-md">50</td>
-            </tr>
-            <tr>
-              <td class="rounded-r-md">إسم اللقاح</td>
-              <td class="rounded-l-md">50</td>
-            </tr>
-            <tr>
-              <td class="rounded-r-md">إسم اللقاح</td>
-              <td class="rounded-l-md">50</td>
-            </tr>
-            <tr>
-              <td class="rounded-r-md">إسم اللقاح</td>
-              <td class="rounded-l-md">50</td>
-            </tr>
-            <tr>
-              <td class="rounded-r-md">إسم اللقاح</td>
-              <td class="rounded-l-md">50</td>
-            </tr>
+
+            }
           </tbody>
         </table>
       </div>
@@ -51,6 +41,16 @@
         <span class="font-bold text-sm"> إبلاغ عن نقص </span>
         <img src="/icons/mingcute_warning-line.svg" class="" alt="" />
       </button>
+
+      }@else {
+      <button
+        (click)="createInventory()"
+        class="flex  gap-x-2 mt-8 mx-auto w-fit bg-primary-btn text-white py-3 px-6 rounded-lg transition-colors hover:bg-primary-hovbtn duration-200"
+      >
+        <span class="font-bold text-sm"> إنشاء مخزن </span>
+      </button>
+
+      }
     </div>
   </div>
 </section>

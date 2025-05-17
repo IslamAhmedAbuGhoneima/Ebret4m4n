@@ -10,7 +10,6 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { GlobalService } from '../../../../core/services/APIs/global.service';
 import { ParentService } from '../../../../features/parent/services/parent.service';
 
 @Component({

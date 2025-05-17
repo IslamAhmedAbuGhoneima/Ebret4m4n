@@ -8,8 +8,8 @@
           (change)="navigateTo($event)"
           class="w-full text-lg px-3 py-2 rounded-lg border border-third-border appearance-none text-right outline-none cursor-pointer"
         >
-          <option value="">الطلبات المطلوبة</option>
-          <option value="all-orders">كل الطلبات</option>
+          <option value="all-orders">الطلبات المطلوبة</option>
+          <option value="all-orders" selected>كل الطلبات</option>
           <option value="my-orders">طلباتي</option>
         </select>
 
@@ -74,7 +74,11 @@
           <div
             class="flex justify-between bg-primary-bg text-white rounded-t-lg py-3 mb-2 border rounded-lg"
           >
+            @if(role=='admin'){
+            <div class="w-1/2 text-center">المحافظة</div>
+            }@else if(role=='governorateAdmin'){
             <div class="w-1/2 text-center">المركز</div>
+            }
             <div class="w-1/2 text-center">الحالة</div>
           </div>
           <div class="scroll-container">
@@ -82,11 +86,13 @@
             <div
               (click)="selectOrder(order.id, order.status)"
               class="flex justify-between py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
-              [ngClass]="{
-        'border-transparent border-r-primary-bg border-r-8 ': selectedOrderId === order?.id,
-      }"
+              [ngClass]="{'border-transparent border-r-primary-bg border-r-8 ': selectedOrderId === order?.id,}"
             >
+              @if(role=='admin'){
               <div class="w-1/2 text-center">{{ order?.governorate }}</div>
+              }@else if(role=='governorateAdmin'){
+              <div class="w-1/2 text-center">{{ governorateName }}</div>
+              }
 
               <div
                 class="w-fit flex mx-auto px-3 py-1 font-semibold rounded-2xl"

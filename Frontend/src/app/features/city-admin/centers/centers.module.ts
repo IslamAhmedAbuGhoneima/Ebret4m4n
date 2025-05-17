@@ -7,9 +7,9 @@ import { CenterComponent } from './components/center/center.component';
 
 const routes: Routes = [
   { path: '', component: CentersHomePageComponent },
-  { path: ':cityName/:cityId', component: CenterComponent },
+  { path: ':cityName', component: CenterComponent },
   {
-    path: ':cityName/:cityId/:healthCareCenterName/:healthCareCenterId',
+    path: ':cityName/:healthCareCenterName/:healthCareCenterId',
     component: HealthUnitComponent,
   },
 ];

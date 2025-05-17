@@ -17,20 +17,24 @@
       </div>
 
       <ul class="flex gap-4 flex-wrap mt-6">
-        <!-- @for (item of data; track $index) { -->
+        @for (item of data.healthCares; track $index) {
         <li>
           <a
-            routerLink="/city-admin/centers/health-unit"
+            [routerLink]="[
+              '/city-admin/centers',
+              cityName,
+              item.healthCareCenterName,
+              item.healthCareCenterId
+            ]"
             class="w-[188px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
           >
             <p class="break-words line-clamp-2">
-              إسم الوحدة الصحية إسم الوحدة الصحية إسم الوحدة الصحية إسم الوحدة
-              الصحية إسم الوحدة الصحية
+              {{ item.healthCareCenterName }}
             </p>
           </a>
         </li>
 
-        <!-- } -->
+        }
       </ul>
 
       <button
