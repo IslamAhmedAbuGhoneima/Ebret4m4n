@@ -88,10 +88,13 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
 	[Authorize(Roles = "governorateAdmin")]
 	public async Task<ActionResult<StatisticssDto>> GetGovernorateStats()
 	{
-		string? gov = User.FindFirst("governorate")?.Value;
-		if (gov is null) return Unauthorized("Governorate claim missing");
-		return Ok(await GetStatistics(gov));
+		string? governorate = User.FindFirst("governorate")?.Value;
+		if (governorate is null) return Unauthorized("Governorate claim missing");
+
+		return Ok(await GetStatistics(governorate));
+
 	}
+
 
 	[HttpGet("city")]
 	[Authorize(Roles = "cityAdmin")]
@@ -105,31 +108,48 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
 
 	private async Task<StatisticssDto> GetStatistics(string? governorate = null, string? city = null)
 	{
-		var childrenQuery = _unitOfWork.ChildRepo.FindAll(false, "User", "Vaccines");
-		var complaintsQuery = _unitOfWork.ComplaintRepo.FindAll(false, "User");
-		var vaccinesQuery = _unitOfWork.VaccineRepo.FindAll(false, "Child.User");
-		var healthUnitsQuery = _unitOfWork.HealthCareCenterRepo.FindAll(false);
+		var childrenQuery = await _unitOfWork.ChildRepo
+			.FindAll(false, "User", "Vaccines")
+			.ToListAsync();
+
+		var complaintsQuery = await _unitOfWork.ComplaintRepo
+			.FindAll(false, "User")
+			.ToListAsync();
+
+		var vaccinesQuery = await _unitOfWork.VaccineRepo
+			.FindAll(false, "Child.User")
+			.ToListAsync();
+
+		var healthUnitsQuery = await _unitOfWork.HealthCareCenterRepo
+			.FindAll(false)
+			.ToListAsync();
+
+		var cityNames = await _unitOfWork.CityAdminStaffRepo.FindAll(false)
+			.Where(u => u.Governorate == governorate && u.City != null)
+			.Select(u => u.City!.Trim())
+			.Distinct()
+			.ToListAsync();
 
 		if (governorate is not null)
 		{
-			childrenQuery = childrenQuery.Where(c => c.User.Governorate == governorate);
-			complaintsQuery = complaintsQuery.Where(c => c.User.Governorate == governorate);
-			vaccinesQuery = vaccinesQuery.Where(v => v.Child.User.Governorate == governorate);
-			healthUnitsQuery = healthUnitsQuery.Where(h => h.Governorate == governorate);
+			childrenQuery = childrenQuery.Where(c => c.User.Governorate == governorate).ToList();
+			complaintsQuery = complaintsQuery.Where(c => c.User.Governorate == governorate).ToList();
+			vaccinesQuery = vaccinesQuery.Where(v => v.Child.User.Governorate == governorate).ToList();
+			healthUnitsQuery = healthUnitsQuery.Where(h => h.Governorate == governorate).ToList();
 		}
 
 		if (city is not null)
 		{
-			childrenQuery = childrenQuery.Where(c => c.User.City == city);
-			complaintsQuery = complaintsQuery.Where(c => c.User.City == city);
-			vaccinesQuery = vaccinesQuery.Where(v => v.Child.User.City == city);
-			healthUnitsQuery = healthUnitsQuery.Where(h => h.City == city);
+			childrenQuery = childrenQuery.Where(c => c.User.City == city).ToList();
+			complaintsQuery = complaintsQuery.Where(c => c.User.City == city).ToList();
+			vaccinesQuery = vaccinesQuery.Where(v => v.Child.User.City == city).ToList();
+			healthUnitsQuery = healthUnitsQuery.Where(h => h.City == city).ToList();
 		}
 
-		var children = await childrenQuery.ToListAsync();
-		var complaints = await complaintsQuery.ToListAsync();
-		var vaccines = await vaccinesQuery.ToListAsync();
-		var healthUnits = await healthUnitsQuery.ToListAsync();
+		var children = childrenQuery;
+		var complaints = complaintsQuery;
+		var vaccines = vaccinesQuery;
+		var healthUnits = healthUnitsQuery;
 
 		int fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
 		int registeredChildren = children.Count;
@@ -149,15 +169,21 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
 			.Take(15)
 			.ToList();
 
-		var unitReport = vaccines
-			.Where(v => v.IsTaken && v.Child.User.HealthCareCenter != null)
-			.GroupBy(v => v.Child.User.HealthCareCenter.HealthCareCenterName)
+		var unitReport = await _unitOfWork.HealthCareCenterRepo.FindByCondition
+			(e=>e.City==city,false)
 			.Select(g => new UnitReportDto
 			{
-				UnitName = g.Key,
-				ComplaintsCount = complaints.Count(c => c.User.HealthCareCenter != null && c.User.HealthCareCenter.HealthCareCenterName == g.Key),
-				VaccinesTaken = g.Count()
-			}).ToList();
+				UnitName = g.HealthCareCenterName,
+				ComplaintsCount = _unitOfWork.ComplaintRepo.FindAll(false)
+			.Count(c => c.User.HealthCareCenter != null &&
+						c.User.HealthCareCenter.HealthCareCenterName == g.HealthCareCenterName),
+
+				VaccinesTaken = _unitOfWork.VaccineRepo.FindAll(false)
+			.Count(v => v.IsTaken &&
+						v.Child.User.HealthCareCenter != null &&
+						v.Child.User.HealthCareCenter.HealthCareCenterName == g.HealthCareCenterName)
+
+			}).ToListAsync();
 
 		var topCities = vaccines
 			.Where(v => v.IsTaken)
@@ -171,15 +197,13 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
 			.Take(15)
 			.ToList();
 
-		var cityReport = vaccines
-			.Where(v => v.IsTaken)
-			.GroupBy(v => v.Child.User.City)
-			.Select(g => new CityReportDto
-			{
-				City = g.Key ?? "",
-				HealthUnitCount = healthUnits.Count(h => h.City == g.Key),
-				VaccinesTaken = g.Count()
-			}).ToList();
+		var cityReport = cityNames
+	.Select(cityName => new CityReportDto
+	{
+		City = cityName!,
+		HealthUnitCount = healthUnits.Count(h => h.City?.Trim() == cityName),
+		VaccinesTaken = vaccines.Count(v => v.IsTaken && v.Child.User.City?.Trim() == cityName)
+	}).ToList();
 
 		return new StatisticssDto
 		{
