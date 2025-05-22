@@ -135,6 +135,7 @@ public class GovernorateAdminController
             return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور علي هذا المستخدم"));
 
         cityAdmin.City = model.City;
+        cityAdmin.User.NormalizedEmail = userManager.NormalizeEmail(model.Email);
         model.Adapt(cityAdmin.User);
 
         var userMangerResult = await userManager.UpdateAsync(cityAdmin.User);

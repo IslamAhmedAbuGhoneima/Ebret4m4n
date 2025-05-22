@@ -36,6 +36,12 @@ public static class MapsterConfig
         TypeAdapterConfig<AddGovernorateAdminDto, ApplicationUser>.NewConfig()
             .Map(dest => dest.UserName, src => src.Email);
 
+        TypeAdapterConfig<UpdateCityAdminDto,ApplicationUser>.NewConfig()
+            .Map(dest => dest.UserName, src => src.Email);
+
+        TypeAdapterConfig<UpdateGovernorateAdminDto, ApplicationUser>.NewConfig()
+            .Map(dest => dest.UserName, src => src.Email);
+
         TypeAdapterConfig<(AddChildDto childDtod, string parentId), Child>
             .NewConfig()
             .Map(dest => dest, src => src.childDtod)
@@ -160,6 +166,9 @@ public static class MapsterConfig
         TypeAdapterConfig<CityAdminStaff, CityAdminDetailsDto>.NewConfig()
             .Map(dest => dest.City, src => src.City)
             .Map(dest => dest.Governorate, src => src.Governorate)
+            .Map(dest => dest, src => src.User);
+
+        TypeAdapterConfig<MedicalStaff, MedicalStaffDetailsDto>.NewConfig()
             .Map(dest => dest, src => src.User);
     }
 }

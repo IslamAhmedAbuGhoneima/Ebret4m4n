@@ -28,7 +28,7 @@ public record AddMedicalStaffDto
     [Required(ErrorMessage = "من فضلك ادخل المركز التابع له")]
     public string City { get; init; } = null!;
 
-    [Required(ErrorMessage = "يجب ادخال الوحده الصحيه التي سينتمي اليها هذا الموضف")]
+    [Required(ErrorMessage = "يجب ادخال الوحده الصحيه التي سينتمي اليها هذا الموظف")]
     public Guid HealthCareCenterId { get; init; }
 
     public string StaffRole { get; init; } = null!;

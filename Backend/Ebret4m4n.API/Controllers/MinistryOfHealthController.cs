@@ -141,6 +141,7 @@ public class MinistryOfHealthController
         if (admin is null)
             return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد ادمن بهذا الرقم"));
 
+        admin.User.NormalizedEmail = userManager.NormalizeEmail(model.Email);
         model.Adapt(admin.User);
 
         var result = await userManager.UpdateAsync(admin.User);
@@ -149,8 +150,11 @@ public class MinistryOfHealthController
             return BadRequest(GeneralResponse<string>.FailureResponse("الرجاء التاكد من ان البريد الالكتروني صحيح او هذا الايميل موجود بالفعل"));
 
         admin.Governorate = model.Governorate;
+
         unitOfWork.GovernorateAdminRepo.Update(admin);
+
         var dbResult = await unitOfWork.SaveAsync();
+
         if (dbResult == 0)
             return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات حاول مره اخري"));
 
