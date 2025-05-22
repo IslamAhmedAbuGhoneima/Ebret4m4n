@@ -150,7 +150,7 @@ public class CityAdminController
         var city = User.FindFirst("city")!.Value;
 
         var complaints = unitOfWork.ComplaintRepo
-            .FindByCondition(c => c.User.City == city && c.IsResolved == false, false, "User")
+            .FindByCondition(c => c.User.City == city && c.IsResolved == false, false, ["User.HealthCareCenter"])
             .Select(C => C.Adapt<ComplaintsDto>())
             .ToList();
             
@@ -227,7 +227,7 @@ public class CityAdminController
 
         var response = GeneralResponse<List<MedicalStaffDetailsDto>>.SuccessResponse(organizersDto);
 
-        return Ok(organizersDto);
+        return Ok(response);
     }
 
     [HttpGet("doctors")]
@@ -240,16 +240,74 @@ public class CityAdminController
 
         var response = GeneralResponse<List<MedicalStaffDetailsDto>>.SuccessResponse(doctorsDto);
 
-        return Ok(doctorsDto);
+        return Ok(response);
     }
+
+    [HttpGet("{medicalStaffId}/medicalstaff-data")]
+    public async Task<IActionResult> MedicalStaffData(string medicalStaffId)
+    {
+        var meddicalStaff =
+            await unitOfWork.StaffRepo.FindAsync(staff => staff.UserId == medicalStaffId, false, ["User"]);
+
+        if (meddicalStaff is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد طبيب او منظم بهذا الرقم"));
+
+        var medicalStaffDto = meddicalStaff.Adapt<MedicalStaffDetailsDto>();
+
+        var response = GeneralResponse<MedicalStaffDetailsDto>.SuccessResponse(medicalStaffDto);
+
+        return Ok(response);
+    }
+
+    [HttpPut("{medicalStaffId}/medicalstaff-update")]
+    public async Task<IActionResult> UpdateMedicalStaff(string medicalStaffId, [FromBody] UpdateMedicalStaffDto model)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(GeneralResponse<object>.FailureResponse(ModelState));
+
+        var medicalStaff = await unitOfWork.StaffRepo.FindAsync(staff => staff.UserId == medicalStaffId, true, ["User"]);
+        var healthCare = await unitOfWork.HealthCareCenterRepo.FindAsync(hc => hc.HealthCareCenterId == model.HealthCareCenterId, false);
+
+        if (medicalStaff is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد طبيب او منظم بهذا الرقم"));
+
+        if(healthCare is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد وحده صحيه بهذا الرقم"));
+
+        var adminExistsInHc = await unitOfWork.StaffRepo.ExistsAsync(staff => staff.StaffRole == medicalStaff.StaffRole && staff.HCCenterId == model.HealthCareCenterId && staff.UserId != medicalStaffId);
+
+        if(adminExistsInHc)
+            return BadRequest(GeneralResponse<string>.FailureResponse("هذه الوحده الصحيه المختاره تمتلك هذا الدور لايمكن اضافه هذا المستخدم لها"));
+
+
+        medicalStaff.User.NormalizedEmail = userManager.NormalizeEmail(model.Email);
+        medicalStaff.User.UserName = model.Email;
+        model.Adapt(medicalStaff.User);
+
+        var userMangerResult = await userManager.UpdateAsync(medicalStaff.User);
+
+        if (!userMangerResult.Succeeded)
+            return BadRequest(GeneralResponse<string>.FailureResponse("خطا في البيانات المدخله او الايميل موجود من قبل"));
+
+        (model, healthCare).Adapt(medicalStaff);
+
+        unitOfWork.StaffRepo.Update(medicalStaff);
+        var result = await unitOfWork.SaveAsync();
+
+        if (result == 0)
+            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم تحديث البيانات حاول مره اخري"));
+
+        return Ok(GeneralResponse<string>.SuccessResponse("تم تحديث المستخدم بنجاح"));
+    }
+
 
     private List<MedicalStaff> GetMedicalStaff(StaffRole role)
     {
         var adminId = User.FindFirst("id")!.Value;
 
         var staff =
-            unitOfWork.StaffRepo.FindByCondition(organizer => organizer.CityAdminStaffId == adminId
-            && organizer.StaffRole == role, false, ["User"])
+            unitOfWork.StaffRepo.FindByCondition(staff => staff.CityAdminStaffId == adminId
+            && staff.StaffRole == role, false, ["User"])
             .ToList() ?? [];
 
         return staff;

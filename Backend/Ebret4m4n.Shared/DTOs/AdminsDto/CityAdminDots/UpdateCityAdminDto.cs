@@ -1,5 +1,4 @@
-﻿using Ebret4m4n.Shared.CutomAttribute;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Ebret4m4n.Shared.DTOs.AdminsDto.CityAdminDots;
 

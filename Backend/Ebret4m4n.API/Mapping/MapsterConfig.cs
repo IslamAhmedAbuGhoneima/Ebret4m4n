@@ -100,6 +100,14 @@ public static class MapsterConfig
             .Map(dest => dest, src => src.staffDto)
             .Map(dest => dest, src => src.hcCenter);
 
+        TypeAdapterConfig<(UpdateMedicalStaffDto staffDto, HealthCareCenter hcCenter), MedicalStaff>.NewConfig()
+            .Map(dest => dest.HealthCareCenterGovernorate, src => src.hcCenter.Governorate)
+            .Map(dest => dest.HealthCareCenterCity, src => src.hcCenter.City)
+            .Map(dest => dest.HealthCareCenterVillage, src => src.hcCenter.Village)
+            .Map(dest => dest.HCCenterId, src => src.hcCenter.HealthCareCenterId)
+            .Map(dest => dest, src => src.staffDto)
+            .Map(dest => dest, src => src.hcCenter);
+
         TypeAdapterConfig<(Complaint complaint, HealthCareCenter hcCenter), ComplaintDto>.NewConfig()
             .Map(dest => dest.UserName, src => $"{src.complaint.User.FirstName} {src.complaint.User.LastName}")
             .Map(dest => dest.HCLocation, src => $"{src.hcCenter.Governorate},{src.hcCenter.City},{src.hcCenter.Village}")
@@ -127,6 +135,7 @@ public static class MapsterConfig
             .Map(dest => dest, src => src);
 
         TypeAdapterConfig<Complaint, ComplaintsDto>.NewConfig()
+            .Map(dest => dest.HealthCareCenterName, src => src.User.HealthCareCenter!.HealthCareCenterName)
             .Map(dest => dest.UserName, src => $"{src.User.FirstName} {src.User.LastName}");
 
         TypeAdapterConfig<CityAdminStaff, CityRecordDetailsDto>.NewConfig()
@@ -169,6 +178,7 @@ public static class MapsterConfig
             .Map(dest => dest, src => src.User);
 
         TypeAdapterConfig<MedicalStaff, MedicalStaffDetailsDto>.NewConfig()
+            .Map(dest => dest.HCCenterId, src => src.HCCenterId)
             .Map(dest => dest, src => src.User);
     }
 }

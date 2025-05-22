@@ -310,7 +310,7 @@ public class OrderController
         }
     }
 
-    [HttpPost("{orderId:guid}/orgnizer-recived-order")]
+    [HttpPut("{orderId:guid}/orgnizer-recived-order")]
     [Authorize(Roles = "organizer")]
     public async Task<IActionResult> OrgnizerRecivedOrder(Guid orderId)
     {

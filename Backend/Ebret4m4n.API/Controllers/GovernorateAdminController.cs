@@ -136,6 +136,7 @@ public class GovernorateAdminController
 
         cityAdmin.City = model.City;
         cityAdmin.User.NormalizedEmail = userManager.NormalizeEmail(model.Email);
+        cityAdmin.User.UserName = model.Email;
         model.Adapt(cityAdmin.User);
 
         var userMangerResult = await userManager.UpdateAsync(cityAdmin.User);
