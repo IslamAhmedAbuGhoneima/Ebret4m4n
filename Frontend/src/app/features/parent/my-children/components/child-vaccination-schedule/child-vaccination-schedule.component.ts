@@ -40,6 +40,7 @@ export class ChildVaccinationScheduleComponent implements OnInit {
     this._ParentService.childVaccineSchedule(this.childId).subscribe({
       next: (res) => {
         this.data = res.data;
+        console.log(this.data);
         this.childName = this.data.name;
         this.vaccines = this.formateData(this.data.vaccines);
         this.ageInMonth = this.data.ageInMonth;

@@ -116,7 +116,6 @@ export class AddChildComponent implements OnInit {
       });
 
       dialogRef.afterClosed().subscribe((selectedVaccines: string[]) => {
-        console.log(selectedVaccines);
         if (selectedVaccines) {
           const vaccinesFormArray = this.formAddChild.get(
             'vaccines'
@@ -186,16 +185,16 @@ export class AddChildComponent implements OnInit {
     formData.append('Weight', formValue.weight);
     formData.append('PatientHistory', formValue.medicalHistory || '');
 
-    const birthday = formValue.birthday;
+    const birthday = this.formAddChild.value.birthday;
     if (birthday?.day && birthday?.month && birthday?.year) {
       const day = String(birthday.day).padStart(2, '0');
       const month = String(birthday.month).padStart(2, '0');
       const year = birthday.year;
 
       const formattedDate = `${year}-${month}-${day}`;
+
       formData.append('BirthDate', formattedDate);
     }
-
     const imageFiles = formValue.medicalImages;
     if (imageFiles && imageFiles.length > 0) {
       imageFiles.forEach((file: File) => {
@@ -205,21 +204,13 @@ export class AddChildComponent implements OnInit {
     // edited
     const vaccines = formValue.vaccines;
     if (vaccines && vaccines.length > 0) {
-      vaccines.forEach((vaccine: string) => {
-        formData.append('TakedVaccines', vaccine);
-      });
+        vaccines.forEach((vaccine: string) => {
+            formData.append('TakedVaccines', vaccine);
+        });
     }
 
     for (const [key, value] of formData.entries()) {
-      if (key === 'TakedVaccines') {
-        try {
-          console.log(`${key}:`, JSON.parse(value as string));
-        } catch {
-          console.log(`${key}:`, value);
-        }
-      } else {
         console.log(`${key}:`, value);
-      }
     }
 
     return formData;
