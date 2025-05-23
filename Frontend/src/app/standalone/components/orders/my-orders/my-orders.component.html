@@ -38,11 +38,6 @@
             class="border px-4 py-2 rounded-[42px] hover:bg-primary-hov transition-colors"
           >
             <span> قيد الإنتظار </span>
-            <span
-              *ngIf="pendingOrderCount"
-              class="inline-block mr-2 bg-error text-white rounded-full px-2 py-0.5 text-center text-sm"
-              >+{{ pendingOrderCount }}</span
-            >
           </button>
 
           <button
@@ -53,6 +48,12 @@
             class="border px-4 py-2 rounded-[42px] hover:bg-primary-hov transition-colors"
           >
             جارى التوصيل
+
+            <span
+              *ngIf="processingOrderCount"
+              class="inline-block mr-2 bg-error text-white rounded-full px-2 py-0.5 text-center text-sm"
+              >+{{ processingOrderCount }}</span
+            >
           </button>
           <button
             [ngClass]="{
@@ -139,7 +140,7 @@
             </table>
 
             <button
-              *ngIf="!acceptedDoses && hasProcessingOrder"
+              *ngIf="!hasReceivedDosesForSelected && hasProcessingOrder"
               (click)="acceptDoses()"
               class="flex items-center w-fit bg-primary-bg px-6 py-3 mx-auto mt-6 rounded-lg hover:bg-primary-hovbtn transition-colors"
             >

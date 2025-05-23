@@ -7,7 +7,6 @@
     </h2>
     <!--  links -->
     <div class="pr-4 pl-1">
-      <!-- parent links -->
       <ul *ngIf="true" class="[&_a]:activeLink">
         <li>
           <a
@@ -104,35 +103,6 @@
         </li>
         <li>
           <a
-            *ngIf="hasRole(['governorateAdmin', 'cityAdmin', 'admin'])"
-            routerLink="/admins"
-            routerLinkActive="present"
-            ><img src="/icons/Frame (1).svg" alt="" /><span>المسئولين</span></a
-          >
-        </li>
-        <li>
-          <a
-            *ngIf="hasRole(['governorateAdmin', 'doctor', 'cityAdmin'])"
-            routerLink="/vaccines"
-            routerLinkActive="present"
-            ><img src="/icons/vaccine.svg" alt="" /><span>اللقاحات </span></a
-          >
-        </li>
-
-        <li>
-          <a
-            *ngIf="
-              hasRole(['governorateAdmin', 'organizer', 'cityAdmin', 'admin'])
-            "
-            routerLink="/orders"
-            routerLinkActive="present"
-            ><img src="/icons/Group (1).svg" alt="" /><span>الطلبات</span></a
-          >
-        </li>
-
-        <!-- Admin of city center links -->
-        <li>
-          <a
             *ngIf="hasRole(['cityAdmin'])"
             routerLink="/city-center-admin/dashboard"
             routerLinkActive="present"
@@ -151,10 +121,38 @@
 
         <li>
           <a
+            *ngIf="hasRole(['governorateAdmin', 'cityAdmin', 'admin'])"
+            routerLink="/admins"
+            routerLinkActive="present"
+            ><img src="/icons/Frame (1).svg" alt="" /><span>المسئولين</span></a
+          >
+        </li>
+        <li>
+          <a
             *ngIf="hasRole(['cityAdmin'])"
             routerLink="/city-center-admin/doctors"
             routerLinkActive="present"
             ><img src="/icons/doctors.svg" alt="" /><span>الأطباء </span></a
+          >
+        </li>
+
+        <li>
+          <a
+            *ngIf="hasRole(['governorateAdmin', 'doctor', 'cityAdmin'])"
+            routerLink="/vaccines"
+            routerLinkActive="present"
+            ><img src="/icons/vaccine.svg" alt="" /><span>اللقاحات </span></a
+          >
+        </li>
+
+        <li>
+          <a
+            *ngIf="
+              hasRole(['governorateAdmin', 'organizer', 'cityAdmin', 'admin'])
+            "
+            routerLink="/orders"
+            routerLinkActive="present"
+            ><img src="/icons/Group (1).svg" alt="" /><span>الطلبات</span></a
           >
         </li>
 

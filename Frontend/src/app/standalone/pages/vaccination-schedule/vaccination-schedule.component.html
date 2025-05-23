@@ -1,1 +1,79 @@
-<p>vaccination-schedule works!</p>
+
+<section class="bg-mainBg-200 font-arabic">
+  <div class="container py-12 px-20">
+    <table
+      class="table-fixed w-full text-center [&_tbody_tr]:h-[92px] [&_tr:not(:first-child)]:border-t-[2px] [&_tr]:border-white [&_td]:py-4 [&_td]:px-2 [&_th]:py-4"
+    >
+      <thead>
+        <tr class="bg-primary-bg text-white text-xl">
+          <th class="rounded-tr-md">الجرعة</th>
+          <th class="border-x-[2px]">العمر</th>
+          <th class="rounded-tl-md">المرض</th>
+        </tr>
+      </thead>
+      <tbody class="bg-mainBg-300 text-xl">
+        <tr>
+          <td>الميلاد</td>
+          <td class="border-x-[2px] border-white">أول 24 ساعة</td>
+          <td>إلتهاب الكبد الفيروسي B</td>
+        </tr>
+        <tr>
+          <td>الصفرية</td>
+          <td class="border-x-[2px] border-white">عند الميلاد</td>
+          <td>شلل الأطفال</td>
+        </tr>
+        <tr>
+          <td>الدرن</td>
+          <td class="border-x-[2px] border-white">عند الميلاد</td>
+          <td>الدرن</td>
+        </tr>
+        <tr>
+          <td>الأولى</td>
+          <td class="border-x-[2px] border-white">شهرين</td>
+          <td>
+            شلل الأطفال , الثلاثى البكتيرى DPT, هيموفيلاس إنفلونزا , الكبدى ب
+          </td>
+        </tr>
+        <tr>
+          <td>الثانية</td>
+          <td class="border-x-[2px] border-white">4 أشهر</td>
+          <td>
+            شلل الأطفال , الثلاثى البكتيرى DPT, هيموفيلاس إنفلونزا , الكبدى ب
+          </td>
+        </tr>
+        <tr>
+          <td>الثالثة</td>
+          <td class="border-x-[2px] border-white">6 أشهر</td>
+          <td>
+            شلل الأطفال , الثلاثى البكتيرى DPT, هيموفيلاس إنفلونزا , الكبدى ب
+          </td>
+        </tr>
+        <tr>
+          <td>الرابعة</td>
+          <td class="border-x-[2px] border-white">9 أشهر</td>
+          <td>شلل الأطفال</td>
+        </tr>
+        <tr>
+          <td>الخامسة</td>
+          <td class="border-x-[2px] border-white">12 شهر</td>
+          <td>شلل الأطفال , النكاف, الحصبة , الحصبة الألمانى</td>
+        </tr>
+        <tr>
+          <td>المنشطة</td>
+          <td class="border-x-[2px] border-white">18 شهر</td>
+          <td>
+            شلل الأطفال , النكاف, الحصبة , الحصبة الألمانى, الدفتيريا ,
+            التيتانوس , السعال الديكى
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <button
+      (click)="goBack()"
+      class="flex w-fit mx-auto font-bold mt-8 bg-black text-white py-3 px-8 rounded-lg"
+    >
+      رجوع
+    </button>
+  </div>
+</section>
+

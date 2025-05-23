@@ -6,8 +6,10 @@ import { ComplaintDetailsComponent } from './components/complaint-details/compla
 
 const routes: Routes = [
   { path: '', component: ComplaintsListComponent },
-
-  { path: 'complaint-details', component: ComplaintDetailsComponent },
+  {
+    path: 'complaint-details/:id',
+    component: ComplaintDetailsComponent,
+  },
 ];
 
 @NgModule({

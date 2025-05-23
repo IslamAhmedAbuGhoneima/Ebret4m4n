@@ -7,12 +7,41 @@ import { VaccinationScheduleComponent } from './standalone/pages/vaccination-sch
 import { roleGuard } from './core/guards/role.guard';
 import { PaymentSuccessComponent } from './standalone/components/payment-success/payment-success.component';
 import { PaymentCancelComponent } from './standalone/components/payment-cancel/payment-cancel.component';
+import { SecondLayoutComponent } from './layout/second-layout/second-layout.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent },
-  { path: 'contact-us', component: ContactUsComponent },
-  { path: 'vaccination-schedule', component: VaccinationScheduleComponent },
+  {
+    path: '',
+    component: SecondLayoutComponent,
+    children: [
+      {
+        path: '',
+        redirectTo: '/home',
+        pathMatch: 'full',
+      },
+      {
+        path: 'home',
+        loadComponent: () =>
+          import('./standalone/pages/home/home.component').then(
+            (c) => c.HomeComponent
+          ),
+      },
+      {
+        path: 'contact-us',
+        loadComponent: () =>
+          import('./standalone/pages/contact-us/contact-us.component').then(
+            (c) => c.ContactUsComponent
+          ),
+      },
+      {
+        path: 'vaccination-schedule',
+        loadComponent: () =>
+          import(
+            './standalone/pages/vaccination-schedule/vaccination-schedule.component'
+          ).then((c) => c.VaccinationScheduleComponent),
+      },
+    ],
+  },
 
   {
     path: 'auth',

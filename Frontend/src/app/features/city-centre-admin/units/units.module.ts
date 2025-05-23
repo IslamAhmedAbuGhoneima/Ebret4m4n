@@ -12,7 +12,7 @@ const routes: Routes = [
 
   { path: 'add-unit', component: AddUnitComponent },
   {
-    path: 'health-unit',
+    path: ':healthCareCenterName/:healthCareCenterId',
     component: HealthUnitComponent,
   },
 ];

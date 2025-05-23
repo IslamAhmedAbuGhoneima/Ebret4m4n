@@ -24,10 +24,11 @@ export class MyOrdersComponent implements OnInit {
   activeFilter: string = 'all';
   selectedOrder: any | null = null;
   role: any;
-  pendingOrderCount: any;
+  processingOrderCount: any;
   selectedOrderId: any;
   acceptedDoses: boolean = false;
   governorateName: any;
+  receivedMap = new Map<number, boolean>();
 
   constructor(
     private router: Router,
@@ -40,16 +41,19 @@ export class MyOrdersComponent implements OnInit {
     this.loadOrders();
   }
 
-  loadOrders() {
-    if (this.role === 'governorateAdmin') {
+  loadOrders(resetFilter: boolean = true) {
+    if (this.role === 'governorateAdmin' || this.role == 'cityAdmin') {
       this._GovernorateAdminService.getMyOrders().subscribe({
         next: (res) => {
           this.allOrders = this.formateData(res.data);
           this.filteredOrders = [...this.allOrders];
 
-          this.pendingOrderCount = this.allOrders.filter(
-            (item: any) => item.status === 'Pending'
+          this.processingOrderCount = this.allOrders.filter(
+            (item: any) => item.status === 'Processing'
           ).length;
+          if (!resetFilter) {
+            this.applyFilters();
+          }
         },
         error: (err) => {},
       });
@@ -57,13 +61,13 @@ export class MyOrdersComponent implements OnInit {
   }
   acceptDoses() {
     if (!this.selectedOrderId) return;
-    if (this.role == 'governorateAdmin') {
+    if (this.role == 'governorateAdmin' || this.role == 'cityAdmin') {
       this._GovernorateAdminService
         .markReceivedOrder(this.selectedOrderId)
         .subscribe({
           next: () => {
-            this.acceptedDoses = true;
-            this.loadOrders();
+            this.receivedMap.set(this.selectedOrderId!, true);
+            this.loadOrders(false);
           },
           error: (err) => {},
         });
@@ -98,7 +102,7 @@ export class MyOrdersComponent implements OnInit {
   }
   selectOrder(orderId: any, orderStatus: any) {
     this.selectedOrderId = orderId;
-    if (this.role == 'governorateAdmin') {
+    if (this.role == 'governorateAdmin' || this.role == 'cityAdmin') {
       this._GovernorateAdminService.getOrderDetails(orderId).subscribe({
         next: (res) => {
           this.selectedOrder = res.data.map((item: any) => ({
@@ -136,14 +140,15 @@ export class MyOrdersComponent implements OnInit {
       this.router.navigate(['/orders/my-orders']);
     }
   }
-  get hasPendingOrder(): boolean {
-    return this.selectedOrder?.some(
-      (item: any) => item.orderStatus === 'Pending'
-    );
-  }
+
   get hasProcessingOrder(): boolean {
     return this.selectedOrder?.some(
       (item: any) => item.orderStatus === 'Processing'
     );
+  }
+  get hasReceivedDosesForSelected(): boolean {
+    return this.selectedOrderId
+      ? this.receivedMap.get(this.selectedOrderId) ?? false
+      : false;
   }
 }

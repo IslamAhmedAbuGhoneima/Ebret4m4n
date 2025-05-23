@@ -8,6 +8,10 @@
 
     <h3 class="text-2xl font-semibold">مسئولى المراكز</h3>
 
+    } @else if (role==='cityAdmin') {
+
+    <h3 class="text-2xl font-semibold">مسئولى الوحدات</h3>
+
     }
 
     <div class="flex justify-between mb-2 mt-5">
@@ -31,12 +35,22 @@
         <img class="absolute top-1/3 right-3" src="/icons/search.svg" alt="" />
       </div>
       }@else if (role==='governorateAdmin') {
-
       <div class="relative w-64">
         <input
           class="w-full placeholder:text-sm py-3 pl-3 pr-9 border border-third-border rounded-lg outline-none placeholder:text-third-txt"
           type="text"
-          placeholder="بحث عن مسئول مركز..."
+          placeholder="بحث عن مسئول وحدة..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="search(searchTerm)"
+        />
+        <img class="absolute top-1/3 right-3" src="/icons/search.svg" alt="" />
+      </div>
+      }@else if (role==='cityAdmin') {
+      <div class="relative w-64">
+        <input
+          class="w-full placeholder:text-sm py-3 pl-3 pr-9 border border-third-border rounded-lg outline-none placeholder:text-third-txt"
+          type="text"
+          placeholder="بحث عن مسئول وحدة..."
           [(ngModel)]="searchTerm"
           (ngModelChange)="search(searchTerm)"
         />
@@ -59,6 +73,8 @@
           }@else if(role==='governorateAdmin'){
           <td>مركز</td>
 
+          } @if (role==='cityAdmin') {
+          <td>الوحدة الصحية</td>
           }
           <td>البريد الإلكترونى</td>
           <td class="rounded-tl-md">الإجراءات</td>
@@ -68,12 +84,17 @@
         @for (item of filteredData; track $index) {
         <tr>
           <td>{{ item.firstName }} {{ item.lastName }}</td>
+
           @if ( role == "admin") {
           <td>{{ item.governorate }}</td>
           }@else if(role==='governorateAdmin'){
           <td>{{ item.city }}</td>
+          }@else if(role==='cityAdmin'){
+          <td>{{ item.healthCareCenterName }}</td>
           }
+
           <td>{{ item.email }}</td>
+          
           <td class="flex justify-center">
             <a [routerLink]="['/admins/edit-admin', item.userId]"
               ><img src="/icons/edit.svg" alt=""

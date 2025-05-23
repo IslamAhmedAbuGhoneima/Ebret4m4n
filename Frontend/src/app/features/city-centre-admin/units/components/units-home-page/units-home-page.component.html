@@ -15,78 +15,23 @@
       </a>
     </div>
     <ul class="flex gap-4 flex-wrap">
+      @for (item of unitList; track $index) {
       <li>
         <a
+          [routerLink]="[
+            '/city-center-admin/units',
+            item.healthCareCenterName,
+            item.healthCareCenterId
+          ]"
           routerLink="/city-center-admin/units/health-unit"
           class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
         >
-          <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
+          <p class="break-words line-clamp-2">
+            {{ item.healthCareCenterName }}
+          </p>
         </a>
       </li>
-      <li>
-        <a
-          routerLink="/city-center-admin/units/health-unit"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">الوحدة الصحية بقرية البرجاية</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-center-admin/units/health-unit"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-center-admin/units/health-unit"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-center-admin/units/health-unit"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-center-admin/units/health-unit"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-center-admin/units/health-unit"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-center-admin/units/health-unit"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-        </a>
-      </li>
-      <li>
-        <a
-          routerLink="/city-center-admin/units/health-unit"
-          class="w-[210px] h-36 flex justify-center items-center py-14 px-4 overflow-hidden text-ellipsis bg-white border border-third-border rounded-lg text-center text-xl font-semibold cursor-pointer hover:bg-primary-hov transition-colors duration-200"
-        >
-          <p class="break-words line-clamp-2">إسم الوحدة الصحية</p>
-        </a>
-      </li>
+      }
     </ul>
   </div>
 </section>

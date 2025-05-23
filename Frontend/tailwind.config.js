@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        arabic: ["Cairo", "normal"],
+        arabic: ["Cairo", "sans-serif"],
       },
       borderRadius: {
         "4xl": "15rem",
@@ -24,6 +24,7 @@ module.exports = {
         mainBg: {
           100: "#f6f5f3", //main white background... white
           200: "#F9FAFB",
+          300: "#E7F1EE",
         },
         primary: {
           txt100: "#0B4632", //light green text

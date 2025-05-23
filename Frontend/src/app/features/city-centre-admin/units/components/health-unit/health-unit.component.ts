@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddUnitComponent } from '../add-unit/add-unit.component';
 import { Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { CityCenterService } from '../../../services/cityCenter.service';
 
 @Component({
   selector: 'app-health-unit',
@@ -9,21 +11,56 @@ import { Location } from '@angular/common';
   templateUrl: './health-unit.component.html',
   styleUrl: './health-unit.component.css',
 })
-export class HealthUnitComponent {
-  constructor(private matDialog: MatDialog,private location:Location) {}
+export class HealthUnitComponent implements OnInit {
+  governorateName: any;
+  centerName: any;
+  centerId: any;
+  healthCareCenterName: any;
+  healthCareCenterId: any;
+  data: any;
+  constructor(
+    private location: Location,
+    private route: ActivatedRoute,
+    private _CityCenterService: CityCenterService
+  ) {}
+  ngOnInit(): void {
+    this.route.paramMap.subscribe((params) => {
+      this.healthCareCenterName = params.get('healthCareCenterName')!;
+      this.healthCareCenterId = params.get('healthCareCenterId')!;
+      this.healthUnitDetails(this.healthCareCenterId);
+    });
+  }
 
-  reportShortage() {
-    (document.activeElement as HTMLElement)?.blur();
+  healthUnitDetails(HealthUnitId: any) {
+    this._CityCenterService.getHealthCareUnitDetails(HealthUnitId).subscribe({
+      next: (res) => {
+        this.data = this.formateData(res.data);
+        this.governorateName = this.data.governorate;
+        this.centerName = this.data.city;
+      },
+      error: (err) => {},
+    });
+  }
+  formateData(data: any): any {
+    if (!data || typeof data !== 'object') {
+      return {};
+    }
 
-    setTimeout(() => {
-      const dialogRef = this.matDialog.open(AddUnitComponent, {
-        width: '750px',
-        panelClass: 'report-shortage-style',
-        autoFocus: true,
-        restoreFocus: false,
-        disableClose: true,
-      });
-    }, 0);
+    const dayMap: Record<string, string> = {
+      Saturday: 'السبت',
+      Sunday: 'الأحد',
+      Monday: 'الإثنين',
+      Tuesday: 'الثلاثاء',
+      Wednesday: 'الأربعاء',
+      Thursday: 'الخميس',
+      Friday: 'الجمعة',
+    };
+
+    return {
+      ...data,
+      firstDayAr: dayMap[data.firstDay] || data.firstDay,
+      secondDayAr: dayMap[data.secondDay] || data.secondDay,
+    };
   }
   goBack() {
     this.location.back();

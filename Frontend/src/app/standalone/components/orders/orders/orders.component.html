@@ -2,7 +2,7 @@
   <div class="container pt-6 pb-5">
     <h3 class="text-[28px] font-semibold text-[#51419]">الطلبات</h3>
     <div class="mt-5">
-      @if (role=='governorateAdmin') {
+      @if (role=='governorateAdmin' || role=='cityAdmin') {
       <div class="w-[250px] relative mb-4">
         <select
           (change)="navigateTo($event)"
@@ -91,7 +91,10 @@
               @if(role=='admin'){
               <div class="w-1/2 text-center">{{ order?.governorate }}</div>
               }@else if(role=='governorateAdmin'){
-              <div class="w-1/2 text-center">{{ governorateName }}</div>
+              <div class="w-1/2 text-center">{{ order?.city }}</div>
+              }@else if(role=='cityAdmin'){
+              <!-- <div class="w-1/2 text-center">{{ order?.city }}</div> -->
+              <div class="w-1/2 text-center">وحدة</div>
               }
 
               <div
@@ -148,7 +151,7 @@
             </table>
 
             <button
-              *ngIf="!hasSentDoses && hasPendingOrder"
+              *ngIf="!hasSentDosesForSelected && hasPendingOrder"
               (click)="sendDoses()"
               class="flex items-center w-fit bg-primary-bg px-6 py-3 mx-auto mt-6 rounded-lg hover:bg-primary-hovbtn transition-colors"
             >

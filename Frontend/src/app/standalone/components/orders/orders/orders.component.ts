@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
+import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
 
 @Component({
   selector: 'app-orders',
@@ -23,12 +24,14 @@ export class OrdersComponent implements OnInit {
   selectedOrderId: any;
   hasSentDoses: boolean = false;
   governorateName: any;
+  hasSentDosesMap = new Map<number, boolean>(); // جديد
 
   constructor(
     private router: Router,
     private _AuthService: AuthService,
     private _HealthMinistryService: HealthMinistryService,
-    private _GovernorateAdminService: GovernorateAdminService
+    private _GovernorateAdminService: GovernorateAdminService,
+    private _CityCenterService: CityCenterService
   ) {}
   ngOnInit() {
     this.role = this._AuthService.getRole();
@@ -36,7 +39,7 @@ export class OrdersComponent implements OnInit {
     this.loadOrders();
   }
 
-  loadOrders() {
+  loadOrders(resetFilter: boolean = true) {
     if (this.role == 'admin') {
       this._HealthMinistryService.getOrders().subscribe({
         next: (res) => {
@@ -46,6 +49,9 @@ export class OrdersComponent implements OnInit {
           this.pendingOrderCount = this.allOrders.filter(
             (item: any) => item.status === 'Pending'
           ).length;
+          if (!resetFilter) {
+            this.applyFilters();
+          }
         },
         error: (err) => {},
       });
@@ -58,6 +64,24 @@ export class OrdersComponent implements OnInit {
           this.pendingOrderCount = this.allOrders.filter(
             (item: any) => item.status === 'Pending'
           ).length;
+          if (!resetFilter) {
+            this.applyFilters();
+          }
+        },
+        error: (err) => {},
+      });
+    } else if (this.role == 'cityAdmin') {
+      this._CityCenterService.getOrders().subscribe({
+        next: (res) => {
+          this.allOrders = this.formateData(res.data);
+          this.filteredOrders = [...this.allOrders];
+
+          this.pendingOrderCount = this.allOrders.filter(
+            (item: any) => item.status === 'Pending'
+          ).length;
+          if (!resetFilter) {
+            this.applyFilters();
+          }
         },
         error: (err) => {},
       });
@@ -77,20 +101,50 @@ export class OrdersComponent implements OnInit {
         .acceptGovernorateOrder(this.selectedOrderId)
         .subscribe({
           next: () => {
-            this.hasSentDoses = true;
+            const index = this.allOrders.findIndex(
+              (order) => order.id === this.selectedOrderId
+            );
 
-            this.loadOrders();
+            if (index !== -1) {
+              this.allOrders[index].status = 'Recived';
+              this.allOrders[index].statusAr = 'مستلمة';
+            }
+
+            this.selectedOrderId = null;
+            this.selectedOrder = null;
+            this.hasSentDosesMap.set(this.selectedOrderId, true);
+
+            this.applyFilters();
+
+            this.pendingOrderCount = this.allOrders.filter(
+              (item: any) => item.status === 'Pending'
+            ).length;
           },
           error: (err) => {},
         });
-    } else if (this.role == 'governorateAdmin') {
+    } else if (this.role == 'governorateAdmin' || this.role == 'cityAdmin') {
       this._GovernorateAdminService
-        .acceptGovernorateOrder(this.selectedOrderId)
+        .acceptOrders(this.selectedOrderId)
         .subscribe({
           next: () => {
-            this.hasSentDoses = true;
+            const index = this.allOrders.findIndex(
+              (order) => order.id === this.selectedOrderId
+            );
 
-            this.loadOrders();
+            if (index !== -1) {
+              this.allOrders[index].status = 'Recived';
+              this.allOrders[index].statusAr = 'مستلمة';
+            }
+
+            this.selectedOrderId = null;
+            this.selectedOrder = null;
+            this.hasSentDosesMap.set(this.selectedOrderId, true);
+
+            this.applyFilters();
+
+            this.pendingOrderCount = this.allOrders.filter(
+              (item: any) => item.status === 'Pending'
+            ).length;
           },
           error: (err) => {},
         });
@@ -162,5 +216,10 @@ export class OrdersComponent implements OnInit {
     return this.selectedOrder?.some(
       (item: any) => item.orderStatus === 'Pending'
     );
+  }
+  get hasSentDosesForSelected(): boolean {
+    return this.selectedOrderId
+      ? this.hasSentDosesMap.get(this.selectedOrderId) ?? false
+      : false;
   }
 }

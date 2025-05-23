@@ -63,18 +63,16 @@ export class GovernorateAdminService {
       `${environment.apiUrl}/order/requested-city-orders`
     );
   }
-  //
-
   markReceivedOrder(orderId: any) {
     return this.http.put<any>(
       `${environment.apiUrl}/Order/${orderId}/marke-received-order`,
       {}
     );
   }
-  acceptGovernorateOrder(model: any) {
+  acceptOrders(orderId: string) {
     return this.http.post<any>(
-      `${environment.apiUrl}/Order/request-order`,
-      model
+      `${environment.apiUrl}/Order/${orderId}/accept-vaccine-order`,
+      {}
     );
   }
 }

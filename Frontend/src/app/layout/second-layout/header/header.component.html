@@ -1,0 +1,42 @@
+<header class="relative bg-mainBg-200 font-arabic overflow-hidden z-10">
+  <div class="container flex justify-between items-center py-4 font-bold">
+    <h2 class="text-xl">إبرة<span class="text-primary-bg"> أمان</span></h2>
+    <nav>
+      <ul class="flex gap-6 text-[16px]">
+        <li>
+          <a
+            routerLink="/home"
+            routerLinkActive="active"
+            class="text-third-txt hover:text-primary-bg transition-colors"
+            >الصفحة الرئيسية</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/vaccination-schedule"
+            routerLinkActive="active"
+            class="text-third-txt hover:text-primary-bg transition-colors"
+            >جدول التطعيمات</a
+          >
+        </li>
+        <li>
+          <a
+            routerLink="/contact-us"
+            routerLinkActive="active"
+            class="text-third-txt hover:text-primary-bg transition-colors"
+            >تواصل معنا</a
+          >
+        </li>
+      </ul>
+    </nav>
+
+    <div class="flex items-center gap-6 text-[16px] text-primary-bg">
+      <a routerLink="/auth/login">تسجيل دخول</a>
+      <a
+        routerLink="/auth/register"
+        class="border-2 border-primary-btn rounded-[48px] py-3 px-8 hover:bg-primary-bg hover:text-white transition-colors"
+        >إنشاء حساب</a
+      >
+    </div>
+  </div>
+</header>

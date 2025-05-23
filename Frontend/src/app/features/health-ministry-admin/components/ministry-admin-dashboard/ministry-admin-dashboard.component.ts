@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { HealthMinistryService } from '../../services/health-ministry.service';
-import { StatisticsAdmin } from '../../../../core/interfaces/statisticsAdmin';
 
 @Component({
   selector: 'app-ministry-admin-dashboard',
@@ -26,26 +25,26 @@ export class MinistryAdminDashboardComponent implements OnInit {
     this._HealthMinistryService.getStatisticsOfAdmin().subscribe({
       next: (res) => {
         this.data = res;
-
-        const labels = this.data.vaccineRequests.map(
+        console.log(this.data);
+        const labels1 = this.data.vaccineRequests.map(
           (item: any) => item.vaccineName
         );
-        const data = this.data.vaccineRequests.map(
+        const data1 = this.data.vaccineRequests.map(
           (item: any) => item.requestedAmount
         );
-        this.barChartData1.labels = labels;
-        this.barChartData1.datasets[0].data = data;
+        this.barChartData1.labels = labels1;
+        this.barChartData1.datasets[0].data = data1;
         this.barChartData1 = { ...this.barChartData1 };
 
-        const labels2 = this.data.topGovernoratesByVaccines.map(
+        const labels2 = this.data.governoratesReport.map(
           (item: any) => item.governorate
         );
-        const data2 = this.data.topGovernoratesByVaccines.map(
-          (item: any) => item.totalVaccinesRequested
+        const data2 = this.data.governoratesReport.map(
+          (item: any) => item.vaccinesTaken
         );
-        this.barChartData2.labels = labels;
-        this.barChartData2.datasets[0].data = data;
-        this.barChartData2 = { ...this.barChartData1 };
+        this.barChartData2.labels = labels2;
+        this.barChartData2.datasets[0].data = data2;
+        this.barChartData2 = { ...this.barChartData2 };
       },
       error: (err) => {
         this.errorMessage = err.error.Message;
@@ -90,7 +89,7 @@ export class MinistryAdminDashboardComponent implements OnInit {
     },
   };
   public pieChartData: ChartData<'pie', number[], string | string[]> = {
-    labels: ['ذكر', 'أنثى'],
+    labels: ['طفل', 'طفلة'],
     datasets: [
       {
         data: [this.data.maleChildren, this.data.femaleChildren],

@@ -3,5 +3,8 @@ export interface AddAdmin {
   lastName: string;
   email: string;
   password: string;
-  governorate: string;
+  governorate?: string;
+  city?: string;
+  healthCareCenterId?: string;
+  staffRole?: string;
 }

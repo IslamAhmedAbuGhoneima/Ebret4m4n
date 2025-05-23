@@ -6,7 +6,6 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart } from 'chart.js';
 import { GovernorateAdminService } from '../../services/governorateAdmin.service';
 
-// تسجيل الـ plugins
 Chart.register(ChartDataLabels);
 @Component({
   selector: 'app-city-admin-dashboard',

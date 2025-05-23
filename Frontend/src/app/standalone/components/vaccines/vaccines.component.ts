@@ -37,8 +37,7 @@ export class VaccinesComponent implements OnInit {
     }
   }
   reportShortage() {
-    let shortageItems = this.data.filter((item: any) => item.amount <= 20);
-    shortageItems = shortageItems.map((item: any) => ({
+    let shortageItems = this.data.map((item: any) => ({
       ...item,
       requested: null,
     }));

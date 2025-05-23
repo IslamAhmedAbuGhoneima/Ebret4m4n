@@ -12,6 +12,7 @@ import { passwordMatch } from '../../../../core/customValidation/passwordMatch.v
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
+import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
 
 @Component({
   selector: 'app-add-administrator',
@@ -286,7 +287,9 @@ export class AddAdministratorComponent implements OnInit {
     'عابدين',
     'قصر النيل',
   ];
+  healthUnits: any;
   adminOfgovernorate: any;
+  cityAdminName: any;
 
   constructor(
     private fb: FormBuilder,
@@ -294,12 +297,26 @@ export class AddAdministratorComponent implements OnInit {
     private location: Location,
     private _HealthMinistryService: HealthMinistryService,
     private _AuthService: AuthService,
-    private _GovernorateAdminService: GovernorateAdminService
+    private _GovernorateAdminService: GovernorateAdminService,
+    private _CityCenterService: CityCenterService
   ) {}
 
   ngOnInit() {
     this.role = this._AuthService.getRole();
     this.adminOfgovernorate = this._AuthService.getUserGovernorate()!;
+    this.cityAdminName = this._AuthService.getUserCity()!;
+    if (this.role == 'cityAdmin') {
+      this._AuthService
+        .getHealthUnits(this.adminOfgovernorate, this.cityAdminName)
+        .subscribe({
+          next: (res) => {
+            this.healthUnits = res.data;
+          },
+          error: (err) => {
+            this.healthUnits = [];
+          },
+        });
+    }
 
     this.createForm();
   }
@@ -328,6 +345,7 @@ export class AddAdministratorComponent implements OnInit {
         email: ['', [Validators.required, Validators.email]],
         governorate: [''],
         city: [''],
+        healthCareCenterId: [''],
         password: ['', [Validators.required, Validators.minLength(8)]],
         confirmPassword: ['', [Validators.required]],
       },
@@ -347,14 +365,18 @@ export class AddAdministratorComponent implements OnInit {
       case 'governorateAdmin':
         this.city?.setValidators([Validators.required]);
         break;
+      case 'cityAdmin':
+        this.healthCareCenterId?.setValidators([Validators.required]);
+        break;
     }
 
     this.governorate?.updateValueAndValidity();
     this.city?.updateValueAndValidity();
+    this.healthCareCenterId?.updateValueAndValidity();
   }
   addAdmin() {
     if (this.addAdminForm.valid) {
-      console.log(this.addAdminForm.value)
+      console.log(this.addAdminForm.value);
       this.getService();
     }
   }
@@ -393,6 +415,25 @@ export class AddAdministratorComponent implements OnInit {
           this.errorMessage = err.error.Message;
         },
       });
+    } else if (this.role === 'cityAdmin') {
+      const MODEL = {
+        firstName: this.firstName?.value,
+        lastName: this.lastName?.value,
+        email: this.email?.value,
+        password: this.password?.value,
+        city: this.cityAdminName,
+        governorate: this.adminOfgovernorate,
+        healthCareCenterId: this.healthCareCenterId?.value,
+        staffRole: 'organizer',
+      };
+      this._CityCenterService.addOrganizer(MODEL).subscribe({
+        next: (res) => {
+          this.route.navigate(['/admins']);
+        },
+        error: (err) => {
+          this.errorMessage = err.error.Message;
+        },
+      });
     }
   }
 
@@ -408,6 +449,9 @@ export class AddAdministratorComponent implements OnInit {
   }
   get governorate() {
     return this.addAdminForm.get('governorate');
+  }
+  get healthCareCenterId() {
+    return this.addAdminForm.get('healthCareCenterId');
   }
 
   get email() {

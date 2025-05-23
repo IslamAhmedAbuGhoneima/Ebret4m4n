@@ -4,47 +4,23 @@
 
     <div class="mt-4">
       <div
-        class="flex justify-between items-center bg-primary-table rounded-t-lg py-3 mb-2 border rounded-lg"
+        class="flex justify-between items-center bg-primary-bg text-white rounded-t-lg py-3 mb-2 border rounded-lg"
       >
         <div class="w-1/2 text-center">مقدم الشكوى</div>
         <div class="w-1/2 text-center">الوحدة الصحية</div>
       </div>
+      @for (item of complaintsList; track $index) {
       <a
         class="flex justify-between items-center py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
-        routerLink="/city-center-admin/complaints/complaint-details"
+        [routerLink]="['/city-center-admin/complaints/complaint-details', item.id]"
       >
-        <div class="w-1/2 text-center">محمد إبراهيم</div>
+        <div class="w-1/2 text-center">{{ item.userName }}</div>
         <div class="mx-auto px-3 py-1 font-semibold">
-          <span>الوحدة الصحية بقرية ....</span>
+          <span>{{ item.healthCareCenterName }}</span>
         </div>
       </a>
-      <a
-        class="flex justify-between items-center py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
-        routerLink="/city-center-admin/complaints/complaint-details"
-      >
-        <div class="w-1/2 text-center">محمد إبراهيم</div>
-        <div class="mx-auto px-3 py-1 font-semibold">
-          <span>الوحدة الصحية بقرية ....</span>
-        </div>
-      </a>
-      <a
-        class="flex justify-between items-center py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
-        routerLink="/city-center-admin/complaints/complaint-details"
-      >
-        <div class="w-1/2 text-center">محمد إبراهيم</div>
-        <div class="mx-auto px-3 py-1 font-semibold">
-          <span>الوحدة الصحية بقرية ....</span>
-        </div>
-      </a>
-      <a
-        class="flex justify-between items-center py-3 mb-2 bg-white border rounded-lg hover:bg-primary-hov transition-colors cursor-pointer"
-        routerLink="/city-center-admin/complaints/complaint-details"
-      >
-        <div class="w-1/2 text-center">محمد إبراهيم</div>
-        <div class="mx-auto px-3 py-1 font-semibold">
-          <span>الوحدة الصحية بقرية ....</span>
-        </div>
-      </a>
+
+      }
     </div>
   </div>
 </section>

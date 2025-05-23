@@ -10,35 +10,42 @@
             <img class="inline" src="/icons/user-compalint.svg" alt="" />
             <span class="text-third-txt font-normal">مقدم الشكوى</span>
           </div>
-          <p class="font-semibold">محمد سيد</p>
+          <p class="font-semibold">{{ data?.userName }}</p>
         </div>
         <div class="flex items-center mt-4 mb-6">
           <div class="flex-1">
             <img class="inline" src="/icons/uniys-gray.svg" alt="" />
             <span class="mr-1 text-third-txt font-normal">الوحدة الصحية</span>
-            <p class="font-semibold mt-1">الوحدة الصحية بقرية البرجاية</p>
+            <p class="font-semibold mt-1">{{ data?.healthCareCenterName }}</p>
           </div>
           <div class="flex-1">
             <img class="inline" src="/icons/location.svg" alt="" />
             <span class="mr-1 text-third-txt font-normal">العنوان</span>
-            <p class="font-semibold mt-1">مركز المنيا - محافظة المنيا</p>
+            <p class="font-semibold mt-1">
+              محافظة
+              {{ organizerGovernorateName }}
+
+              - مركز {{ organizerCityName }}
+            </p>
           </div>
           <div class="flex-1">
             <img class="inline" src="/icons/cib_gmail.svg" alt="" />
             <span class="mr-1 text-third-txt font-normal"
               >البريد الإلكترونى الخاص بمسئول الوحدة</span
             >
-            <p class="font-semibold mt-1">someone&#64; example.com</p>
+            <p class="font-semibold mt-1">{{ organizerEmail }}</p>
           </div>
         </div>
 
         <p class="text-center mx-auto">
-          أشكو الوحدة الصحية بقرية .... بسبب .....
+          {{ data?.message }}
         </p>
       </div>
     </div>
 
     <button
+      *ngIf="!complaintHandled"
+      (click)="handleComplaint()"
       class="flex items-center w-fit bg-primary-bg px-6 py-3 mx-auto rounded-lg hover:bg-primary-hovbtn transition-colors"
     >
       <img src="/icons/carbon_send-filled.svg" alt="" />

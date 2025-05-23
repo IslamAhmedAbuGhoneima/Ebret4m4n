@@ -248,6 +248,56 @@
               </div>
             </div>
           </div>
+          }@else if (role==='cityAdmin') {
+          <div class="mb-4 flex-1 font-arabic">
+            <div class="relative">
+              <select
+                formControlName="healthCareCenterId"
+                [ngClass]="{
+                  'border-red-700':
+                    healthCareCenterId?.invalid &&
+                    (healthCareCenterId?.touched || healthCareCenterId?.dirty),
+                  'border-third-border':
+                    healthCareCenterId?.valid || healthCareCenterId?.untouched
+                }"
+                class="w-full text-third-txt px-3 py-4 rounded-md border border-third-border appearance-none text-right outline-none cursor-pointer"
+                name="healthCareCenterId"
+                id="healthCareCenterId"
+              >
+                <option value="" disabled>إختر مركز طبى</option>
+                @for (item of healthUnits; track $index) {
+                <option [value]="item.healthCareCenterId">
+                  {{ item.healthCareCenterName }}
+                </option>
+                }
+              </select>
+
+              <img
+                class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
+                src="icons/Caret Down.svg"
+                alt=""
+              />
+            </div>
+            <div
+              class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+              *ngIf="
+                healthCareCenterId?.invalid &&
+                (healthCareCenterId?.touched || healthCareCenterId?.dirty)
+              "
+            >
+              <img
+                src="./icons/si_warning-fill.svg"
+                alt=""
+                class="w-4 h-4 mt-[1px]"
+              />
+              <div>
+                <small *ngIf="healthCareCenterId?.errors?.['required']">
+                  يجب إختيار مركز طبى.
+                </small>
+              </div>
+            </div>
+          </div>
+
           }
 
           <div class="flex justify-between items-center mt-5">

@@ -1,1 +1,102 @@
-<p>contact-us works!</p>
+<section class="bg-mainBg-200">
+  <div class="container w-[540px] py-24 mx-auto">
+    <h3 class="font-bold text-2xl text-center mb-10">
+      تواصل معنا لتحسين موقعنا
+    </h3>
+    <form [formGroup]="formComplaint" (ngSubmit)="submit()">
+      <div class="mb-6">
+        <label class="block text-xl font-semibold mb-2 mr-2" for="email"
+          >البريد الإلكتروني</label
+        >
+        <div class="relative">
+          <input
+            formControlName="email"
+            [ngClass]="{
+              'border-red-700': email?.invalid && email?.dirty,
+              'border-third-border': email?.valid || email?.untouched
+            }"
+            type="email"
+            name="email"
+            id="email"
+            placeholder="someone@example.com"
+            class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
+          />
+          <img
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-sm"
+            src="icons/tabler_mail.svg"
+            alt=""
+          />
+        </div>
+        <div
+          class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+          *ngIf="email?.invalid && email?.dirty"
+        >
+          <img
+            src="./icons/si_warning-fill.svg"
+            alt=""
+            class="w-4 h-4 mt-[1px]"
+          />
+          <div>
+            <small *ngIf="email?.errors?.['required']">
+              أدخل البريد الإلكتروني.
+            </small>
+            <small *ngIf="email?.errors?.['email']">
+              الرجاء إدخال عنوان بريد إلكتروني صحيح (مثل name&#64;example.com).
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label
+          class="block text-xl font-semibold mb-2 mr-4 text-[#151419]"
+          for="complaint-details"
+        >
+          إقتراحك أو الإبلاغ عن مشكلة
+        </label>
+
+        <textarea
+          formControlName="complaint"
+          [ngClass]="{
+            'border-red-700': complaint?.invalid && complaint?.dirty,
+            'border-third-border': complaint?.valid || complaint?.untouched
+          }"
+          name="complaint-details"
+          id="complaint-details"
+          class="block w-full h-36 resize-none overflow-y-auto placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-lg border-[1.5px] border-third-border"
+          placeholder="أكتب شكوتك"
+        ></textarea>
+
+        <div
+          class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
+          *ngIf="complaint?.invalid && complaint?.dirty"
+        >
+          <img
+            src="./icons/si_warning-fill.svg"
+            alt=""
+            class="w-4 h-4 mt-[1px]"
+          />
+          <small *ngIf="complaint?.errors?.['required']">
+            هذه الخانة مطلوبة.
+          </small>
+        </div>
+      </div>
+
+      <div class="flex gap-8 justify-center">
+        <button
+          type="submit"
+          class="flex w-fit font-bold mt-8 bg-primary-btn text-white py-3 px-8 rounded-lg hover:bg-primary-hovbtn transition-colors"
+        >
+          إرسال
+        </button>
+        <button
+          type="button"
+          (click)="goBack()"
+          class="flex w-fit font-bold mt-8 bg-black text-white py-3 px-8 rounded-lg hover:bg-opacity-65 transition-colors"
+        >
+          رجوع
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

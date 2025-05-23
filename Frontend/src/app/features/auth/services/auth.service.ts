@@ -155,6 +155,16 @@ export class AuthService {
       return null;
     }
   }
+  getUserCity(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+    try {
+      const decoded: any = jwtDecode(token);
+      return decoded.city || null;
+    } catch {
+      return null;
+    }
+  }
 
   getUserId(): string | null {
     const token = this.getToken();

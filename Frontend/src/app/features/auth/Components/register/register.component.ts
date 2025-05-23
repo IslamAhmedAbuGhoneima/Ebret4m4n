@@ -330,7 +330,7 @@ export class RegisterComponent implements OnInit {
     this.secondFormGroup = this.fb.group({
       city: ['', [Validators.required]],
       town: ['', [Validators.required]],
-      healthUnit: ['', [Validators.required]],
+      healthUnit: [''],
     });
   }
 
@@ -416,7 +416,7 @@ export class RegisterComponent implements OnInit {
       city: this.secondFormGroup.value.town,
       village: this.secondFormGroup.value.town,
       role: 'parent',
-      healthCareCenterId: 'F51D0B28-172B-4591-97E0-9E0D203CD3CA',
+      healthCareCenterId: this.healthUnit?.value,
     };
   }
 }

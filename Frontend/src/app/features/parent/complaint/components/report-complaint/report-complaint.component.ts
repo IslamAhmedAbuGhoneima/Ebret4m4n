@@ -11,6 +11,7 @@ import { ParentService } from '../../../services/parent.service';
 export class ReportComplaintComponent implements OnInit {
   formComplaint!: FormGroup;
   errorMessage: any;
+  data:any
   constructor(private fb: FormBuilder, private _ParentService: ParentService) {}
   ngOnInit() {
     this.createForm();
@@ -26,7 +27,7 @@ export class ReportComplaintComponent implements OnInit {
       const model = { message: this.formComplaint.value.complaint };
       this._ParentService.addComplaint(model).subscribe({
         next: (res) => {
-          this.errorMessage = res.data;
+          this.data = res.data;
         },
         error: (error) => {
           this.errorMessage = error.error.Message;

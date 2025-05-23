@@ -10,6 +10,7 @@ import {
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
+import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
 @Component({
   selector: 'app-edit-admin',
   imports: [CommonModule, ReactiveFormsModule],
@@ -287,6 +288,8 @@ export class EditAdministratorComponent implements OnInit {
   msgError: any;
   role: any;
   errorMessage: any;
+  healthUnits: any;
+  cityAdminName: any;
   constructor(
     private fb: FormBuilder,
     private route: Router,
@@ -294,13 +297,26 @@ export class EditAdministratorComponent implements OnInit {
     private _ActivatedRoute: ActivatedRoute,
     private _HealthMinistryService: HealthMinistryService,
     private _AuthService: AuthService,
-    private _GovernorateAdminService: GovernorateAdminService
+    private _GovernorateAdminService: GovernorateAdminService,
+    private _CityCenterService: CityCenterService
   ) {}
 
   ngOnInit() {
     this.role = this._AuthService.getRole();
     this.adminOfgovernorate = this._AuthService.getUserGovernorate()!;
-
+    this.cityAdminName = this._AuthService.getUserCity()!;
+    if (this.role == 'cityAdmin') {
+      this._AuthService
+        .getHealthUnits(this.adminOfgovernorate, this.cityAdminName)
+        .subscribe({
+          next: (res) => {
+            this.healthUnits = res.data;
+          },
+          error: (err) => {
+            this.healthUnits = [];
+          },
+        });
+    }
     this.createForm();
     this._ActivatedRoute.paramMap.subscribe((params) => {
       this.userId = params.get('userId');
@@ -331,6 +347,7 @@ export class EditAdministratorComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       governorate: [''],
       city: [''],
+      healthCareCenterId: [''],
     });
     this.setValidatorsByUserType();
   }
@@ -351,10 +368,14 @@ export class EditAdministratorComponent implements OnInit {
       case 'governorateAdmin':
         this.city?.setValidators([Validators.required]);
         break;
+      case 'cityAdmin':
+        this.healthCareCenterId?.setValidators([Validators.required]);
+        break;
     }
 
     this.governorate?.updateValueAndValidity();
     this.city?.updateValueAndValidity();
+    this.healthCareCenterId?.updateValueAndValidity();
   }
 
   loadUserData() {
@@ -386,6 +407,23 @@ export class EditAdministratorComponent implements OnInit {
             secondName: this.data.lastName,
             email: this.data.email,
             city: this.data.city,
+          };
+
+          this.formEditProfileAdmin.patchValue(userData);
+        },
+        error: (err) => {
+          this.msgError = err.error.message;
+        },
+      });
+    } else if (this.role === 'cityAdmin') {
+      this._CityCenterService.getOrganizerDetails(this.userId).subscribe({
+        next: (res) => {
+          this.data = res.data;
+          const userData = {
+            firstName: this.data.firstName,
+            secondName: this.data.lastName,
+            email: this.data.email,
+            healthCareCenterId: this.data?.hcCenterId,
           };
 
           this.formEditProfileAdmin.patchValue(userData);
@@ -432,6 +470,23 @@ export class EditAdministratorComponent implements OnInit {
             this.errorMessage = err.error.Message;
           },
         });
+    } else if (this.role == 'cityAdmin') {
+      const MODEL = {
+        firstName: this.formEditProfileAdmin.value.firstName,
+        lastName: this.formEditProfileAdmin.value.secondName,
+        email: this.formEditProfileAdmin.value.email,
+        healthCareCenterId: this.healthCareCenterId?.value,
+      };
+      this._CityCenterService
+        .editCityCenterOrganizer(this.userId, MODEL)
+        .subscribe({
+          next: (res) => {
+            this.route.navigate(['/admins']);
+          },
+          error: (err) => {
+            this.errorMessage = err.error.Message;
+          },
+        });
     }
   }
   get firstName() {
@@ -446,6 +501,9 @@ export class EditAdministratorComponent implements OnInit {
   }
   get governorate() {
     return this.formEditProfileAdmin.get('governorate');
+  }
+  get healthCareCenterId() {
+    return this.formEditProfileAdmin.get('healthCareCenterId');
   }
   get email() {
     return this.formEditProfileAdmin.get('email');

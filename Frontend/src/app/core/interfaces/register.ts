@@ -8,5 +8,5 @@ export interface Register {
   city: string;
   village: string;
   role: string;
-  healthCareCenterId?: string;
+  healthCareCenterId?: string|null;
 }

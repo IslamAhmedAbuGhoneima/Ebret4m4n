@@ -5,6 +5,7 @@ import { AuthService } from '../../../../features/auth/services/auth.service';
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 import { FormsModule } from '@angular/forms';
+import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
 
 @Component({
   selector: 'app-administrators',
@@ -20,7 +21,8 @@ export class AdministratorsComponent {
   constructor(
     private authService: AuthService,
     private _HealthMinistryService: HealthMinistryService,
-    private _GovernorateAdminService: GovernorateAdminService
+    private _GovernorateAdminService: GovernorateAdminService,
+    private _CityCenterService: CityCenterService
   ) {}
 
   ngOnInit(): void {
@@ -42,6 +44,16 @@ export class AdministratorsComponent {
       });
     } else if (this.role === 'governorateAdmin') {
       this._GovernorateAdminService.getCitiesCenterAdmins().subscribe({
+        next: (res) => {
+          this.data = res.data;
+          this.filteredData = res.data;
+        },
+        error: (err: any) => {
+          console.log(err);
+        },
+      });
+    } else if (this.role === 'cityAdmin') {
+      this._CityCenterService.getOrganizers().subscribe({
         next: (res) => {
           this.data = res.data;
           this.filteredData = res.data;

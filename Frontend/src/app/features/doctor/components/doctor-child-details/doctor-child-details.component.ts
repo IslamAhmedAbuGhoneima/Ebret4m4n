@@ -9,7 +9,7 @@ import { Location } from '@angular/common';
   styleUrl: './doctor-child-details.component.css',
 })
 export class DoctorChildDetailsComponent implements OnInit {
-  fromPage: string = '';
+  fromPage: any;
   imageList = [
     {
       name: 'صورة 1',
@@ -21,12 +21,16 @@ export class DoctorChildDetailsComponent implements OnInit {
     },
   ];
   deferredChild: boolean = true;
-  constructor(private route: ActivatedRoute, private location: Location) {}
+  constructor(
+    private _ActivatedRoute: ActivatedRoute,
+    private location: Location
+  ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
-      this.fromPage = params['from']; // القيمة الافتراضية
+    this._ActivatedRoute.paramMap.subscribe((params) => {
+      this.fromPage = params.get('from');
     });
+    ;
   }
   goBack() {
     this.location.back();

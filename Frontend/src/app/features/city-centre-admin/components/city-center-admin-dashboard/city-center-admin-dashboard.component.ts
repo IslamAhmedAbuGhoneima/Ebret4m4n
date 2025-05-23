@@ -1,6 +1,7 @@
 import { Component, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { CityCenterService } from '../../services/cityCenter.service';
 
 @Component({
   selector: 'app-city-center-admin-dashboard',
@@ -13,8 +14,36 @@ export class CityCenterAdminDashboardComponent {
   @ViewChild(BaseChartDirective) chartBar:
     | BaseChartDirective<'bar'>
     | undefined;
+  data: any = {};
+  errorMessage: any;
+  constructor(private _CityCenterService: CityCenterService) {}
 
+  ngOnInit(): void {
+    this.getStatistics();
+  }
+  getStatistics() {
+    this._CityCenterService.getStatisticsOfCityCenterAdmin().subscribe({
+      next: (res) => {
+        this.data = res;
+        const labels = this.data.topHealthCareUnitsByVaccines.map(
+          (item: any) => item.unitName
+        );
+        const vaccines = this.data.topCitiesByVaccines.map(
+          (item: any) => item.requestedAmount
+        );
+
+        this.barChartData.labels = labels;
+        this.barChartData.datasets[0].data = vaccines;
+        this.barChartData = { ...this.barChartData };
+      },
+      error: (err) => {
+        this.errorMessage = err.error.Message;
+      },
+    });
+  }
   // Pie
+  public pieChartType: ChartType = 'pie';
+
   public pieChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     plugins: {
@@ -52,18 +81,16 @@ export class CityCenterAdminDashboardComponent {
     },
   };
   public pieChartData: ChartData<'pie', number[], string | string[]> = {
-    labels: ['ذكر', 'أنثى'],
+    labels: ['طفل', 'طفلة'],
     datasets: [
       {
-        data: [300, 500],
+        data: [this.data.maleChildren, this.data.femaleChildren],
         backgroundColor: ['#00ACF8', '#ec4899'], // 💙 ذكر، 💗 أنثى
       },
     ],
   };
-  public pieChartType: ChartType = 'pie';
 
   // bar;
-
   public barChartType = 'bar' as const;
 
   public barChartOptions: ChartConfiguration<'bar'>['options'] = {
@@ -105,32 +132,12 @@ export class CityCenterAdminDashboardComponent {
   };
 
   public barChartData: ChartData<'bar'> = {
-    labels: [
-      'الرعايه',
-      'دار السلام',
-      'دار الاهلالي',
-      'السلام',
-      'السعود',
-      'ابو الريش',
-      'المنوفية',
-      'المنيا',
-      'السويس',
-      'أسوان',
-      'أسيوط',
-      'بني سويف',
-      'بورسعيد',
-      'دمياط',
-      'مطروح',
-      'الأقصر',
-      'نجع حمادي',
-    ],
+    labels: [],
     datasets: [
       {
         label: 'عدد الطلبات',
-        data: [
-          320000, 180000, 370000, 120000, 210000, 29000, 210000, 220000, 210000,
-          200000, 190000, 180000, 180000, 14000, 180000, 15000, 40000,
-        ],
+
+        data: [],
         backgroundColor: '#127453', // اللون الأخضر الداكن كما في الصورة
         borderRadius: 6, // زوايا دائرية
         barThickness: 30, // سمك العمود

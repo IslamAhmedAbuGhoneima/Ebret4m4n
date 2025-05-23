@@ -6,12 +6,12 @@
   <p class="text-third-txt text-xl font-semibold mb-6">
     هذه الصفحة غير موجودة... لكن لا تقلق، سنعيدك للطريق الصحيح
   </p>
-  <a
-    [routerLink]="['/auth/login']"
+  <button
+    (click)="goBack()"
     class="flex gap-x-2 mt-4 mx-auto w-fit bg-primary-btn text-white py-2 px-6 rounded-lg cursor-pointer hover:bg-primary-hovbtn transition-colors"
   >
     <img src="/icons/streamline_emergency-exit.svg" class="" alt="" />
     <span class="font-bold">رجوع</span>
-  </a>
+  </button>
     
 </div>
