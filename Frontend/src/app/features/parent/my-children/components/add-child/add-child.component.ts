@@ -203,7 +203,7 @@ export class AddChildComponent implements OnInit {
     }
     // edited
     const vaccines = formValue.vaccines;
-    if (vaccines && vaccines.length > 0) {
+    if (vaccines && Array.isArray(vaccines) && vaccines.length > 0) {
         vaccines.forEach((vaccine: string) => {
             formData.append('TakedVaccines', vaccine);
         });
