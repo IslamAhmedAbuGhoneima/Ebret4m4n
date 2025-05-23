@@ -192,7 +192,7 @@ export const routes: Routes = [
     ],
   },
 
-  { path: 'payment/success', component: PaymentSuccessComponent },
+  { path: 'payment/success/:id', component: PaymentSuccessComponent },
   { path: 'payment/cancel', component: PaymentCancelComponent },
   { path: 'not-found', component: NotFoundComponent },
   { path: '**', component: NotFoundComponent },

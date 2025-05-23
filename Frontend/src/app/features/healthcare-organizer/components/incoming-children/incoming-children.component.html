@@ -45,6 +45,7 @@
           </tr>
         </thead>
         <tbody>
+          @for (item of data; track $index) {
           <tr (click)="vaccinatedChildren()">
             <td class="border border-[#E5E7EB] border-l-transparent">
               أحمد محمد
@@ -72,6 +73,7 @@
               </div>
             </td>
           </tr>
+          }
         </tbody>
       </table>
     </div>

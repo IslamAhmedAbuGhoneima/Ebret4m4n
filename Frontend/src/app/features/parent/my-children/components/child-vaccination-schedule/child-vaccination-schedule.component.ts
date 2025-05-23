@@ -105,7 +105,6 @@ export class ChildVaccinationScheduleComponent implements OnInit {
       const dialogRef = this.matDialog.open(SideEffectsComponent, {
         width: '350px',
         panelClass: 'dialog-side-effects-container',
-
         autoFocus: true,
         restoreFocus: false,
         disableClose: true,
@@ -155,7 +154,7 @@ export class ChildVaccinationScheduleComponent implements OnInit {
 
     const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
 
-    return diffInHours; // هيرجع عدد الساعات المتبقية على انتهاء الـ 48 ساعة
+    return diffInHours;
   }
   goBack() {
     this.location.back();

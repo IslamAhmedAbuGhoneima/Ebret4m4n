@@ -72,7 +72,7 @@ export class LoginComponent {
         this.router.navigate(['/city-center-admin']);
         break;
       case 'organizer':
-        this.router.navigate(['/health-organizer']);
+        this.router.navigate(['/healthcare-organizer']);
         break;
       case 'admin':
         this.router.navigate(['/health-ministry']);

@@ -5,7 +5,7 @@ import { IncomingChildrenComponent } from './components/incoming-children/incomi
 import { VaccinatedChildrenComponent } from './components/vaccinated-children/vaccinated-children.component';
 
 const routes: Routes = [
-  { path: '', component: IncomingChildrenComponent },
+  { path: '', redirectTo: 'incoming-children', pathMatch: 'prefix' },
   {
     path: 'incoming-children',
     component: IncomingChildrenComponent,
