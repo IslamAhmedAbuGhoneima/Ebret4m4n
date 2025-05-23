@@ -180,5 +180,9 @@ public static class MapsterConfig
         TypeAdapterConfig<MedicalStaff, MedicalStaffDetailsDto>.NewConfig()
             .Map(dest => dest.HCCenterId, src => src.HCCenterId)
             .Map(dest => dest, src => src.User);
+
+        TypeAdapterConfig<Appointment, ComingChildrenDto>.NewConfig()
+            .Map(dest => dest.ChildName, src => src.Child.Name)
+            .Map(dest => dest.ParentName, src => $"{src.User.FirstName} {src.User.LastName}");
     }
 }

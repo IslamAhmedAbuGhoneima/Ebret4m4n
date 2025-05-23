@@ -133,13 +133,11 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 	{
 		var orgnizerHCId = User.FindFirst("healthCareId")!.Value;
 
-		var children = unitOfWork.AppointmentRepo.FindByCondition(a => a.Date == DateTime.UtcNow && a.User.HealthCareCenterId.ToString() == orgnizerHCId, false, ["User", "Child"])
-			.Select(a => new { a.Child.Name, a.User.FirstName, a.User.LastName, a.ChildId, a.VaccineName })
+		var children = unitOfWork.AppointmentRepo.FindByCondition(a => a.Date == DateTime.UtcNow.Date && a.User.HealthCareCenterId.ToString() == orgnizerHCId, false, ["User", "Child"])
+			.Select(a => a.Adapt<ComingChildrenDto>())
 			.ToList() ?? [];
 			
-		var childrenDtos = children.Adapt<List<ComingChildrenDto>>();
-
-		var response = GeneralResponse<List<ComingChildrenDto>>.SuccessResponse(childrenDtos);
+		var response = GeneralResponse<List<ComingChildrenDto>>.SuccessResponse(children);
 
 		return Ok(response);
 	}

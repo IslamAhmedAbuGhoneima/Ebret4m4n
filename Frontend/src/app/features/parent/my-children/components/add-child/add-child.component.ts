@@ -202,13 +202,12 @@ export class AddChildComponent implements OnInit {
         formData.append('ReportFiles', file);
       });
     }
-
-    const vaccinesArray = Array.isArray(formValue.vaccines)
-      ? formValue.vaccines.filter((v: string) => v && v.trim() !== '')
-      : [];
-
-    if (vaccinesArray.length > 0) {
-      formData.append('TakedVaccines', JSON.stringify(vaccinesArray));
+    // edited
+    const vaccines = formValue.vaccines;
+    if (vaccines && vaccines.length > 0) {
+      vaccines.forEach((vaccine: string) => {
+        formData.append('TakedVaccines', vaccine);
+      });
     }
 
     for (const [key, value] of formData.entries()) {
