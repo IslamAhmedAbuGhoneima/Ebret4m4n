@@ -63,14 +63,11 @@
       </thead>
       <tbody>
         @for (item of vaccines; track $index) {
-
         <tr
           class="border border-[#E5E7EB] border-t-transparent"
           [ngClass]="{
-            'text-third-txt':
-              item.isTaken && getDaysDifference(item.takedAt) <= 0,
-            'text-[#151419]':
-              item.isTaken && getDaysDifference(item.takedAt) > 0
+            'text-third-txt': item.isTaken == true,
+            'text-[#151419]': item.isTaken == false
           }"
           [ngStyle]="
             item.isTaken && getDaysDifference(item.takedAt) < 0
