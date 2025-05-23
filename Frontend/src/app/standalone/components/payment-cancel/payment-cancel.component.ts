@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-payment-cancel',
@@ -8,8 +9,8 @@ import { Location } from '@angular/common';
   styleUrl: './payment-cancel.component.css',
 })
 export class PaymentCancelComponent {
-  constructor(private loc: Location) {}
-  paymentPage() {
-    this.loc.back();
+  constructor(private router: Router) {}
+  back() {
+    this.router.navigate(['/parent/my-children/child-vaccine-schedule']);
   }
 }
