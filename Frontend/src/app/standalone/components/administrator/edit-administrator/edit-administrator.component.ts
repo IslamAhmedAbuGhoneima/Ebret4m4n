@@ -416,7 +416,7 @@ export class EditAdministratorComponent implements OnInit {
         },
       });
     } else if (this.role === 'cityAdmin') {
-      this._CityCenterService.getOrganizerDetails(this.userId).subscribe({
+      this._CityCenterService.getOrganizerOrDoctorDetails(this.userId).subscribe({
         next: (res) => {
           this.data = res.data;
           const userData = {
@@ -478,7 +478,7 @@ export class EditAdministratorComponent implements OnInit {
         healthCareCenterId: this.healthCareCenterId?.value,
       };
       this._CityCenterService
-        .editCityCenterOrganizer(this.userId, MODEL)
+        .editCityCenterOrganizerOrDoctor(this.userId, MODEL)
         .subscribe({
           next: (res) => {
             this.route.navigate(['/admins']);

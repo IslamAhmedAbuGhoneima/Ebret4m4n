@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
@@ -13,7 +13,7 @@ import { CityCenterService } from '../../../../features/city-centre-admin/servic
   templateUrl: './administrators.component.html',
   styleUrl: './administrators.component.css',
 })
-export class AdministratorsComponent {
+export class AdministratorsComponent implements OnInit{
   role: any;
   data: any[] = [];
   filteredData: any[] = [];

@@ -5,14 +5,14 @@ import { AddDoctorComponent } from './components/add-doctor/add-doctor.component
 import { DoctorsHomePageComponent } from './components/doctors-home-page/doctors-home-page.component';
 import { RouterModule, Routes } from '@angular/router';
 import { MatDialogModule } from '@angular/material/dialog';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   { path: '', component: DoctorsHomePageComponent },
 
   { path: 'add-doctor', component: AddDoctorComponent },
   {
-    path: 'edit-doctor',
+    path: 'edit-doctor/:userId',
     component: EditDoctorComponent,
   },
 ];
@@ -25,6 +25,7 @@ const routes: Routes = [
   ],
   imports: [
     CommonModule,
+    FormsModule,
     RouterModule.forChild(routes),
     MatDialogModule,
     ReactiveFormsModule,

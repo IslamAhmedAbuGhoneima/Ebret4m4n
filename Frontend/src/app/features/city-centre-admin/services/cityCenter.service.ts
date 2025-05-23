@@ -21,18 +21,18 @@ export class CityCenterService {
   getOrganizers() {
     return this.http.get<any>(`${environment.apiUrl}/CityAdmin/organizers`);
   }
-  addOrganizer(model: AddAdmin) {
+  addOrganizerOrDoctor(model: AddAdmin) {
     return this.http.post<any>(
       `${environment.apiUrl}/CityAdmin/medical-postion-add`,
       model
     );
   }
-  getOrganizerDetails(medicalStaffId: any) {
+  getOrganizerOrDoctorDetails(medicalStaffId: any) {
     return this.http.get<any>(
       `${environment.apiUrl}/CityAdmin/${medicalStaffId}/medicalstaff-data`
     );
   }
-  editCityCenterOrganizer(
+  editCityCenterOrganizerOrDoctor(
     medicalStaffId: string,
     model: {
       firstName: string;
@@ -82,29 +82,5 @@ export class CityCenterService {
   getDoctors() {
     return this.http.get<any>(`${environment.apiUrl}/CityAdmin/doctors`);
   }
-  addDoctor(model: AddAdmin) {
-    return this.http.post<any>(
-      `${environment.apiUrl}/CityAdmin/medical-postion-add`,
-      model
-    );
-  }
-  getDoctorDetails(medicalStaffId: any) {
-    return this.http.get<any>(
-      `${environment.apiUrl}/CityAdmin/${medicalStaffId}/medicalstaff-data`
-    );
-  }
-  editDoctor(
-    medicalStaffId: string,
-    model: {
-      firstName: string;
-      lastName: string;
-      email: string;
-      healthCareCenterId: string;
-    }
-  ) {
-    return this.http.put<any>(
-      `${environment.apiUrl}/CityAdmin/${medicalStaffId}/medicalstaff-update`,
-      model
-    );
-  }
+ 
 }

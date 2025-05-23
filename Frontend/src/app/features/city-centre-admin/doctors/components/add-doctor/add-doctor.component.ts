@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { passwordMatch } from '../../../../../core/customValidation/passwordMatch.validator';
+import { AuthService } from '../../../../auth/services/auth.service';
+import { CityCenterService } from '../../../services/cityCenter.service';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-add-doctor',
@@ -13,11 +16,32 @@ export class AddDoctorComponent implements OnInit {
   addDoctorForm!: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
-
-  constructor(private fb: FormBuilder, private location: Location) {}
+  cityAdminName: any;
+  adminOfgovernorate: any;
+  errorMessage: any;
+  healthUnits: any;
+  constructor(
+    private fb: FormBuilder,
+    private location: Location,
+    private _AuthService: AuthService,
+    private _CityCenterService: CityCenterService,
+    private route: Router
+  ) {}
 
   ngOnInit() {
     this.createForm();
+    this.adminOfgovernorate = this._AuthService.getUserGovernorate()!;
+    this.cityAdminName = this._AuthService.getUserCity()!;
+    this._AuthService
+      .getHealthUnits(this.adminOfgovernorate, this.cityAdminName)
+      .subscribe({
+        next: (res) => {
+          this.healthUnits = res.data;
+        },
+        error: (err) => {
+          this.healthUnits = [];
+        },
+      });
   }
 
   createForm() {
@@ -42,7 +66,8 @@ export class AddDoctorComponent implements OnInit {
           ],
         ],
         email: ['', [Validators.required, Validators.email]],
-        medicalCenter: ['', [Validators.required]],
+
+        healthCareCenterId: ['', [Validators.required]],
         password: ['', [Validators.required, Validators.minLength(8)]],
         confirmPassword: ['', [Validators.required]],
       },
@@ -52,29 +77,24 @@ export class AddDoctorComponent implements OnInit {
 
   addDoctor() {
     if (this.addDoctorForm.valid) {
-      console.log('valid');
-      console.log(this.addDoctorForm.value);
-      // let model: VMHttp = {
-      //   username: this.addDoctorForm.value['username'],
-      //   email: this.addDoctorForm.value['email'],
-      //   password: this.addDoctorForm.value['password'],
-      //   role: 'user',
-      // };
-      // this._apiService.createAccount(model).subscribe({
-      //   next: (response: any) => {
-      //     // Use translation keys for Toastr messages
-      //     this.toastr.success(
-      //       this.translate.instant('REGISTER.SUCCESS_MESSAGE'),
-      //       this.translate.instant('REGISTER.GREETING', {
-      //         username: model.username,
-      //       })
-      //     );
-      //     localStorage.setItem('user_token', response.token);
-      //     this.router.navigate(['/tasks']);
-      //   },
-      // });
-    } else {
-      console.log('InValid');
+      const MODEL = {
+        firstName: this.firstName?.value,
+        lastName: this.secondName?.value,
+        email: this.email?.value,
+        password: this.password?.value,
+        city: this.cityAdminName,
+        governorate: this.adminOfgovernorate,
+        healthCareCenterId: this.healthCareCenterId?.value,
+        staffRole: 'doctor',
+      };
+      this._CityCenterService.addOrganizerOrDoctor(MODEL).subscribe({
+        next: (res) => {
+          this.route.navigate(['/city-center-admin/doctors']);
+        },
+        error: (err) => {
+          this.errorMessage = err.error.Message;
+        },
+      });
     }
   }
 
@@ -85,8 +105,8 @@ export class AddDoctorComponent implements OnInit {
     return this.addDoctorForm.get('secondName');
   }
 
-  get medicalCenter() {
-    return this.addDoctorForm.get('medicalCenter');
+  get healthCareCenterId() {
+    return this.addDoctorForm.get('healthCareCenterId');
   }
   get email() {
     return this.addDoctorForm.get('email');

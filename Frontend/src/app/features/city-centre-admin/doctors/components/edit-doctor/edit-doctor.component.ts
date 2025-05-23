@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Location } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../../../auth/services/auth.service';
+import { CityCenterService } from '../../../services/cityCenter.service';
 
 @Component({
   selector: 'app-edit-doctor',
@@ -12,12 +15,42 @@ export class EditDoctorComponent implements OnInit {
   formEditProfileDoctor!: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
-
-  constructor(private fb: FormBuilder, private location: Location) {}
+  adminOfgovernorate: any;
+  userId: any;
+  data: any;
+  msgError: any;
+  errorMessage: any;
+  healthUnits: any;
+  cityAdminName: any;
+  constructor(
+    private fb: FormBuilder,
+    private route: Router,
+    private location: Location,
+    private _ActivatedRoute: ActivatedRoute,
+    private _AuthService: AuthService,
+    private _CityCenterService: CityCenterService
+  ) {}
 
   ngOnInit() {
     this.createForm();
-    this.loadUserData();
+
+    this.adminOfgovernorate = this._AuthService.getUserGovernorate()!;
+    this.cityAdminName = this._AuthService.getUserCity()!;
+    this._AuthService
+      .getHealthUnits(this.adminOfgovernorate, this.cityAdminName)
+      .subscribe({
+        next: (res) => {
+          this.healthUnits = res.data;
+        },
+        error: (err) => {
+          this.healthUnits = [];
+        },
+      });
+
+    this._ActivatedRoute.paramMap.subscribe((params) => {
+      this.userId = params.get('userId');
+      this.loadUserData();
+    });
   }
 
   createForm() {
@@ -41,53 +74,47 @@ export class EditDoctorComponent implements OnInit {
         ],
       ],
       email: ['', [Validators.required, Validators.email]],
-      healthUnit: ['', [Validators.required]],
+      healthCareCenterId: ['', [Validators.required]],
     });
   }
-
-  addAdmin() {
-    if (this.formEditProfileDoctor.valid) {
-      console.log('valid');
-      // let model: VMHttp = {
-      //   username: this.formEditProfileDoctor.value['username'],
-      //   email: this.formEditProfileDoctor.value['email'],
-      //   password: this.formEditProfileDoctor.value['password'],
-      //   role: 'user',
-      // };
-      // this._apiService.createAccount(model).subscribe({
-      //   next: (response: any) => {
-      //     // Use translation keys for Toastr messages
-      //     this.toastr.success(
-      //       this.translate.instant('REGISTER.SUCCESS_MESSAGE'),
-      //       this.translate.instant('REGISTER.GREETING', {
-      //         username: model.username,
-      //       })
-      //     );
-      //     localStorage.setItem('user_token', response.token);
-      //     this.router.navigate(['/tasks']);
-      //   },
-      // });
-    } else {
-      console.log('InValid');
+  saveNewData() {
+    if (this.formEditProfileDoctor.valid && this.formEditProfileDoctor.dirty) {
+      const MODEL = {
+        firstName: this.firstName?.value,
+        lastName: this.secondName?.value,
+        email: this.email?.value,
+        healthCareCenterId: this.healthCareCenterId?.value,
+      };
+      this._CityCenterService
+        .editCityCenterOrganizerOrDoctor(this.userId, MODEL)
+        .subscribe({
+          next: (res) => {
+            this.route.navigate(['/admins']);
+          },
+          error: (err) => {
+            this.errorMessage = err.error.Message;
+          },
+        });
     }
   }
 
   loadUserData() {
-    const userData = {
-      firstName: 'محمد',
-      secondName: 'أحمد',
-      email: 'someone@example.com',
-      healthUnit: '',
-    };
+    this._CityCenterService.getOrganizerOrDoctorDetails(this.userId).subscribe({
+      next: (res) => {
+        this.data = res.data;
+        const userData = {
+          firstName: this.data.firstName,
+          secondName: this.data.lastName,
+          email: this.data.email,
+          healthCareCenterId: this.data?.hcCenterId,
+        };
 
-    this.formEditProfileDoctor.patchValue(userData);
-  }
-
-  saveNewData() {
-    if (this.formEditProfileDoctor.valid && this.formEditProfileDoctor.dirty) {
-      console.log('valid');
-    } else {
-    }
+        this.formEditProfileDoctor.patchValue(userData);
+      },
+      error: (err) => {
+        this.msgError = err.error.message;
+      },
+    });
   }
 
   get firstName() {
@@ -97,8 +124,14 @@ export class EditDoctorComponent implements OnInit {
     return this.formEditProfileDoctor.get('secondName');
   }
 
-  get healthUnit() {
-    return this.formEditProfileDoctor.get('healthUnit');
+  get city() {
+    return this.formEditProfileDoctor.get('city');
+  }
+  get governorate() {
+    return this.formEditProfileDoctor.get('governorate');
+  }
+  get healthCareCenterId() {
+    return this.formEditProfileDoctor.get('healthCareCenterId');
   }
   get email() {
     return this.formEditProfileDoctor.get('email');

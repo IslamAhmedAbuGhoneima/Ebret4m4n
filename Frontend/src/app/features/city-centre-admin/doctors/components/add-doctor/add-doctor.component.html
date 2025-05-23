@@ -151,25 +151,30 @@
             </div>
           </div>
         </div>
+
         <div class="mb-4 flex-1 font-arabic">
           <div class="relative">
             <select
-              formControlName="medicalCenter"
+              formControlName="healthCareCenterId"
               [ngClass]="{
                 'border-red-700':
-                  medicalCenter?.invalid &&
-                  (medicalCenter?.touched || medicalCenter?.dirty),
+                  healthCareCenterId?.invalid &&
+                  (healthCareCenterId?.touched || healthCareCenterId?.dirty),
                 'border-third-border':
-                  medicalCenter?.valid || medicalCenter?.untouched
+                  healthCareCenterId?.valid || healthCareCenterId?.untouched
               }"
               class="w-full text-third-txt px-3 py-4 rounded-md border border-third-border appearance-none text-right outline-none cursor-pointer"
-              name="center"
-              id="center"
+              name="healthCareCenterId"
+              id="healthCareCenterId"
             >
               <option value="" disabled>إختر مركز طبى</option>
-              <option value="المنيا">المنيا</option>
-              <option value="ابو قرقاص">ابو قرقاص</option>
+              @for (item of healthUnits; track $index) {
+              <option [value]="item.healthCareCenterId">
+                {{ item.healthCareCenterName }}
+              </option>
+              }
             </select>
+
             <img
               class="block absolute top-1/2 -translate-y-[calc(50%+1.5px)] left-6 cursor-pointer"
               src="icons/Caret Down.svg"
@@ -179,8 +184,8 @@
           <div
             class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
             *ngIf="
-              medicalCenter?.invalid &&
-              (medicalCenter?.touched || medicalCenter?.dirty)
+              healthCareCenterId?.invalid &&
+              (healthCareCenterId?.touched || healthCareCenterId?.dirty)
             "
           >
             <img
@@ -189,12 +194,13 @@
               class="w-4 h-4 mt-[1px]"
             />
             <div>
-              <small *ngIf="medicalCenter?.errors?.['required']">
-                يجب إختيار المركز الطبي.
+              <small *ngIf="healthCareCenterId?.errors?.['required']">
+                يجب إختيار مركز طبى.
               </small>
             </div>
           </div>
         </div>
+
         <div class="mb-4">
           <label class="block text-xl font-semibold mb-2 mr-2" for="password"
             >كلمة المرور</label
@@ -307,15 +313,15 @@
           <button
             (click)="goBack()"
             class="flex items-center justify-center gap-2 text-base font-semibold bg-[#151419] text-mainBg-100 px-6 py-[9px] rounded-lg transition duration-200 hover:opacity-80"
-            role="button"
+            type="button"
           >
             رجوع
           </button>
 
           <button
             type="submit"
-              [disabled]="addDoctorForm.invalid"
-            class="disabled:opacity-35 disabled:cursor-not-allowed cursor-pointer flex font-arabic gap-2 py-[9px] px-6 rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+            *ngIf="addDoctorForm.valid"
+            class="cursor-pointer flex font-arabic gap-2 py-[9px] px-6 rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
           >
             إنشاء حساب
           </button>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { CityCenterService } from '../../../services/cityCenter.service';
 import { AuthService } from '../../../../auth/services/auth.service';
@@ -16,13 +16,13 @@ export class ComplaintDetailsComponent implements OnInit {
   organizerGovernorateName: any;
   organizerCityName: any;
   organizerEmail: any;
-  complaintHandled: boolean = false;
 
   constructor(
     private _ActivatedRoute: ActivatedRoute,
     private location: Location,
     private _CityCenterService: CityCenterService,
-    private _AuthService: AuthService
+    private _AuthService: AuthService,
+    private route: Router
   ) {}
 
   ngOnInit(): void {
@@ -45,10 +45,10 @@ export class ComplaintDetailsComponent implements OnInit {
   handleComplaint() {
     this._CityCenterService.handleComplaint(this.complaintId).subscribe({
       next: (res) => {
-        this.data = res.data;
-        this.complaintHandled = true;
+        this.route.navigate(['/city-center-admin/complaints']);
       },
-      error: (err) => {},
+      error: (err) => {
+      },
     });
   }
   goBack() {

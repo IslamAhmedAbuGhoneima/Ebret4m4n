@@ -426,7 +426,7 @@ export class AddAdministratorComponent implements OnInit {
         healthCareCenterId: this.healthCareCenterId?.value,
         staffRole: 'organizer',
       };
-      this._CityCenterService.addOrganizer(MODEL).subscribe({
+      this._CityCenterService.addOrganizerOrDoctor(MODEL).subscribe({
         next: (res) => {
           this.route.navigate(['/admins']);
         },
