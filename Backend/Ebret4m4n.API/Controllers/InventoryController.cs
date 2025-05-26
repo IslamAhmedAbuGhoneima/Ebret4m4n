@@ -99,6 +99,12 @@ public class InventoryController
     {
         var organizerHCId = User.FindFirst("healthCareId")!.Value;
 
+        var inventoryExists = await unitOfWork.InventoryRepo.
+            ExistsAsync(inv => inv.HealthCareCenterId.ToString() == organizerHCId);
+
+        if (inventoryExists)
+            return BadRequest(GeneralResponse<string>.FailureResponse("تم انشاء مخزون لهذه الوحده الصحيه من قبل"));
+
         var antigens = Utility.InventoryAntigens();
 
         List<Inventory> inventoryAntigens = [];
