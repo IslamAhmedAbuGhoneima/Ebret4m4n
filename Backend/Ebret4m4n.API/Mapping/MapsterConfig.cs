@@ -157,8 +157,11 @@ public static class MapsterConfig
             .Map(dest => dest, src => src.Sender);
 
         TypeAdapterConfig<Appointment, ComingChildrenDto>.NewConfig()
-            .Map(dest => dest.ParentName, src => src.User.FirstName)
-            .Map(dest => dest.ChildName, src => src.Child.Name);
+            .Map(dest => dest.AppointmentId, src => src.Id)
+            .Map(dest => dest.ChildId, src => src.ChildId)
+            .Map(dest => dest.ChildName, src => src.Child.Name)
+            .Map(dest => dest.ParentName, src => $"{src.User.FirstName} {src.User.LastName}")
+            .Map(dest => dest.VaccineName, src => src.VaccineName);
 
         TypeAdapterConfig<(Session session, string parentId, string childId), Transaction>.NewConfig()
             .Map(dest => dest.Amount, src => src.session.AmountTotal)

@@ -238,7 +238,9 @@ public class OrderController
             .Select(order => order.Adapt<HealthCareOrdersDto>())
             .ToList() ?? [];
 
-        return Ok(orders);
+        var response = GeneralResponse<List<HealthCareOrdersDto>>.SuccessResponse(orders);
+
+        return Ok(response);
     }
 
     [HttpGet("requested-city-orders")]

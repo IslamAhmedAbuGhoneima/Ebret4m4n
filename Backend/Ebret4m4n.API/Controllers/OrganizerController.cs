@@ -37,7 +37,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 	public async Task<IActionResult> UpdateVaccineStatues(List<UpdateVaccineDto> model)
 	{
         if (!ModelState.IsValid)
-			return UnprocessableEntity( GeneralResponse<string>.FailureResponse("تاكد من ان جميع المدخلات صحيحه"));
+			return UnprocessableEntity(GeneralResponse<string>.FailureResponse("تاكد من ان جميع المدخلات صحيحه"));
 
         var orgnizerHCId = User.FindFirst("healthCareId")!.Value;
 
@@ -45,7 +45,7 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 
 		try
 		{
-            var childrenIds = model.Select(c => c.Id).ToList();
+            var childrenIds = model.Select(c => c.ChildId).ToList();
 
             var children = unitOfWork.ChildRepo.FindByCondition(c => childrenIds.Contains(c.Id), true, ["Vaccines"])
                 .ToList();
@@ -57,17 +57,17 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 
             foreach (var data in model)
             {
-                var child = children.FirstOrDefault(c => c.Id == data.Id);
+                var child = children.FirstOrDefault(c => c.Id == data.ChildId);
 
                 if (child == null)
                 {
-                    notFoundChildren.Add($":لا يوجد طفل مسجل بهذا الرقم {data.Id}");
+                    notFoundChildren.Add($":لا يوجد طفل مسجل بهذا الرقم {data.ChildId}");
                     continue;
                 }
 
                 if (child.Vaccines == null)
                 {
-                    notFoundChildren.Add($" :لا يوجد تطعيمات مسجله لهذا الطفل {data.Id}");
+                    notFoundChildren.Add($" :لا يوجد تطعيمات مسجله لهذا الطفل {data.ChildId}");
                     continue;
                 }
 
@@ -86,6 +86,12 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
                 return BadRequest(notFoundChildren);
 
             await UpdateOrgnizerInventory(model, inventory);
+
+			foreach(var data in model)
+			{
+				var appointment = await unitOfWork.AppointmentRepo.FindAsync(a=>a.Id == data.AppointmentId, true);
+				unitOfWork.AppointmentRepo.Remove(appointment);
+            }
 
             var result = await unitOfWork.SaveAsync();
 
@@ -106,10 +112,10 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
         }  
 	}
 
-	[HttpPost("{id}/postpone_child_appointment_vaccine")]
-	public async Task<IActionResult> PostponeChildAppointment(string childId)
+	[HttpPost("{appointmentId:guid}/postpone_child_appointment_vaccine")]
+	public async Task<IActionResult> PostponeChildAppointment(Guid appointmentId)
 	{
-		var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.ChildId == childId, false);
+		var appointment = await unitOfWork.AppointmentRepo.FindAsync(a => a.Id == appointmentId, false);
 
 		if (appointment == null)
 			 return NotFound(GeneralResponse<string>.FailureResponse("لا يوجد موعد محجوز لهذا الطفل"));
@@ -136,10 +142,17 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
         var today = DateTime.UtcNow.Date;        
         var tomorrow = today.AddDays(1);         
 
-		var children = unitOfWork.AppointmentRepo.FindByCondition(a => a.Date >= today
+		var appointments = unitOfWork.AppointmentRepo.FindByCondition(a => a.Date >= today
 			  && a.Date < tomorrow && a.User.HealthCareCenterId.ToString() == orgnizerHCId, false, ["User", "Child"])
-			.Select(a => a.Adapt<ComingChildrenDto>())
 			.ToList() ?? [];
+
+        var children = appointments.Select(a => new ComingChildrenDto(
+            AppointmentId: a.Id,
+            ChildId: a.ChildId,
+            ChildName: a.Child.Name,
+            ParentName: $"{a.User.FirstName} {a.User.LastName}",
+            VaccineName: a.VaccineName
+        )).ToList();
 			
 		var response = GeneralResponse<List<ComingChildrenDto>>.SuccessResponse(children);
 

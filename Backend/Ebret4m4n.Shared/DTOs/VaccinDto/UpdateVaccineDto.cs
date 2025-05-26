@@ -1,3 +1,3 @@
 ﻿namespace Ebret4m4n.Shared.DTOs.VaccinDto;
 
-public record UpdateVaccineDto(string Id, string VaccineName);
+public record UpdateVaccineDto(Guid AppointmentId,string ChildId, string VaccineName);
