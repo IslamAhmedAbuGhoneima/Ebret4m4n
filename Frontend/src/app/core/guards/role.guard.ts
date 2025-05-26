@@ -8,12 +8,27 @@ export const roleGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
   const authService = inject(AuthService);
 
-  const token = authService.getToken();
+  let token: any = authService.getToken();
+
+  // لو التوكن مش موجود أو منتهي، نجرب نعمل refresh
   if (!token || authService.isTokenExpired()) {
-    router.navigate(['/auth/login']);
-    return false;
+    try {
+      // نحاول نعمل refresh للتوكن
+      token = await authService.refreshToken().toPromise();
+
+      // لو لسه مفيش توكن بعد الريفريش، نرجع تسجيل الدخول
+      if (!token) {
+        router.navigate(['/auth/login']);
+        return false;
+      }
+    } catch (err) {
+      // لو فشل refresh
+      router.navigate(['/auth/login']);
+      return false;
+    }
   }
 
+  // decode بعد التأكد من التوكن
   try {
     const decoded: any = jwtDecode(token);
     const userRole = decoded?.role || null;

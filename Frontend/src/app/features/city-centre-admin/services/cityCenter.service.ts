@@ -82,5 +82,10 @@ export class CityCenterService {
   getDoctors() {
     return this.http.get<any>(`${environment.apiUrl}/CityAdmin/doctors`);
   }
- 
+  acceptOrders(orderId: string) {
+    return this.http.put<any>(
+      `${environment.apiUrl}/Order/${orderId}/orgnizer-recived-order`,
+      {}
+    );
+  }
 }

@@ -14,16 +14,17 @@ export class OrganizerService {
     );
   }
 
-  searchById(id: any) {
-    return this.http.get<any>(
-      `${environment.apiUrl}/Organizer/${id}/search_by_id`
+  updateVaccineStatues(body: { id: string; vaccineName: string }[]) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Organizer/update_vaccine_statues`,
+      body
     );
   }
 
-  // addCityCenterAdmin(model: any) {
-  //   return this.http.post<any>(
-  //     `${environment.apiUrl}/GovernorateAdmin/city-admin-add`,
-  //     model
-  //   );
-  // }
+  postponeChildAppointmentVaccine(id: any) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Organizer/${id}/postpone_child_appointment_vaccine`,
+      {}
+    );
+  }
 }

@@ -170,6 +170,7 @@ export class AddChildComponent implements OnInit {
       this.day?.setValue(null);
     }
   }
+ 
 
   removeImage(index: number) {
     this.medicalImages.removeAt(index);

@@ -13,7 +13,7 @@ import { CityCenterService } from '../../../../features/city-centre-admin/servic
   templateUrl: './administrators.component.html',
   styleUrl: './administrators.component.css',
 })
-export class AdministratorsComponent implements OnInit{
+export class AdministratorsComponent implements OnInit {
   role: any;
   data: any[] = [];
   filteredData: any[] = [];
@@ -67,7 +67,8 @@ export class AdministratorsComponent implements OnInit{
   normalize(text: string): string {
     return text
       .toLowerCase()
-      .replace(/ال/g, '') // إزالة "ال"
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ال/g, '')
       .replace(/\s+/g, '') // إزالة المسافات
       .trim();
   }

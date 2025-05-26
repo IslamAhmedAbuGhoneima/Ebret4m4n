@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Login } from '../../../core/interfaces/login';
-import { Observable, of, switchMap, tap } from 'rxjs';
+import { Observable, first, of, switchMap, tap } from 'rxjs';
 import { CookieService } from 'ngx-cookie-service';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
@@ -74,7 +74,6 @@ export class AuthService {
       const exp = decoded.exp;
       const now = Math.floor(Date.now() / 1000);
 
-      // هامش أمان 60 ثانية
       return exp < now + 60;
     } catch {
       return true;
@@ -109,7 +108,8 @@ export class AuthService {
             this.cookies.set(this.refreshKey, newRefreshToken);
           }
         }),
-        switchMap((response) => of(response.accessToken))
+        switchMap((response) => of(response.accessToken)),
+        first() // ✅ علشان toPromise() تشتغل كويس وتـresolve
       );
   }
 

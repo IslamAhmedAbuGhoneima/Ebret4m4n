@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { VaccinationBookingComponent } from '../../../../../standalone/components/dialogs/vaccination-booking/vaccination-booking.component';
 import { SideEffectsComponent } from '../../../../../standalone/components/dialogs/side-effects/side-effects.component';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ParentService } from '../../../services/parent.service';
 import { Location } from '@angular/common';
 
@@ -27,7 +27,7 @@ export class ChildVaccinationScheduleComponent implements OnInit {
     private matDialog: MatDialog,
     private _ActivatedRoute: ActivatedRoute,
     private _ParentService: ParentService,
-    private location: Location
+    private route: Router
   ) {}
   ngOnInit(): void {
     this._ActivatedRoute.paramMap.subscribe((params) => {
@@ -158,6 +158,6 @@ export class ChildVaccinationScheduleComponent implements OnInit {
     return diffInHours;
   }
   goBack() {
-    this.location.back();
+    this.route.navigate(['/parent/my-children']);
   }
 }

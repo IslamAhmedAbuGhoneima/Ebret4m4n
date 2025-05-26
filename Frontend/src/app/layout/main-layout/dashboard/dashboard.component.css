@@ -1,3 +1,9 @@
 .logout-tooltip-style {
   --mat-sys-body-small-font: "Cairo", sans-serif !important;
 }
+/* يخلي النص ينكسر عند نهاية السطر بدل ما يطلع بره */
+.break-word {
+  word-break: break-word; /* يتكسر النص عند الحاجة */
+  overflow-wrap: break-word;
+  white-space: normal; /* يسمح بتكسير السطر */
+}
