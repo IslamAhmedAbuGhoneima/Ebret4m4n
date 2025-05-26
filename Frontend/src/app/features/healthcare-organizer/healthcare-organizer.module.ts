@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { IncomingChildrenComponent } from './components/incoming-children/incoming-children.component';
 import { VaccinatedChildrenComponent } from './components/vaccinated-children/vaccinated-children.component';
+import { FormsModule } from '@angular/forms';
 
 const routes: Routes = [
   { path: '', redirectTo: 'incoming-children', pathMatch: 'prefix' },
@@ -18,6 +19,6 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [IncomingChildrenComponent, VaccinatedChildrenComponent],
-  imports: [CommonModule, RouterModule.forChild(routes)],
+  imports: [CommonModule,FormsModule, RouterModule.forChild(routes)],
 })
 export class HeathCareOrganizerModule {}

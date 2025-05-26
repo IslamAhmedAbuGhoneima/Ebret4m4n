@@ -7,11 +7,13 @@ import { HealthMinistryService } from '../../../../features/health-ministry-admi
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 import { registerLocaleData } from '@angular/common';
 import localeAr from '@angular/common/locales/ar';
+import { FormsModule } from '@angular/forms';
+import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
 registerLocaleData(localeAr);
 
 @Component({
   selector: 'app-my-orders',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   providers: [{ provide: LOCALE_ID, useValue: 'ar-EG' }],
 
   templateUrl: './my-orders.component.html',
@@ -20,7 +22,6 @@ registerLocaleData(localeAr);
 export class MyOrdersComponent implements OnInit {
   allOrders: any[] = [];
   filteredOrders: any[] = [];
-  searchTerm: string = '';
   activeFilter: string = 'all';
   selectedOrder: any | null = null;
   role: any;
@@ -33,7 +34,8 @@ export class MyOrdersComponent implements OnInit {
   constructor(
     private router: Router,
     private _AuthService: AuthService,
-    private _GovernorateAdminService: GovernorateAdminService
+    private _GovernorateAdminService: GovernorateAdminService,
+    private _CityCenterService: CityCenterService
   ) {}
   ngOnInit() {
     this.role = this._AuthService.getRole();
@@ -42,7 +44,11 @@ export class MyOrdersComponent implements OnInit {
   }
 
   loadOrders(resetFilter: boolean = true) {
-    if (this.role === 'governorateAdmin' || this.role == 'cityAdmin') {
+    if (
+      this.role === 'governorateAdmin' ||
+      this.role == 'cityAdmin' ||
+      this.role == 'organizer'
+    ) {
       this._GovernorateAdminService.getMyOrders().subscribe({
         next: (res) => {
           this.allOrders = this.formateData(res.data);
@@ -59,6 +65,7 @@ export class MyOrdersComponent implements OnInit {
       });
     }
   }
+
   acceptDoses() {
     if (!this.selectedOrderId) return;
     if (this.role == 'governorateAdmin' || this.role == 'cityAdmin') {
@@ -71,6 +78,14 @@ export class MyOrdersComponent implements OnInit {
           },
           error: (err) => {},
         });
+    } else if (this.role == 'organizer') {
+      this._CityCenterService.acceptOrders(this.selectedOrderId).subscribe({
+        next: () => {
+          this.receivedMap.set(this.selectedOrderId!, true);
+          this.loadOrders(false);
+        },
+        error: (err) => {},
+      });
     }
   }
   filterOrders(status: string) {
@@ -102,7 +117,11 @@ export class MyOrdersComponent implements OnInit {
   }
   selectOrder(orderId: any, orderStatus: any) {
     this.selectedOrderId = orderId;
-    if (this.role == 'governorateAdmin' || this.role == 'cityAdmin') {
+    if (
+      this.role == 'governorateAdmin' ||
+      this.role == 'cityAdmin' ||
+      this.role == 'organizer'
+    ) {
       this._GovernorateAdminService.getOrderDetails(orderId).subscribe({
         next: (res) => {
           this.selectedOrder = res.data.map((item: any) => ({
@@ -115,11 +134,9 @@ export class MyOrdersComponent implements OnInit {
     }
   }
   applyFilters() {
-    this.filteredOrders = this.allOrders
-      .filter(
-        (o) => this.activeFilter === 'all' || o.status === this.activeFilter
-      )
-      .filter((o) => !this.searchTerm || o.center?.includes(this.searchTerm));
+    this.filteredOrders = this.allOrders.filter(
+      (o) => this.activeFilter === 'all' || o.status === this.activeFilter
+    );
   }
   getDotIcon(status: string): string {
     switch (status) {

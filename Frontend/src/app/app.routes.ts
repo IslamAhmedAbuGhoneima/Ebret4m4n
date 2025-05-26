@@ -130,7 +130,9 @@ export const routes: Routes = [
             (c) => c.VaccinesComponent
           ),
         canActivate: [roleGuard],
-        data: { roles: ['governorateAdmin', 'doctor', 'cityAdmin'] },
+        data: {
+          roles: ['governorateAdmin', 'doctor', 'cityAdmin', 'organizer'],
+        },
       },
       {
         path: 'orders',
@@ -140,7 +142,7 @@ export const routes: Routes = [
           ),
         canActivate: [roleGuard],
         data: {
-          roles: ['governorateAdmin', 'organizer', 'cityAdmin', 'admin'],
+          roles: ['governorateAdmin', 'cityAdmin', 'admin'],
         },
       },
       {

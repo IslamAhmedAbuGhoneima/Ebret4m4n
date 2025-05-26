@@ -34,6 +34,15 @@ export class VaccinesComponent implements OnInit {
           console.log('error : ', err.error);
         },
       });
+    } else if (this.role == 'organizer') {
+      this.inventoryService.getOrganizerInventory().subscribe({
+        next: (res) => {
+          this.data = res.data?.length ? res.data : null;
+        },
+        error: (err) => {
+          console.log('error : ', err.error);
+        },
+      });
     }
   }
   reportShortage() {
@@ -56,10 +65,18 @@ export class VaccinesComponent implements OnInit {
 
   createInventory() {
     if (this.role === 'governorateAdmin' || this.role === 'cityAdmin') {
-      const model = {};
-      this.inventoryService.adminCreateInventory(model).subscribe({
+      this.inventoryService.adminCreateInventory({}).subscribe({
         next: (res) => {
           this.getServiceInventory();
+        },
+        error: (err) => {
+          console.log('error : ', err.error);
+        },
+      });
+    } else if (this.role == 'organizer') {
+      this.inventoryService.organizerCreateInventory({}).subscribe({
+        next: (res) => {
+          this.data = res.data?.length ? res.data : null;
         },
         error: (err) => {
           console.log('error : ', err.error);

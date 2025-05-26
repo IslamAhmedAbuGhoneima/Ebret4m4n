@@ -31,6 +31,6 @@ export class InventoryService {
     );
   }
   getOrganizerInventory() {
-    return this.http.get<any>(`${environment.apiUrl}/get_orgnizer_inventory`);
+    return this.http.get<any>(`${environment.apiUrl}/Inventory/get_orgnizer_inventory`);
   }
 }

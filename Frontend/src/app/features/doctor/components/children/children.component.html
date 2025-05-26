@@ -3,7 +3,8 @@
     <h3 class="text-[28px] font-semibold text-[#51419]">الأطفال</h3>
     <div class="mt-4 relative w-64 mr-auto">
       <input
-        (keyup)="search($event)"
+        [(ngModel)]="searchId"
+        (keyup)="onSearch()"
         placeholder="بحث بالرقم القومى"
         class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
       />
@@ -17,7 +18,7 @@
       <table
         class="min-w-full overflow-x-auto text-lg text-[#151419] text-center border-separate border-spacing-y-2 [&_tbody_tr]:bg-white [&_td]:px-6 [&_td]:py-3 font-semibold"
       >
-        <thead class="bg-primary-table">
+        <thead class="bg-primary-bg text-white">
           <tr>
             <td scope="col" class="rounded-s-md">إسم الطفل</td>
             <td scope="col">الرقم القومى</td>
@@ -25,6 +26,7 @@
           </tr>
         </thead>
         <tbody>
+          @for (item of filteredData; track $index) {
           <tr>
             <td class="border border-[#E5E7EB] border-l-transparent">
               أحمد محمد
@@ -34,12 +36,14 @@
             </td>
             <td class="border border-[#E5E7EB] border-r-transparent">
               <a
-                routerLink="/doctor/children/doctor-child-details" [queryParams]="{ from: 'children' }"
+                [routerLink]="['/doctor/children/doctor-child-details']"
+                [queryParams]="{ from: 'children' }"
                 class="underline"
                 >عرض بيانات الطفل</a
               >
             </td>
           </tr>
+          }
         </tbody>
       </table>
     </div>

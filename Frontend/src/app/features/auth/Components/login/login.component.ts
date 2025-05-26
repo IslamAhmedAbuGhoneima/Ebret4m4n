@@ -77,6 +77,9 @@ export class LoginComponent {
       case 'admin':
         this.router.navigate(['/health-ministry']);
         break;
+      case 'doctor':
+        this.router.navigate(['/doctor']);
+        break;
       default:
         this.router.navigate(['/auth/login']); // fallback
         break;

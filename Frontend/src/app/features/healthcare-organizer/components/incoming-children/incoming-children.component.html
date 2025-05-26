@@ -21,7 +21,9 @@
 
         <div class="relative w-64">
           <input
-            type="number"
+            type="text"
+            [(ngModel)]="searchId"
+            (keyup)="onSearch()"
             placeholder="بحث بالرقم القومى"
             class="placeholder:text-right w-full py-3 px-10 border rounded-lg outline-none border-third-border placeholder:text-third-txt placeholder:text-base"
           />
@@ -36,7 +38,7 @@
       <table
         class="min-w-full overflow-x-auto text-lg text-[#151419] text-center border-separate border-spacing-y-2 [&_tbody_tr]:bg-white [&_td]:px-6 [&_td]:py-3 font-semibold"
       >
-        <thead class="bg-primary-table">
+        <thead class="bg-primary-bg text-white">
           <tr>
             <td scope="col" class="rounded-s-md">إسم الطفل</td>
             <td scope="col">الرقم القومى</td>
@@ -45,26 +47,28 @@
           </tr>
         </thead>
         <tbody>
-          @for (item of data; track $index) {
-          <tr (click)="vaccinatedChildren()">
+          @for (item of filteredData; track $index) {
+          <tr>
             <td class="border border-[#E5E7EB] border-l-transparent">
-              أحمد محمد
+              {{ item.childName }} {{ item.parentName }}
             </td>
             <td class="border border-[#E5E7EB] border-x-transparent">
-              30306077483923499
+              {{ item.childId }}
             </td>
             <td class="border border-[#E5E7EB] border-x-transparent">
-              الجرعة التانية
+              جرعة {{ item.vaccineName }}
             </td>
             <td class="border border-[#E5E7EB] border-r-transparent">
               <div class="flex gap-4 justify-center">
                 <button
+                  (click)="vaccinated(item)"
                   class="flex items-center w-fit bg-primary-bg px-4 py-2 rounded-lg hover:bg-primary-hovbtn transition-colors"
                 >
                   <img src="/icons/game-icons_check-mark.svg" alt="" />
                   <span class="text-white mr-2 text-sm">تم التطعيم</span>
                 </button>
                 <button
+                  (click)="postponeVaccination(item.appointmentId)"
                   class="flex items-center w-fit bg-error px-4 py-2 rounded-lg hover:bg-errorHov transition-colors"
                 >
                   <span class="text-white ml-2 text-sm">تأجيل</span>

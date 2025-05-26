@@ -11,6 +11,7 @@ import {
 import { DeferredChildrenComponent } from './components/deferred-children/deferred-children.component';
 import { ChildrenComponent } from './components/children/children.component';
 import { DoctorChildDetailsComponent } from './components/doctor-child-details/doctor-child-details.component';
+import { FormsModule } from '@angular/forms';
 const routes: Routes = [
   { path: '', redirectTo: 'children', pathMatch: 'full' },
   { path: 'children', component: ChildrenComponent },
@@ -36,7 +37,7 @@ const routes: Routes = [
     DeferredChildrenComponent,
     DoctorChildDetailsComponent,
   ],
-  imports: [CommonModule, RouterModule.forChild(routes)],
+  imports: [CommonModule,FormsModule, RouterModule.forChild(routes)],
   exports: [],
 })
 export class DoctorModule {}

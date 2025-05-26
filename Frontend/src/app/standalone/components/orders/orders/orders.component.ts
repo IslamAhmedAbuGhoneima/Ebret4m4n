@@ -6,17 +6,18 @@ import { AuthService } from '../../../../features/auth/services/auth.service';
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-orders',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.css',
 })
 export class OrdersComponent implements OnInit {
   allOrders: any[] = [];
   filteredOrders: any[] = [];
-  searchTerm: string = '';
+  searchTerm: any;
   activeFilter: string = 'all';
   selectedOrder: any | null = null;
   role: any;
@@ -75,7 +76,6 @@ export class OrdersComponent implements OnInit {
         next: (res) => {
           this.allOrders = this.formateData(res.data);
           this.filteredOrders = [...this.allOrders];
-
           this.pendingOrderCount = this.allOrders.filter(
             (item: any) => item.status === 'Pending'
           ).length;
@@ -191,7 +191,7 @@ export class OrdersComponent implements OnInit {
       .filter(
         (o) => this.activeFilter === 'all' || o.status === this.activeFilter
       )
-      .filter((o) => !this.searchTerm || o.center?.includes(this.searchTerm));
+      .filter((o) => this.matchesSearch(o));
   }
   getDotIcon(status: string): string {
     switch (status) {
@@ -205,6 +205,7 @@ export class OrdersComponent implements OnInit {
         return '';
     }
   }
+
   navigateTo(event: any) {
     if (event.target.value === 'all-orders') {
       this.router.navigate(['/orders']);
@@ -221,5 +222,48 @@ export class OrdersComponent implements OnInit {
     return this.selectedOrderId
       ? this.hasSentDosesMap.get(this.selectedOrderId) ?? false
       : false;
+  }
+  get filteredOrderDetails() {
+    if (!this.selectedOrder) return [];
+
+    return this.selectedOrder.filter((item: any) =>
+      item.antigen.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  }
+  search(term: string) {
+    this.searchTerm = term;
+    this.applyFilters();
+  }
+  matchesSearch(order: any): boolean {
+    const term = this.normalize(this.searchTerm);
+    if (!term) return true;
+
+    let target = '';
+
+    switch (this.role) {
+      case 'admin':
+        target = this.normalize(order.governorate || '');
+        break;
+      case 'governorateAdmin':
+        target = this.normalize(order.city || '');
+        break;
+      case 'cityAdmin':
+        target = this.normalize(order.healthCareCenterName || '');
+        break;
+      default:
+        return false;
+    }
+
+    return target.includes(term);
+  }
+
+  normalize(text: string): string {
+    if (!text || typeof text !== 'string') return '';
+    return text
+      .toLowerCase()
+      .replace(/[أإآ]/g, 'ا')
+      .replace(/ال/g, '')
+      .replace(/\s+/g, '') // إزالة المسافات
+      .trim();
   }
 }
