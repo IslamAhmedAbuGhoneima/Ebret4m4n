@@ -53,6 +53,12 @@ public static class MapsterConfig
         TypeAdapterConfig<Child, ChildDataDto>.NewConfig()
         .Map(dest => dest.FilePath, src => src.HealthReportFiles.Select(f => f.FilePath).ToList());
 
+        TypeAdapterConfig<Child, SuspendedChildrenDto>.NewConfig()
+            .Map(dest => dest.ChildId, src => src.Id)
+            .Map(dest => dest.ChildName, src => src.Name)
+            .Map(dest => dest.ParentName, src => $"{src.User.FirstName} {src.User.LastName}")
+            .Map(dest => dest.AgeInMonth, src => src.AgeInMonth);
+
         TypeAdapterConfig<BaseVaccine, Vaccine>.NewConfig()
             .Map(dest => dest.Name, src => src.name)
             .Map(dest => dest.ChildAge, src => src.childAge);

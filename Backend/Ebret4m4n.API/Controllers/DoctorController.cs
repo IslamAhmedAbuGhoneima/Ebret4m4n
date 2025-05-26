@@ -19,11 +19,11 @@ public class DoctorController
     {
         var doctorHcCenterId = User.FindFirst("healthCareId")!.Value;
 
-        var children =
-             unitOfWork.ChildRepo.FindByCondition(
-                c => c.PatientHistory != null &&
-                (c.Transaction != null && c.Transaction.Paid == true) &&
-                c.User.HealthCareCenterId.ToString() == doctorHcCenterId, false, ["User", "Transaction"]).ToList();
+        var children = unitOfWork.ChildRepo.FindByCondition(
+            c => (c.PatientHistory != null || (c.HealthReportFiles != null && c.HealthReportFiles.Any())) &&
+            c.IsNormal == false &&
+            c.User.HealthCareCenterId.ToString() == doctorHcCenterId,
+        false,["User","HealthReportFiles"]).ToList();
 
 
         var childrenDto = children.Adapt<List<ChildDto>>();
@@ -69,22 +69,35 @@ public class DoctorController
     [HttpGet("children-suspended")]
     public IActionResult SuspendedChildren()
     {
-        var children = unitOfWork.ChildRepo.FindByCondition(children => children.IsNormal == false, false)
-            .Select(children => children.Name).ToList() ?? [];
+        var doctorHcCenterId = User.FindFirst("healthCareId")!.Value;
 
-        var response = GeneralResponse<List<string>>.SuccessResponse(children);
+        var children = unitOfWork.ChildRepo.FindByCondition(
+            child => child.IsNormal == false && child.User.HealthCareCenterId.ToString() == doctorHcCenterId, false, ["User"])
+            .Select(child => child.Adapt<SuspendedChildrenDto>()).ToList() ?? [];
+
+        var response = GeneralResponse<List<SuspendedChildrenDto>>.SuccessResponse(children);
+
         return Ok(response);
     }
 
     [HttpPost("{childId}/add-normal-vaccine")]
     public async Task<IActionResult> AddNormalVacinnes(string childId)
     {
+        var child = await unitOfWork.ChildRepo.FindAsync(c => c.Id == childId, true);
+
+        if (child == null)
+            return NotFound(GeneralResponse<string>.FailureResponse("الطفل غير موجود"));
+
         var vaccines = Utility.ChildVaccines(null, childId);
 
         foreach (var vaccine in vaccines)
             vaccine.ChildId = childId;
 
+        child.IsNormal = true;
+
         await unitOfWork.VaccineRepo.AddRangeAsync(vaccines);
+        unitOfWork.ChildRepo.Update(child);
+
 
         var result = await unitOfWork.SaveAsync();
 
