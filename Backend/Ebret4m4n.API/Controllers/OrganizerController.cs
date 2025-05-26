@@ -133,7 +133,11 @@ public class OrganizerController(IUnitOfWork unitOfWork) : ControllerBase
 	{
 		var orgnizerHCId = User.FindFirst("healthCareId")!.Value;
 
-		var children = unitOfWork.AppointmentRepo.FindByCondition(a => a.Date == DateTime.UtcNow.Date && a.User.HealthCareCenterId.ToString() == orgnizerHCId, false, ["User", "Child"])
+        var today = DateTime.UtcNow.Date;        
+        var tomorrow = today.AddDays(1);         
+
+		var children = unitOfWork.AppointmentRepo.FindByCondition(a => a.Date >= today
+			  && a.Date < tomorrow && a.User.HealthCareCenterId.ToString() == orgnizerHCId, false, ["User", "Child"])
 			.Select(a => a.Adapt<ComingChildrenDto>())
 			.ToList() ?? [];
 			
