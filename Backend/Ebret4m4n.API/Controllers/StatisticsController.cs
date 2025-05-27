@@ -1,4 +1,5 @@
 ﻿using Ebret4m4n.Contracts;
+using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Shared.DTOs.StatisticsDto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,21 @@ namespace Ebret4m4n.API.Controllers;
 [ApiController]
 public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
 {
+    private async Task<(int maleCount, int femaleCount, int fullyVaccinated, double vaccinesTaken)> GetBaseStats(
+        ICollection<Child> children, ICollection<Vaccine> vaccines)
+    {
+        var maleCount = children.Count(c => c.Gender == 'M');
+        var femaleCount = children.Count(c => c.Gender == 'F');
+        var fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
+        var vaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
+
+        return (maleCount, femaleCount, fullyVaccinated, vaccinesTaken);
+    }
+
     [HttpGet("admin")]
     [Authorize(Roles = "admin")]
     public async Task<ActionResult<AdminDto>> GetAdminStats()
     {
-        // Get base data
         var children = await _unitOfWork.ChildRepo
             .FindAll(false, "Vaccines", "User")
             .ToListAsync();
@@ -35,13 +46,8 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
             .FindAll(false, "Order.GovernorateAdminStaff")
             .ToListAsync();
 
-        // Calculate base statistics
-        var fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
-        var maleCount = children.Count(c => c.Gender == 'M');
-        var femaleCount = children.Count(c => c.Gender == 'F');
-        var vaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
+        var (maleCount, femaleCount, fullyVaccinated, vaccinesTaken) = await GetBaseStats(children, vaccines);
 
-        // Get governorate statistics
         var topGovs = orders
             .Where(o => o.Order.GovernorateAdminStaff != null)
             .GroupBy(o => o.Order.GovernorateAdminStaff!.Governorate)
@@ -54,7 +60,6 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
             .Take(10)
             .ToList();
 
-        // Get governorate reports
         var govReports = await _unitOfWork.GovernorateAdminRepo
             .FindAll(false, "CityAdminStaffs")
             .Select(gov => new GovernorateReportDto
@@ -70,7 +75,6 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
             })
             .ToListAsync();
 
-        // Get vaccine requests
         var vaccineRequests = orders
             .GroupBy(o => o.Antigen)
             .Select(g => new VaccineRequestDto
@@ -103,7 +107,6 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
         var governorate = User.FindFirst("governorate")?.Value;
         if (governorate == null) return Unauthorized("Governorate claim missing");
 
-        // Get base data filtered by governorate
         var children = await _unitOfWork.ChildRepo
             .FindByCondition(c => c.User.Governorate == governorate, false, "Vaccines", "User")
             .ToListAsync();
@@ -120,13 +123,8 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
             .FindByCondition(h => h.Governorate == governorate, false)
             .ToListAsync();
 
-        // Calculate base statistics
-        var fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
-        var maleCount = children.Count(c => c.Gender == 'M');
-        var femaleCount = children.Count(c => c.Gender == 'F');
-        var vaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
+        var (maleCount, femaleCount, fullyVaccinated, vaccinesTaken) = await GetBaseStats(children, vaccines);
 
-        // Get city statistics
         var cityStats = await _unitOfWork.CityAdminStaffRepo
             .FindByCondition(c => c.Governorate == governorate, false)
             .Select(city => new CityVaccineRequestDto
@@ -140,7 +138,6 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
             .Take(15)
             .ToListAsync();
 
-        // Get city reports
         var cityReports = await _unitOfWork.CityAdminStaffRepo
             .FindByCondition(c => c.Governorate == governorate, false)
             .Select(city => new CityReportDto
@@ -180,7 +177,6 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
         if (governorate == null || city == null) 
             return Unauthorized("Governorate or City claim missing");
 
-        // Get base data filtered by city
         var children = await _unitOfWork.ChildRepo
             .FindByCondition(c => c.User.City == city, false, "Vaccines", "User")
             .ToListAsync();
@@ -197,13 +193,8 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
             .FindByCondition(h => h.City == city, false)
             .ToListAsync();
 
-        // Calculate base statistics
-        var fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
-        var maleCount = children.Count(c => c.Gender == 'M');
-        var femaleCount = children.Count(c => c.Gender == 'F');
-        var vaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
+        var (maleCount, femaleCount, fullyVaccinated, vaccinesTaken) = await GetBaseStats(children, vaccines);
 
-        // Get unit statistics
         var unitStats = healthUnits
             .Select(unit => new UnitVaccineRequestDto
             {
@@ -218,7 +209,6 @@ public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
             .Take(15)
             .ToList();
 
-        // Get unit reports
         var unitReports = healthUnits
             .Select(unit => new UnitReportDto
             {
