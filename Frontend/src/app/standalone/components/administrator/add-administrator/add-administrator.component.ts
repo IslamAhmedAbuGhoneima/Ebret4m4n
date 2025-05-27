@@ -294,7 +294,6 @@ export class AddAdministratorComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private route: Router,
-    private location: Location,
     private _HealthMinistryService: HealthMinistryService,
     private _AuthService: AuthService,
     private _GovernorateAdminService: GovernorateAdminService,
@@ -472,6 +471,5 @@ export class AddAdministratorComponent implements OnInit {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
   goBack() {
-    this.location.back();
-  }
+ this.route.navigate(['/admins']);  }
 }

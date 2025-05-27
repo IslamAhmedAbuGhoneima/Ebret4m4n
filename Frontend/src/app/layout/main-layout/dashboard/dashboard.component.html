@@ -138,9 +138,7 @@
 
         <li>
           <a
-            *ngIf="
-              hasRole(['governorateAdmin', 'doctor', 'cityAdmin', 'organizer'])
-            "
+            *ngIf="hasRole(['governorateAdmin', 'cityAdmin', 'organizer'])"
             routerLink="/vaccines"
             routerLinkActive="present"
             ><img src="/icons/vaccine.svg" alt="" /><span>اللقاحات </span></a

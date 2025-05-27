@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { CityCenterService } from '../../../../city-centre-admin/services/cityCenter.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../auth/services/auth.service';
 
 @Component({
@@ -18,14 +18,14 @@ export class HealthUnitComponent implements OnInit {
   healthCareCenterId: any;
   data: any;
   constructor(
-    private location: Location,
-    private route: ActivatedRoute,
+    private router: Router,
+    private _ActivatedRoute: ActivatedRoute,
     private _AuthService: AuthService,
     private _CityCenterService: CityCenterService
   ) {}
   ngOnInit(): void {
     this.governorate = this._AuthService.getUserGovernorate();
-    this.route.paramMap.subscribe((params) => {
+    this._ActivatedRoute.paramMap.subscribe((params) => {
       this.cityName = params.get('cityName')!;
       this.cityId = params.get('cityId')!;
       this.healthCareCenterName = params.get('healthCareCenterName')!;
@@ -64,6 +64,6 @@ export class HealthUnitComponent implements OnInit {
     };
   }
   goBack() {
-    this.location.back();
+    this.router.navigate(['/city-admin/centers', this.cityName]);
   }
 }

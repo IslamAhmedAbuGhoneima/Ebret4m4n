@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddUnitComponent } from '../add-unit/add-unit.component';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CityCenterService } from '../../../services/cityCenter.service';
 
 @Component({
@@ -19,12 +19,12 @@ export class HealthUnitComponent implements OnInit {
   healthCareCenterId: any;
   data: any;
   constructor(
-    private location: Location,
-    private route: ActivatedRoute,
+    private router: Router,
+    private _ActivatedRoute: ActivatedRoute,
     private _CityCenterService: CityCenterService
   ) {}
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+    this._ActivatedRoute.paramMap.subscribe((params) => {
       this.healthCareCenterName = params.get('healthCareCenterName')!;
       this.healthCareCenterId = params.get('healthCareCenterId')!;
       this.healthUnitDetails(this.healthCareCenterId);
@@ -63,6 +63,6 @@ export class HealthUnitComponent implements OnInit {
     };
   }
   goBack() {
-    this.location.back();
+    this.router.navigate(['/city-center-admin/units']);
   }
 }

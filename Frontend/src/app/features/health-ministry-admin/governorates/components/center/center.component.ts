@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { HealthMinistryService } from '../../../services/health-ministry.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-center',
@@ -15,7 +15,7 @@ export class CenterComponent implements OnInit {
   centerName: any;
   centerId: any;
   constructor(
-    private location: Location,
+    private router: Router,
     private _HealthMinistryService: HealthMinistryService,
     private route: ActivatedRoute
   ) {}
@@ -38,6 +38,9 @@ export class CenterComponent implements OnInit {
     });
   }
   goBack() {
-    this.location.back();
+    this.router.navigate([
+      '/health-ministry/governorates',
+      this.governorateName,
+    ]);
   }
 }

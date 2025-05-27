@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
 import { HealthMinistryService } from '../../../services/health-ministry.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-governorate',
@@ -9,18 +8,18 @@ import { ActivatedRoute } from '@angular/router';
   templateUrl: './governorate.component.html',
   styleUrl: './governorate.component.css',
 })
-export class GovernorateComponent implements OnInit{
+export class GovernorateComponent implements OnInit {
   data: any;
   governorateName: string | undefined;
 
   constructor(
-    private route: ActivatedRoute,
+    private _ActivatedRoute: ActivatedRoute,
     private _HealthService: HealthMinistryService,
-    private location: Location
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+    this._ActivatedRoute.paramMap.subscribe((params) => {
       this.governorateName = params.get('governorateName')!;
       if (this.governorateName) this.GovernorateDetails();
     });
@@ -37,6 +36,6 @@ export class GovernorateComponent implements OnInit{
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/health-ministry/governorates']);
   }
 }

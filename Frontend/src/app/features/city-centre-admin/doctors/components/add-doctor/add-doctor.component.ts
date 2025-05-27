@@ -127,6 +127,6 @@ export class AddDoctorComponent implements OnInit {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
   goBack() {
-    this.location.back();
+    this.route.navigate(['/city-center-admin/doctors']);
   }
 }

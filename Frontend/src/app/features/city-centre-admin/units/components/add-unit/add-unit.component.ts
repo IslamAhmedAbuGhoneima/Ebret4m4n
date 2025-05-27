@@ -278,7 +278,7 @@ export class AddUnitComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private location: Location,
+
     private _CityCenterService: CityCenterService
   ) {}
 
@@ -356,6 +356,6 @@ export class AddUnitComponent implements OnInit {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/city-center-admin/units']);
   }
 }

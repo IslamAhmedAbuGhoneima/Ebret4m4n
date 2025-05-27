@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { GovernorateAdminService } from '../../../services/governorateAdmin.service';
 import { AuthService } from '../../../../auth/services/auth.service';
 
@@ -15,15 +15,15 @@ export class CenterComponent implements OnInit {
   cityName: any;
   governorate: any;
   constructor(
-    private route: ActivatedRoute,
+    private _ActivatedRoute: ActivatedRoute,
     private _GovernorateAdminService: GovernorateAdminService,
-    private location: Location,
+    private router: Router,
     private _AuthService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.governorate = this._AuthService.getUserGovernorate();
-    this.route.paramMap.subscribe((params) => {
+    this._ActivatedRoute.paramMap.subscribe((params) => {
       this.cityName = params.get('cityName')!;
       if (this.cityName) this.GovernorateDetails();
     });
@@ -42,6 +42,6 @@ export class CenterComponent implements OnInit {
   }
 
   goBack() {
-    this.location.back();
+    this.router.navigate(['/city-admin/centers']);
   }
 }

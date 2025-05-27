@@ -128,7 +128,7 @@ export const routes: Routes = [
           ),
         canActivate: [roleGuard],
         data: {
-          roles: ['governorateAdmin', 'doctor', 'cityAdmin', 'organizer'],
+          roles: ['governorateAdmin', 'cityAdmin', 'organizer'],
         },
       },
       {

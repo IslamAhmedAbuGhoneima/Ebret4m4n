@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CityCenterService } from '../../../../city-centre-admin/services/cityCenter.service';
 
 @Component({
@@ -17,12 +17,12 @@ export class HealthUnitComponent implements OnInit {
   healthCareCenterId: any;
   data: any;
   constructor(
-    private location: Location,
-    private route: ActivatedRoute,
+    private router: Router,
+    private _ActivatedRoute: ActivatedRoute,
     private _CityCenterService: CityCenterService
   ) {}
   ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
+    this._ActivatedRoute.paramMap.subscribe((params) => {
       this.governorateName = params.get('governorateName')!;
       this.centerName = params.get('centerName')!;
       this.centerId = params.get('centerId')!;
@@ -62,6 +62,11 @@ export class HealthUnitComponent implements OnInit {
     };
   }
   goBack() {
-    this.location.back();
+    this.router.navigate([
+      '/health-ministry/governorates',
+      this.governorateName,
+      this.centerName,
+      this.centerId,
+    ]);
   }
 }

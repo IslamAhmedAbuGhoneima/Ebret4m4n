@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 
 @Component({
@@ -23,16 +23,23 @@ export class DoctorChildDetailsComponent implements OnInit {
   deferredChild: boolean = true;
   constructor(
     private _ActivatedRoute: ActivatedRoute,
-    private location: Location
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this._ActivatedRoute.paramMap.subscribe((params) => {
-      this.fromPage = params.get('from');
+    this._ActivatedRoute.queryParams.subscribe((params) => {
+      this.fromPage = params['from'];
+      console.log(this.fromPage);
     });
-    ;
   }
+
   goBack() {
-    this.location.back();
+    if (this.fromPage == 'children') {
+      this.router.navigate(['/doctor/children']);
+    } else if (this.fromPage == 'deferred') {
+      this.router.navigate(['/doctor/deferred-children']);
+    } else {
+      this.router.navigate(['/doctor']);
+    }
   }
 }

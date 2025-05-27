@@ -16,7 +16,7 @@
       <table
         class="min-w-full overflow-x-auto text-lg text-[#151419] text-center border-separate border-spacing-y-2 [&_tbody_tr]:bg-white [&_tbody_tr]:transition [&_tbody_tr]:duration-200 [&_tbody_tr]:hover:bg-[#B6D4CA] [&_td]:px-6 [&_td]:py-3 font-semibold"
       >
-        <thead class="bg-primary-table">
+        <thead class="bg-primary-bg text-white">
           <tr>
             <td scope="col" class="rounded-s-md">إسم الطفل</td>
             <td scope="col">الرقم القومى</td>
@@ -33,7 +33,9 @@
             </td>
             <td class="border border-[#E5E7EB] border-r-transparent">
               <a
-                routerLink="/doctor/deferred-children/doctor-child-details"
+                [routerLink]="[
+                  '/doctor/deferred-children/doctor-child-details'
+                ]"
                 [queryParams]="{ from: 'deferred' }"
                 class="underline"
                 >عرض بيانات الطفل</a

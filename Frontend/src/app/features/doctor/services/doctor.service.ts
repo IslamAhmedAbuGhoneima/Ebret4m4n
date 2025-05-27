@@ -16,6 +16,7 @@ export class DoctorService {
       `${environment.apiUrl}/Doctor/${childId}/child-data`
     );
   }
+  
   childrenSuspended() {
     return this.http.get<any>(
       `${environment.apiUrl}/Doctor/children-suspended`
