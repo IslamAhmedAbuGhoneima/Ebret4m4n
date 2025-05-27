@@ -1,9 +1,6 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './standalone/pages/home/home.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { NotFoundComponent } from './standalone/pages/not-found/not-found.component';
-import { ContactUsComponent } from './standalone/pages/contact-us/contact-us.component';
-import { VaccinationScheduleComponent } from './standalone/pages/vaccination-schedule/vaccination-schedule.component';
 import { roleGuard } from './core/guards/role.guard';
 import { PaymentSuccessComponent } from './standalone/components/payment-success/payment-success.component';
 import { PaymentCancelComponent } from './standalone/components/payment-cancel/payment-cancel.component';
