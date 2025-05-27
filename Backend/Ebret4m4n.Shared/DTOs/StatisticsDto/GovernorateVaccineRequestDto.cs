@@ -2,6 +2,6 @@
 
 public class GovernorateVaccineRequestDto
 {
-	public string Governorate { get; set; }
+	public string Governorate { get; set; } = string.Empty;
 	public int TotalVaccinesRequested { get; set; }
 }

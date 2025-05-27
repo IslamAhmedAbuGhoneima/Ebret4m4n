@@ -2,6 +2,6 @@
 
 public class UnitVaccineRequestDto
 {
-	public string UnitName { get; set; }
+	public string UnitName { get; set; } = string.Empty;
 	public int RequestedAmount { get; set; }
 }

@@ -2,6 +2,6 @@
 
 public class VaccineRequestDto
 {
-	public string VaccineName { get; set; }
+	public string VaccineName { get; set; } = string.Empty;
 	public int RequestedAmount { get; set; }
 }

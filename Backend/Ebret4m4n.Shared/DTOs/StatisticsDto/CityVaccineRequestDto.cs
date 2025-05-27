@@ -2,6 +2,6 @@
 
 public class CityVaccineRequestDto
 {
-	public string City { get; set; }
+	public string City { get; set; } = string.Empty;
 	public int RequestedAmount { get; set; }
 }

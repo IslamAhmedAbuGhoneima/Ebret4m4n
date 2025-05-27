@@ -9,7 +9,7 @@ public class AdminDto
 	public int TotalComplaints { get; set; }
 	public int MaleChildren { get; set; }
 	public int FemaleChildren { get; set; }
-	public List<GovernorateVaccineRequestDto> TopGovernoratesByVaccines { get; set; }
-	public List<GovernorateReportDto> GovernoratesReport { get; set; }
-	public List<VaccineRequestDto> VaccineRequests { get; set; }
+	public List<GovernorateVaccineRequestDto> TopGovernoratesByVaccines { get; set; } = new();
+	public List<GovernorateReportDto> GovernoratesReport { get; set; } = new();
+	public List<VaccineRequestDto> VaccineRequests { get; set; } = new();
 }

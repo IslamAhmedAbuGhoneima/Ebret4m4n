@@ -2,7 +2,7 @@
 
 public class CityReportDto
 {
-	public string City { get; set; }
+	public string City { get; set; } = string.Empty;
 	public int HealthUnitCount { get; set; }
 	public int VaccinesTaken { get; set; }
 }

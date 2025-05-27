@@ -11,215 +11,246 @@ namespace Ebret4m4n.API.Controllers;
 public class StatisticsController(IUnitOfWork _unitOfWork) : ControllerBase
 {
     [HttpGet("admin")]
-	[Authorize(Roles = "admin")]
-	public async Task<ActionResult<AdminDto>> GetAdminStats()
-	{
-		var children = await _unitOfWork.ChildRepo.FindAll(false, "Vaccines", "User").ToListAsync();
-		var vaccines = await _unitOfWork.VaccineRepo.FindAll(false).ToListAsync();
-		var complaints = await _unitOfWork.ComplaintRepo.FindAll(false).CountAsync();
-		var healthUnits = await _unitOfWork.HealthCareCenterRepo.FindAll(false).CountAsync();
-		var orders = await _unitOfWork.OrderItemRepo.FindAll(false, "Order").ToListAsync();
-		var allGovs = await _unitOfWork.GovernorateAdminRepo.FindAll(false, "CityAdminStaffs").ToListAsync();
+    [Authorize(Roles = "admin")]
+    public async Task<ActionResult<AdminDto>> GetAdminStats()
+    {
+        // Get base data
+        var children = await _unitOfWork.ChildRepo
+            .FindAll(false, "Vaccines", "User")
+            .ToListAsync();
 
-		int fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
-		int male = children.Count(c => c.Gender == 'M');
-		int female = children.Count(c => c.Gender == 'F');
-		double vaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
+        var vaccines = await _unitOfWork.VaccineRepo
+            .FindAll(false, "Child.User")
+            .ToListAsync();
 
-		var topGovs = orders
-			.Where(o => o.Order.GovernorateAdminStaff != null)
-			.GroupBy(o => o.Order.GovernorateAdminStaff.Governorate)
-			.Select(g => new GovernorateVaccineRequestDto
-			{
-				Governorate = g.Key,
-				TotalVaccinesRequested = g.Sum(x => (int)x.Amount)
-			})
-			.OrderByDescending(g => g.TotalVaccinesRequested)
-			.Take(10)
-			.ToList();
+        var complaints = await _unitOfWork.ComplaintRepo
+            .FindAll(false)
+            .CountAsync();
 
-		var vaccineRequests = orders
-			.GroupBy(o => o.Antigen)
-			.Select(g => new VaccineRequestDto
-			{
-				VaccineName = g.Key,
-				RequestedAmount = g.Sum(x => (int)x.Amount)
-			})
-			.ToList();
+        var healthUnits = await _unitOfWork.HealthCareCenterRepo
+            .FindAll(false)
+            .CountAsync();
 
-		var report = new List<GovernorateReportDto>();
-		foreach (var gov in allGovs)
-		{
-			var govName = gov.Governorate;
-			var cities = gov.CityAdminStaffs.Select(c => c.City).Distinct().ToList();
-			var healthUnitCount = await _unitOfWork.HealthCareCenterRepo
-				.FindByCondition(h => h.Governorate == govName, false)
-				.CountAsync();
+        var orders = await _unitOfWork.OrderItemRepo
+            .FindAll(false, "Order.GovernorateAdminStaff")
+            .ToListAsync();
 
-			var takenVaccines = await _unitOfWork.VaccineRepo
-				.FindByCondition(v => v.IsTaken && v.Child.User.Governorate == govName, false, "Child.User")
-				.CountAsync();
+        // Calculate base statistics
+        var fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
+        var maleCount = children.Count(c => c.Gender == 'M');
+        var femaleCount = children.Count(c => c.Gender == 'F');
+        var vaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
 
-			report.Add(new GovernorateReportDto
-			{
-				Governorate = govName,
-				CityCount = cities.Count,
-				HealthUnitCount = healthUnitCount,
-				VaccinesTaken = takenVaccines
-			});
-		}
+        // Get governorate statistics
+        var topGovs = orders
+            .Where(o => o.Order.GovernorateAdminStaff != null)
+            .GroupBy(o => o.Order.GovernorateAdminStaff!.Governorate)
+            .Select(g => new GovernorateVaccineRequestDto
+            {
+                Governorate = g.Key,
+                TotalVaccinesRequested = g.Sum(x => (int)x.Amount)
+            })
+            .OrderByDescending(x => x.TotalVaccinesRequested)
+            .Take(10)
+            .ToList();
 
-		return Ok(new AdminDto
-		{
-			HealthCareUnits = healthUnits,
-			RegisteredChildren = children.Count,
-			FullyVaccinatedChildren = fullyVaccinated,
-			TotalVaccinesTaken = vaccinesTaken,
-			TotalComplaints = complaints,
-			MaleChildren = male,
-			FemaleChildren = female,
-			TopGovernoratesByVaccines = topGovs,
-			GovernoratesReport = report,
-			VaccineRequests = vaccineRequests
-		});
-	}
+        // Get governorate reports
+        var govReports = await _unitOfWork.GovernorateAdminRepo
+            .FindAll(false, "CityAdminStaffs")
+            .Select(gov => new GovernorateReportDto
+            {
+                Governorate = gov.Governorate,
+                CityCount = gov.CityAdminStaffs.Select(c => c.City).Distinct().Count(),
+                HealthUnitCount = _unitOfWork.HealthCareCenterRepo
+                    .FindByCondition(h => h.Governorate == gov.Governorate, false)
+                    .Count(),
+                VaccinesTaken = _unitOfWork.VaccineRepo
+                    .FindByCondition(v => v.IsTaken && v.Child.User.Governorate == gov.Governorate, false, "Child.User")
+                    .Count()
+            })
+            .ToListAsync();
 
-	[HttpGet("governorate")]
-	[Authorize(Roles = "governorateAdmin")]
-	public async Task<ActionResult<StatisticssDto>> GetGovernorateStats()
-	{
-		string? governorate = User.FindFirst("governorate")?.Value;
-		if (governorate is null) return Unauthorized("Governorate claim missing");
+        // Get vaccine requests
+        var vaccineRequests = orders
+            .GroupBy(o => o.Antigen)
+            .Select(g => new VaccineRequestDto
+            {
+                VaccineName = g.Key,
+                RequestedAmount = g.Sum(x => (int)x.Amount)
+            })
+            .OrderByDescending(x => x.RequestedAmount)
+            .ToList();
 
-		return Ok(await GetStatistics(governorate));
+        return Ok(new AdminDto
+        {
+            HealthCareUnits = healthUnits,
+            RegisteredChildren = children.Count,
+            FullyVaccinatedChildren = fullyVaccinated,
+            TotalVaccinesTaken = vaccinesTaken,
+            TotalComplaints = complaints,
+            MaleChildren = maleCount,
+            FemaleChildren = femaleCount,
+            TopGovernoratesByVaccines = topGovs,
+            GovernoratesReport = govReports,
+            VaccineRequests = vaccineRequests
+        });
+    }
 
-	}
+    [HttpGet("governorate")]
+    [Authorize(Roles = "governorateAdmin")]
+    public async Task<ActionResult<StatisticssDto>> GetGovernorateStats()
+    {
+        var governorate = User.FindFirst("governorate")?.Value;
+        if (governorate == null) return Unauthorized("Governorate claim missing");
 
+        // Get base data filtered by governorate
+        var children = await _unitOfWork.ChildRepo
+            .FindByCondition(c => c.User.Governorate == governorate, false, "Vaccines", "User")
+            .ToListAsync();
 
-	[HttpGet("city")]
-	[Authorize(Roles = "cityAdmin")]
-	public async Task<ActionResult<StatisticssDto>> GetCityStats()
-	{
-		string? gov = User.FindFirst("governorate")?.Value;
-		string? city = User.FindFirst("city")?.Value;
-		if (gov is null || city is null) return Unauthorized("Governorate or City claim missing");
-		return Ok(await GetStatistics(gov, city));
-	}
+        var vaccines = await _unitOfWork.VaccineRepo
+            .FindByCondition(v => v.Child.User.Governorate == governorate, false, "Child.User")
+            .ToListAsync();
 
-	private async Task<StatisticssDto> GetStatistics(string? governorate = null, string? city = null)
-	{
-		var childrenQuery = await _unitOfWork.ChildRepo
-			.FindAll(false, "User", "Vaccines")
-			.ToListAsync();
+        var complaints = await _unitOfWork.ComplaintRepo
+            .FindByCondition(c => c.User.Governorate == governorate, false)
+            .CountAsync();
 
-		var complaintsQuery = await _unitOfWork.ComplaintRepo
-			.FindAll(false, "User")
-			.ToListAsync();
+        var healthUnits = await _unitOfWork.HealthCareCenterRepo
+            .FindByCondition(h => h.Governorate == governorate, false)
+            .ToListAsync();
 
-		var vaccinesQuery = await _unitOfWork.VaccineRepo
-			.FindAll(false, "Child.User")
-			.ToListAsync();
+        // Calculate base statistics
+        var fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
+        var maleCount = children.Count(c => c.Gender == 'M');
+        var femaleCount = children.Count(c => c.Gender == 'F');
+        var vaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
 
-		var healthUnitsQuery = await _unitOfWork.HealthCareCenterRepo
-			.FindAll(false)
-			.ToListAsync();
+        // Get city statistics
+        var cityStats = await _unitOfWork.CityAdminStaffRepo
+            .FindByCondition(c => c.Governorate == governorate, false)
+            .Select(city => new CityVaccineRequestDto
+            {
+                City = city.City!,
+                RequestedAmount = _unitOfWork.VaccineRepo
+                    .FindByCondition(v => v.IsTaken && v.Child.User.City == city.City, false, "Child.User")
+                    .Count()
+            })
+            .OrderByDescending(x => x.RequestedAmount)
+            .Take(15)
+            .ToListAsync();
 
-		var cityNames = await _unitOfWork.CityAdminStaffRepo.FindAll(false)
-			.Where(u => u.Governorate == governorate && u.City != null)
-			.Select(u => u.City!.Trim())
-			.Distinct()
-			.ToListAsync();
+        // Get city reports
+        var cityReports = await _unitOfWork.CityAdminStaffRepo
+            .FindByCondition(c => c.Governorate == governorate, false)
+            .Select(city => new CityReportDto
+            {
+                City = city.City!,
+                HealthUnitCount = _unitOfWork.HealthCareCenterRepo
+                    .FindByCondition(h => h.City == city.City, false)
+                    .Count(),
+                VaccinesTaken = _unitOfWork.VaccineRepo
+                    .FindByCondition(v => v.IsTaken && v.Child.User.City == city.City, false, "Child.User")
+                    .Count()
+            })
+            .ToListAsync();
 
-		if (governorate is not null)
-		{
-			childrenQuery = childrenQuery.Where(c => c.User.Governorate == governorate).ToList();
-			complaintsQuery = complaintsQuery.Where(c => c.User.Governorate == governorate).ToList();
-			vaccinesQuery = vaccinesQuery.Where(v => v.Child.User.Governorate == governorate).ToList();
-			healthUnitsQuery = healthUnitsQuery.Where(h => h.Governorate == governorate).ToList();
-		}
+        return Ok(new StatisticssDto
+        {
+            TotalComplaints = complaints,
+            TotalVaccinesTaken = vaccinesTaken,
+            FullyVaccinatedChildren = fullyVaccinated,
+            RegisteredChildren = children.Count,
+            HealthCareUnits = healthUnits.Count,
+            MaleChildren = maleCount,
+            FemaleChildren = femaleCount,
+            TopHealthCareUnitsByVaccines = new(),
+            AllUnits = new(),
+            TopCitiesByVaccines = cityStats,
+            AllCities = cityReports
+        });
+    }
 
-		if (city is not null)
-		{
-			childrenQuery = childrenQuery.Where(c => c.User.City == city).ToList();
-			complaintsQuery = complaintsQuery.Where(c => c.User.City == city).ToList();
-			vaccinesQuery = vaccinesQuery.Where(v => v.Child.User.City == city).ToList();
-			healthUnitsQuery = healthUnitsQuery.Where(h => h.City == city).ToList();
-		}
+    [HttpGet("city")]
+    [Authorize(Roles = "cityAdmin")]
+    public async Task<ActionResult<CityStatsDto>> GetCityStats()
+    {
+        var governorate = User.FindFirst("governorate")?.Value;
+        var city = User.FindFirst("city")?.Value;
+        if (governorate == null || city == null) 
+            return Unauthorized("Governorate or City claim missing");
 
-		var children = childrenQuery;
-		var complaints = complaintsQuery;
-		var vaccines = vaccinesQuery;
-		var healthUnits = healthUnitsQuery;
+        // Get base data filtered by city
+        var children = await _unitOfWork.ChildRepo
+            .FindByCondition(c => c.User.City == city, false, "Vaccines", "User")
+            .ToListAsync();
 
-		int fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
-		int registeredChildren = children.Count;
-		int male = children.Count(c => c.Gender == 'M');
-		int female = children.Count(c => c.Gender == 'F');
-		double totalVaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
+        var vaccines = await _unitOfWork.VaccineRepo
+            .FindByCondition(v => v.Child.User.City == city, false, "Child.User")
+            .ToListAsync();
 
-		var topUnits = vaccines
-			.Where(v => v.IsTaken && v.Child.User.HealthCareCenter != null)
-			.GroupBy(v => v.Child.User.HealthCareCenter.HealthCareCenterName)
-			.Select(g => new UnitVaccineRequestDto
-			{
-				UnitName = g.Key,
-				RequestedAmount = g.Count()
-			})
-			.OrderByDescending(x => x.RequestedAmount)
-			.Take(15)
-			.ToList();
+        var complaints = await _unitOfWork.ComplaintRepo
+            .FindByCondition(c => c.User.City == city, false)
+            .CountAsync();
 
-		var unitReport = await _unitOfWork.HealthCareCenterRepo.FindByCondition
-			(e=>e.City==city,false)
-			.Select(g => new UnitReportDto
-			{
-				UnitName = g.HealthCareCenterName,
-				ComplaintsCount = _unitOfWork.ComplaintRepo.FindAll(false)
-			.Count(c => c.User.HealthCareCenter != null &&
-						c.User.HealthCareCenter.HealthCareCenterName == g.HealthCareCenterName),
+        var healthUnits = await _unitOfWork.HealthCareCenterRepo
+            .FindByCondition(h => h.City == city, false)
+            .ToListAsync();
 
-				VaccinesTaken = _unitOfWork.VaccineRepo.FindAll(false)
-			.Count(v => v.IsTaken &&
-						v.Child.User.HealthCareCenter != null &&
-						v.Child.User.HealthCareCenter.HealthCareCenterName == g.HealthCareCenterName)
+        // Calculate base statistics
+        var fullyVaccinated = children.Count(c => c.Vaccines != null && c.Vaccines.All(v => v.IsTaken));
+        var maleCount = children.Count(c => c.Gender == 'M');
+        var femaleCount = children.Count(c => c.Gender == 'F');
+        var vaccinesTaken = vaccines.Count(v => v.IsTaken) / 1_000_000.0;
 
-			}).ToListAsync();
+        // Get unit statistics
+        var unitStats = healthUnits
+            .Select(unit => new UnitVaccineRequestDto
+            {
+                UnitName = unit.HealthCareCenterName,
+                RequestedAmount = vaccines.Count(v => 
+                    v.IsTaken && 
+                    v.Child.User.HealthCareCenter != null && 
+                    v.Child.User.HealthCareCenter.HealthCareCenterName == unit.HealthCareCenterName)
+            })
+            .Where(x => x.RequestedAmount > 0)
+            .OrderByDescending(x => x.RequestedAmount)
+            .Take(15)
+            .ToList();
 
-		var topCities = vaccines
-			.Where(v => v.IsTaken)
-			.GroupBy(v => v.Child.User.City)
-			.Select(g => new CityVaccineRequestDto
-			{
-				City = g.Key ?? "",
-				RequestedAmount = g.Count()
-			})
-			.OrderByDescending(x => x.RequestedAmount)
-			.Take(15)
-			.ToList();
+        // Get unit reports
+        var unitReports = healthUnits
+            .Select(unit => new UnitReportDto
+            {
+                UnitName = unit.HealthCareCenterName,
+                ComplaintsCount = _unitOfWork.ComplaintRepo
+                    .FindByCondition(c => 
+                        c.User.HealthCareCenter != null && 
+                        c.User.HealthCareCenter.HealthCareCenterName == unit.HealthCareCenterName, 
+                        false)
+                    .Count(),
+                VaccinesTaken = vaccines.Count(v => 
+                    v.IsTaken && 
+                    v.Child.User.HealthCareCenter != null && 
+                    v.Child.User.HealthCareCenter.HealthCareCenterName == unit.HealthCareCenterName)
+            })
+            .ToList();
 
-		var cityReport = cityNames
-	.Select(cityName => new CityReportDto
-	{
-		City = cityName!,
-		HealthUnitCount = healthUnits.Count(h => h.City?.Trim() == cityName),
-		VaccinesTaken = vaccines.Count(v => v.IsTaken && v.Child.User.City?.Trim() == cityName)
-	}).ToList();
-
-		return new StatisticssDto
-		{
-			TotalComplaints = complaints.Count,
-			TotalVaccinesTaken = totalVaccinesTaken,
-			FullyVaccinatedChildren = fullyVaccinated,
-			RegisteredChildren = registeredChildren,
-			MaleChildren = male,
-			FemaleChildren = female,
-			HealthCareUnits = healthUnits.Count,
-			TopHealthCareUnitsByVaccines = city != null ? topUnits : new(),
-			AllUnits = city != null ? unitReport : new(),
-			TopCitiesByVaccines = city == null ? topCities : new(),
-			AllCities = city == null ? cityReport : new()
-		};
-	}
+        return Ok(new CityStatsDto
+        {
+            TotalComplaints = complaints,
+            TotalVaccinesTaken = vaccinesTaken,
+            FullyVaccinatedChildren = fullyVaccinated,
+            RegisteredChildren = children.Count,
+            HealthCareUnits = healthUnits.Count,
+            MaleChildren = maleCount,
+            FemaleChildren = femaleCount,
+            TopHealthCareUnitsByVaccines = unitStats,
+            AllUnits = unitReports,
+            TopVaccinesTaken = new(),
+            AllCities = new()
+        });
+    }
 }
 
 
