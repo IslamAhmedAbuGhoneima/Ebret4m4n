@@ -21,9 +21,9 @@ public class DoctorController
 
         var children = unitOfWork.ChildRepo.FindByCondition(
             c => (c.PatientHistory != null || (c.HealthReportFiles != null && c.HealthReportFiles.Any())) &&
-            c.IsNormal == false &&
+            (c.IsNormal != false && (c.Vaccines == null || c.Vaccines.Count == 0) ) &&
             c.User.HealthCareCenterId.ToString() == doctorHcCenterId,
-        false,["User","HealthReportFiles"]).ToList();
+        false, ["User", "Vaccines", "HealthReportFiles"]).ToList();
 
 
         var childrenDto = children.Adapt<List<ChildDto>>();
@@ -50,6 +50,9 @@ public class DoctorController
     {
         var child = 
             await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false, ["User"]);
+
+        if (child.IsNormal == false)
+            return BadRequest(GeneralResponse<string>.FailureResponse("تم اضافه الطفل الي قائمه المؤجلين من قبل"));
 
         child.IsNormal = false;
 
@@ -83,10 +86,13 @@ public class DoctorController
     [HttpPost("{childId}/add-normal-vaccine")]
     public async Task<IActionResult> AddNormalVacinnes(string childId)
     {
-        var child = await unitOfWork.ChildRepo.FindAsync(c => c.Id == childId, true);
+        var child = await unitOfWork.ChildRepo.FindAsync(c => c.Id == childId, true, ["Vaccines"]);
 
         if (child == null)
             return NotFound(GeneralResponse<string>.FailureResponse("الطفل غير موجود"));
+
+        if(child.Vaccines != null && child.Vaccines.Count > 0)
+            return BadRequest(GeneralResponse<string>.FailureResponse("هذا الطفل لديه جدول تطعيمات بالفعل"));
 
         var vaccines = Utility.ChildVaccines(null, childId);
 
