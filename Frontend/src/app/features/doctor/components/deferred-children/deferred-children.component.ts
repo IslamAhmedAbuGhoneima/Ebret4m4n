@@ -22,7 +22,7 @@ export class DeferredChildrenComponent implements OnInit {
     this._DoctorService.childrenSuspended().subscribe({
       next: (res) => {
         this.data = res.data;
-        // this.filteredData = this.data;
+        this.filteredData = this.data;
       },
       error: (err) => {},
     });
