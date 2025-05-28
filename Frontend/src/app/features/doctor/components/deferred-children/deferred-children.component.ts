@@ -13,7 +13,7 @@ export class DeferredChildrenComponent implements OnInit {
   filteredData: any;
   data: any;
   constructor(private router: Router, private _DoctorService: DoctorService) {}
- 
+
   ngOnInit(): void {
     this.getChildrenSuspended();
   }
@@ -22,7 +22,7 @@ export class DeferredChildrenComponent implements OnInit {
     this._DoctorService.childrenSuspended().subscribe({
       next: (res) => {
         this.data = res.data;
-        this.filteredData = this.data;
+        // this.filteredData = this.data;
       },
       error: (err) => {},
     });

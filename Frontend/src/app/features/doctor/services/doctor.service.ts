@@ -16,15 +16,24 @@ export class DoctorService {
       `${environment.apiUrl}/Doctor/${childId}/child-data`
     );
   }
-  
+
   childrenSuspended() {
     return this.http.get<any>(
       `${environment.apiUrl}/Doctor/children-suspended`
     );
   }
-  childSuspended(childId:any) {
-    return this.http.get<any>(
-      `${environment.apiUrl}/Doctor/${childId}/suspend`
+
+  childSuspended(childId: any) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Doctor/${childId}/suspend`,
+      {}
+    );
+  }
+
+  acceptVaccination(childId: any) {
+    return this.http.post<any>(
+      `${environment.apiUrl}/Doctor/${childId}/add-normal-vaccine`,
+      {}
     );
   }
 }

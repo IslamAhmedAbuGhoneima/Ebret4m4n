@@ -24,17 +24,19 @@
           </tr>
         </thead>
         <tbody>
+          @for (item of filteredData; track $index) {
           <tr>
             <td class="border border-[#E5E7EB] border-l-transparent">
-              أحمد محمد
+              {{ item.childName }} {{ item.parentName }}
             </td>
             <td class="border border-[#E5E7EB] border-x-transparent">
-              30306077483923499
+              {{ item.childId }}
             </td>
             <td class="border border-[#E5E7EB] border-r-transparent">
               <a
                 [routerLink]="[
-                  '/doctor/deferred-children/doctor-child-details'
+                  '/doctor/deferred-children/doctor-child-details',
+                  item.childId
                 ]"
                 [queryParams]="{ from: 'deferred' }"
                 class="underline"
@@ -42,6 +44,7 @@
               >
             </td>
           </tr>
+          }
         </tbody>
       </table>
     </div>

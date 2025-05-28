@@ -22,7 +22,23 @@ export class ChildrenComponent implements OnInit {
     this._DoctorService.childrenDisease().subscribe({
       next: (res) => {
         this.data = res.data;
-        this.filteredData = this.data;
+        // this.filteredData = this.data;
+        this.filteredData = [
+          {
+            id: '30309012404196',
+            name: 'اسلام',
+            ageInMonth: 2,
+            birthDate: '2025-03-10T00:00:00',
+            weight: 8,
+            gender: 'm',
+            '': null,
+            vaccines: [],
+            filePath: [
+              '/Files/ChildReports/109f667d-3103-4640-b7bb-7f8d5c22c540.PNG',
+              '/Files/ChildReports/ce47a2ab-8a81-4a85-88f6-4ac194e4650f.PNG',
+            ],
+          },
+        ];
       },
       error: (err) => {},
     });

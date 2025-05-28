@@ -4,7 +4,6 @@
       {{ fromPage === "deferred" ? "الأطفال المؤجلين" : "الأطفال" }}
     </h3>
 
-    <!-- -->
     <div class="flex items-center gap-1 mt-3">
       @if (fromPage === "children") {
       <a routerLink="/doctor/children"> الأطفال</a>
@@ -12,13 +11,27 @@
       <a routerLink="/doctor/deferred-children"> الأطفال المؤجلين</a>
       }
 
-      <!-- -->
       <img
         src="/icons/Caret Down.svg"
         alt=""
         class="rotate-90 h-3 w-3 mt-[6px]"
       />
-      <span> بيانات الطفل</span>
+
+      @if (fromPage === "children") {
+      <a
+        [routerLink]="['/doctor/children/doctor-child-details', childId]"
+        [queryParams]="{ from: 'children' }"
+      >
+        <span> بيانات الطفل</span>
+      </a>
+      }@else {
+      <a
+        [routerLink]="['/doctor/deferred-children/doctor-child-details', childId]"
+        [queryParams]="{ from: 'deferred' }"
+      >
+        <span> بيانات الطفل</span>
+      </a>
+      }
     </div>
 
     <div
@@ -30,14 +43,18 @@
             <img src="/icons/child.svg" alt="" />
             <span class="text-third-txt font-normal text-sm">إسم الطفل</span>
           </div>
-          <span class="text-base text-[#151419] font-semibold">أحمد محمد</span>
+          <span class="text-base text-[#151419] font-semibold">
+            {{ data?.name }}</span
+          >
         </div>
         <div>
           <div class="flex gap-2 items-center">
             <img src="/icons/fluent-mdl2_date-time.svg" alt="" />
             <span class="text-third-txt font-normal text-sm">العمر </span>
           </div>
-          <span class="text-base text-[#151419] font-semibold"> 60 يوم</span>
+          <span class="text-base text-[#151419] font-semibold">
+            {{ data?.ageInMonth * 30 }} يوم</span
+          >
         </div>
       </div>
       <div class="flex flex-col gap-6 flex-1">
@@ -49,8 +66,8 @@
             >
           </div>
           <span class="text-base text-[#151419] font-semibold">
-            الطفل يعانى من إرتفاع شديد فى درجة الحرارة</span
-          >
+            {{ data?.patientHistory == null ? "لايوجد" : data?.patientHistory }}
+          </span>
         </div>
         <div>
           <div class="flex gap-2 items-center">
@@ -59,11 +76,16 @@
               صور التحاليل</span
             >
           </div>
-
+          <ul
+            class="flex flex-col px-4 gap-2 w-full text-sm font-normal font-arabic text-third-txt"
+          >
+            <li *ngFor="let file of medicalImagesFromApi; let i = index"></li>
+          </ul>
           <ul class="mt-4 space-y-2 text-base text-[#151419] font-semibold">
+            @for (file of medicalImagesFromApi; track $index) {
             <li>
               <a
-                [href]="'assets/images/image1.jpg'"
+                [href]="file.preview"
                 target="_blank"
                 rel="noopener"
                 class="underline"
@@ -71,16 +93,7 @@
                 صورة 1
               </a>
             </li>
-            <li>
-              <a
-                [href]="'assets/images/image2.jpg'"
-                target="_blank"
-                rel="noopener"
-                class="underline"
-              >
-                صورة 2
-              </a>
-            </li>
+            }
           </ul>
         </div>
       </div>
@@ -101,12 +114,14 @@
       </button>
       @if(fromPage==='children'){
       <button
+        (click)="vaccinationPostponement()"
         class="w-fit cursor-pointer flex font-arabic gap-2 py-[9px] px-4 rounded-lg font-bold bg-[#B4231B] text-mainBg-100 transition duration-200 hover:bg-[#7A271A]"
       >
         <span class="inline- text-sm"> تأجيل التطعيم</span>
         <img src="/icons/ph_clock-clockwise-fill.svg" alt="" /></button
       >}
       <button
+        (click)="allowVaccination()"
         class="w-fit cursor-pointer flex font-arabic gap-2 py-[9px] px-4 rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
       >
         <img src="/icons/game-icons_check-mark.svg" alt="" />

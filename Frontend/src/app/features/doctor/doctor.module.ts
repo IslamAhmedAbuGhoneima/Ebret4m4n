@@ -17,15 +17,23 @@ const routes: Routes = [
   { path: 'children', component: ChildrenComponent },
   { path: 'deferred-children', component: DeferredChildrenComponent },
   {
-    path: 'doctor-child-details',
+    path: 'doctor-child-details/:id',
+    component: DoctorChildDetailsComponent,
+  },
+
+
+
+
+
+
+
+  
+  {
+    path: 'deferred-children/doctor-child-details/:id',
     component: DoctorChildDetailsComponent,
   },
   {
-    path: 'deferred-children/doctor-child-details',
-    component: DoctorChildDetailsComponent,
-  },
-  {
-    path: 'children/doctor-child-details',
+    path: 'children/doctor-child-details/:id',
     component: DoctorChildDetailsComponent,
   },
 ];

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { DoctorService } from '../../services/doctor.service';
 
 @Component({
   selector: 'app-doctor-child-details',
@@ -10,29 +11,80 @@ import { Location } from '@angular/common';
 })
 export class DoctorChildDetailsComponent implements OnInit {
   fromPage: any;
-  imageList = [
-    {
-      name: 'صورة 1',
-      url: 'https://www.google.com/imgres?imgurl=https://ichef.bbci.co.uk/ace/ws/640/cpsprodpb/16872/production/_128047229_49852da7-9242-4432-ab6b-97550dd0efa8.jpg.webp&tbnid=Ifdg03i06DfQpM&vet=1&imgrefurl=https://www.bbc.com/arabic/features-64021656&docid=DLYrRa4Bed_xLM&w=640&h=360&source=sh/x/im/m5/2&kgs=d45a01ea27c4a3cc',
-    },
-    {
-      name: 'صورة 2',
-      url: 'https://www.google.com/imgres?imgurl=https://media.filfan.com/NewsPics/FilfanNew/large/324969_0.jpg&tbnid=Cf64epNwWn55iM&vet=1&imgrefurl=https://www.filfan.com/news/130088&docid=BFbAuCFUE5r3IM&w=408&h=510&source=sh/x/im/m1/2&kgs=0259dccfaf7101d8',
-    },
-  ];
   deferredChild: boolean = true;
+  childId: any;
+  data: any;
+  medicalImagesFromApi: any;
   constructor(
     private _ActivatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private _DoctorService: DoctorService
   ) {}
 
   ngOnInit(): void {
     this._ActivatedRoute.queryParams.subscribe((params) => {
       this.fromPage = params['from'];
-      console.log(this.fromPage);
+    });
+    this._ActivatedRoute.paramMap.subscribe((params) => {
+      this.childId = params.get('id');
+      this.childDetails();
     });
   }
+  childDetails() {
+    this._DoctorService.childDiseaseDetails(this.childId).subscribe({
+      next: (res) => {
+        this.data = res.data;
+        this.medicalImagesFromApi = [];
+        this.data.filePath.forEach((path: string) => {
+          const fullUrl = 'http://localhost:5112' + path;
+          const extension = path.split('.').pop()?.toLowerCase();
+          const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(
+            extension || ''
+          );
 
+          const fileObj = isImage
+            ? { preview: fullUrl, type: 'image', path: path }
+            : {
+                name: path.split('/').pop(),
+                preview: fullUrl,
+                type: 'file',
+                path: path,
+              };
+
+          this.medicalImagesFromApi.push(fileObj);
+        });
+      },
+      error: (err) => {},
+    });
+  }
+  vaccinationPostponement() {
+    this._DoctorService.childSuspended(this.childId).subscribe({
+      next: (res) => {
+        if (this.fromPage == 'children') {
+          this.router.navigate(['/doctor/children']);
+        }  if (this.fromPage == 'deferred') {
+          this.router.navigate(['/doctor/deferred-children']);
+        } else {
+          this.router.navigate(['/doctor']);
+        }
+      },
+      error: (err) => {},
+    });
+  }
+  allowVaccination() {
+    this._DoctorService.acceptVaccination(this.childId).subscribe({
+      next: (res) => {
+        if (this.fromPage == 'children') {
+          this.router.navigate(['/doctor/children']);
+        } else if (this.fromPage == 'deferred') {
+          this.router.navigate(['/doctor/deferred-children']);
+        } else {
+          this.router.navigate(['/doctor']);
+        }
+      },
+      error: (err) => {},
+    });
+  }
   goBack() {
     if (this.fromPage == 'children') {
       this.router.navigate(['/doctor/children']);
