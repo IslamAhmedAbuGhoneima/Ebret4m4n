@@ -16,7 +16,7 @@ import { ChatService } from '../../../../core/services/chat.service';
 export class ChatComponent implements OnInit {
   role: any;
   messages: Message[] = [];
-  user :any;
+  user: any;
   newMessage = '';
   selectedDoctorId: any;
   senderId: any;
@@ -33,7 +33,6 @@ export class ChatComponent implements OnInit {
     if (this.role == 'parent') {
       this._ChatService.getHealthcareDoctorId().subscribe({
         next: (res: any) => {
-          console.log(res)
           this.selectedDoctorId = res.data.doctorId;
           this.user = res.data.user;
           this._ChatService
