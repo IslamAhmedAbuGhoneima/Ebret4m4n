@@ -9,6 +9,8 @@ public class CityStatsDto
     public int HealthCareUnits { get; set; }
     public int MaleChildren { get; set; }
     public int FemaleChildren { get; set; }
+    public double MalePercentage { get; set; }
+    public double FemalePercentage { get; set; }
     public List<UnitVaccineRequestDto> TopHealthCareUnitsByVaccines { get; set; } = new();
     public List<UnitReportDto> AllUnits { get; set; } = new();
     public List<VaccineRequestDto> TopVaccinesTaken { get; set; } = new();

@@ -6,6 +6,8 @@ export interface StatisticsAdmin {
   totalComplaints: number;
   maleChildren: number;
   femaleChildren: number;
+  malePercentage: number;
+  femalePercentage: number;
   topGovernoratesByVaccines: [
     {
       governorate: string;
