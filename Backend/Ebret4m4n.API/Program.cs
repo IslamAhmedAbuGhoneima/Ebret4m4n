@@ -62,10 +62,15 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 
+
+string filePaht = Path.Combine(builder.Environment.ContentRootPath, "Files");
+if(!Directory.Exists(filePaht))
+{
+    Directory.CreateDirectory(filePaht);
+}
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(builder.Environment.ContentRootPath, "Files")),
+    FileProvider = new PhysicalFileProvider(filePaht),
     RequestPath = "/Files"
 });
 
