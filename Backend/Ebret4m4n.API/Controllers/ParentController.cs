@@ -57,13 +57,15 @@ public class ParentController
             return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور على بيانات المستخدم"));
 
         var doctor = await unitOfWork.StaffRepo.FindAsync(staff => staff.HCCenterId == parent.HealthCareCenterId &&
-        staff.StaffRole == StaffRole.Doctor, false);
-          
+        staff.StaffRole == StaffRole.Doctor, false,["User"]);
 
         if (doctor is null)
             return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور على طبيب في هذه الوحدة الصحية"));
 
-        var response = GeneralResponse<object>.SuccessResponse(new { DoctorId = doctor.UserId });
+
+        var doctorDto = doctor.Adapt<HealthCareDoctorDto>();
+
+        var response = GeneralResponse<HealthCareDoctorDto>.SuccessResponse(doctorDto);
 
         return Ok(response);
     }

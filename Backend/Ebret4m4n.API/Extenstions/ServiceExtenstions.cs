@@ -31,6 +31,7 @@ public static class ServiceExtenstions
                 builder.WithOrigins("http://localhost:4200")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
+                    .AllowCredentials()
             ));
 
     public static void ConfigureAddIdentity(this IServiceCollection service) =>
