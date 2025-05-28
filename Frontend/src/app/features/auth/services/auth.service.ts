@@ -145,6 +145,7 @@ export class AuthService {
       return null;
     }
   }
+ 
   getUserGovernorate(): string | null {
     const token = this.getToken();
     if (!token) return null;

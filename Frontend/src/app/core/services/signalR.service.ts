@@ -11,7 +11,7 @@ export class SignalRService {
 
   constructor() {
     this.hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('http://localhost:5000/chathub') // Endpoint بتاع الهب
+      .withUrl('http://localhost:5112/chat')
       .withAutomaticReconnect()
       .build();
 

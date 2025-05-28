@@ -29,7 +29,7 @@
     <h6
       class="font-bold text-lg text-[#151419] w-full px-6 py-4 bg-white border border-b-third-border"
     >
-      د/ محمد أحمد
+      {{ user }}
     </h6>
 
     <div class="flex-1 overflow-y-auto content-end">
@@ -45,6 +45,10 @@
             class="absolute -right-[10px] bottom-0"
           />
         </li>
+
+        <div *ngIf="msg.File">
+          <a [href]="msg.File" target="_blank"> عرض الملف</a>
+        </div>
         }
       </ul>
     </div>
@@ -66,7 +70,13 @@
         <label for="files">
           <img src="/icons/Outline.svg" alt="" />
         </label>
-        <input type="file" name="files" id="files" class="hidden" />
+        <input
+          type="file"
+          name="files"
+          id="files"
+          class="hidden"
+          (change)="sendFile($event)"
+        />
       </div>
     </div>
   </div>

@@ -15,10 +15,11 @@ import { ChatService } from '../../../../core/services/chat.service';
 })
 export class ChatComponent implements OnInit {
   role: any;
-  messages: any;
-  user = 'User' + Math.floor(Math.random() * 1000); // اسم مؤقت
+  messages: any = [];
+  user = 'User' + Math.floor(Math.random() * 1000);
   newMessage = '';
   selectedDoctorId: any;
+  senderId: any;
 
   constructor(
     private authService: AuthService,
@@ -27,41 +28,58 @@ export class ChatComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.authService.getRole();
+    this.role = this.authService.getRole();
+    this.senderId = this.authService.getUserId();
 
-    // Step 1: جيبي الـ doctorId
-    this._ChatService.getHealthcareDoctorId().subscribe((doctorId: string) => {
-      this.selectedDoctorId = doctorId;
-
-      // Step 2: جيبي المحادثة معاه
-      this._ChatService.getMessages(doctorId).subscribe((msgs: Message[]) => {
-        this.messages = msgs;
-      });
-
-      // Step 3: استقبلي الرسائل الجديدة من SignalR
-      // this._SignalRService.getMessageStream().subscribe((msg: Message) => {
-      //   if (msg.user === doctorId || msg.receiver === doctorId) {
-      //     this.messages.push(msg);
-      //   }
-      // });
+    this._ChatService.getHealthcareDoctorId().subscribe({
+      next: (res: any) => {
+        this.selectedDoctorId = res.data.doctorId;
+        this._ChatService
+          .getMessages(this.selectedDoctorId)
+          .subscribe((msgs: Message[]) => {
+            this.messages = msgs;
+          });
+        this._SignalRService.getMessageStream().subscribe((msg: Message) => {
+          if (
+            msg.senderId === this.selectedDoctorId ||
+            msg.recieverId === this.selectedDoctorId
+          ) {
+            this.messages.push(msg);
+          }
+        });
+      },
     });
   }
 
   sendMessage(): void {
     if (this.newMessage.trim()) {
       const msg: Message = {
-        user: this.user,
-        content: this.newMessage,
-        timestamp: new Date().toISOString(),
+        message: this.newMessage,
+        File: null,
+        senderId: this.senderId,
+        recieverId: this.selectedDoctorId,
+        sendAt: new Date().toISOString(),
       };
 
-      // ✅ إرسال الرسالة للباك إند (REST)
-      // this._ChatService.sendMessage(msg).subscribe(() => {
-      //   this.newMessage = ''; // تنظيف الحقل بعد الإرسال
-      // });
-
-      // ✅ بث الرسالة عبر SignalR
       this._SignalRService.sendMessage(msg);
+      this.newMessage = '';
     }
+  }
+  sendFile(event: any): void {
+    // const file = event.target.files[0];
+    // const formData = new FormData();
+    // formData.append('file', file);
+
+    // this._ChatService.uploadFile(formData).subscribe((res: any) => {
+    //   const msg: Message = {
+    //     message: null,
+    //     fileUrl: res.fileUrl, // هذا يتم إرجاعه من API رفع الملف
+    //     senderId: this.senderId,
+    //     recieverId: this.selectedDoctorId,
+    //     sendAt: new Date().toISOString(),
+    //   };
+
+    //   this._SignalRService.sendMessage(msg);
+    // });
   }
 }
