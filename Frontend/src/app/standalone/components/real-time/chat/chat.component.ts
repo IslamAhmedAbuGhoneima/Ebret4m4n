@@ -42,7 +42,7 @@ export class ChatComponent implements OnInit {
         this._SignalRService.getMessageStream().subscribe((msg: Message) => {
           if (
             msg.senderId === this.selectedDoctorId ||
-            msg.recieverId === this.selectedDoctorId
+            msg.receiverId === this.selectedDoctorId
           ) {
             this.messages.push(msg);
           }
@@ -57,7 +57,7 @@ export class ChatComponent implements OnInit {
         message: this.newMessage,
         File: null,
         senderId: this.senderId,
-        recieverId: this.selectedDoctorId,
+        receiverId: this.selectedDoctorId,
         sendAt: new Date().toISOString(),
       };
 
