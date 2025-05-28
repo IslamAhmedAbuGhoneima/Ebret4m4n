@@ -120,13 +120,7 @@
           </td>
 
           <td class="px-6 py-4 whitespace-nowrap text-center">
-            <button
-              (click)="bookingVaccine(item.id)"
-              class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
-            >
-              <span class="inline- text-sm"> تعديل موعد</span>
-              <img src="/icons/icon-park-outline_appointment.svg" alt="" />
-            </button>  @if(!item.isTaken && ageInMonth==item.childAge){ @if(!bookingOrNot)
+            @if(!item.isTaken && ageInMonth==item.childAge){ @if(!bookingOrNot)
             {
             <button
               (click)="bookingVaccine(item.id)"
@@ -145,7 +139,7 @@
               <span class="inline- text-sm"> تعديل موعد</span>
               <img src="/icons/icon-park-outline_appointment.svg" alt="" />
             </button>
-      
+
             }} @else if (item.isTaken && ageInMonth==item.childAge &&
             getDaysDifference(item.takedAt)<= 0) {
             <a
