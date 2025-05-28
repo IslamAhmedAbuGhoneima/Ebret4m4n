@@ -15,8 +15,8 @@ import { ChatService } from '../../../../core/services/chat.service';
 })
 export class ChatComponent implements OnInit {
   role: any;
-  messages: any = [];
-  user = 'User' + Math.floor(Math.random() * 1000);
+  messages: Message[] = [];
+  user :any;
   newMessage = '';
   selectedDoctorId: any;
   senderId: any;
@@ -30,25 +30,28 @@ export class ChatComponent implements OnInit {
   ngOnInit(): void {
     this.role = this.authService.getRole();
     this.senderId = this.authService.getUserId();
-
-    this._ChatService.getHealthcareDoctorId().subscribe({
-      next: (res: any) => {
-        this.selectedDoctorId = res.data.doctorId;
-        this._ChatService
-          .getMessages(this.selectedDoctorId)
-          .subscribe((msgs: Message[]) => {
-            this.messages = msgs;
+    if (this.role == 'parent') {
+      this._ChatService.getHealthcareDoctorId().subscribe({
+        next: (res: any) => {
+          console.log(res)
+          this.selectedDoctorId = res.data.doctorId;
+          this.user = res.data.user;
+          this._ChatService
+            .getMessages(this.selectedDoctorId)
+            .subscribe((msgs: Message[]) => {
+              this.messages = msgs;
+            });
+          this._SignalRService.getMessageStream().subscribe((msg: Message) => {
+            if (
+              msg.senderId === this.selectedDoctorId ||
+              msg.recieverId === this.selectedDoctorId
+            ) {
+              this.messages.push(msg);
+            }
           });
-        this._SignalRService.getMessageStream().subscribe((msg: Message) => {
-          if (
-            msg.senderId === this.selectedDoctorId ||
-            msg.recieverId === this.selectedDoctorId
-          ) {
-            this.messages.push(msg);
-          }
-        });
-      },
-    });
+        },
+      });
+    }
   }
 
   sendMessage(): void {
@@ -69,7 +72,6 @@ export class ChatComponent implements OnInit {
     // const file = event.target.files[0];
     // const formData = new FormData();
     // formData.append('file', file);
-
     // this._ChatService.uploadFile(formData).subscribe((res: any) => {
     //   const msg: Message = {
     //     message: null,
@@ -78,7 +80,6 @@ export class ChatComponent implements OnInit {
     //     recieverId: this.selectedDoctorId,
     //     sendAt: new Date().toISOString(),
     //   };
-
     //   this._SignalRService.sendMessage(msg);
     // });
   }
