@@ -62,7 +62,8 @@ export class DoctorChildDetailsComponent implements OnInit {
       next: (res) => {
         if (this.fromPage == 'children') {
           this.router.navigate(['/doctor/children']);
-        }  if (this.fromPage == 'deferred') {
+        }
+        if (this.fromPage == 'deferred') {
           this.router.navigate(['/doctor/deferred-children']);
         } else {
           this.router.navigate(['/doctor']);

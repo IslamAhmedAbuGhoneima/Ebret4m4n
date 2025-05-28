@@ -86,7 +86,14 @@ export class VaccinationBookingComponent implements OnInit {
       secondDayAr: dayMap[data.secondDay] || data.secondDay,
     };
   }
-
+  deleteAppointment() {
+    this._ParentService.appointmentCancel(this.data.appointmentId).subscribe({
+      next: (res) => {},
+      error: (err) => {
+        this.errorMessage = err.error.message;
+      },
+    });
+  }
   close() {
     this.dialog.close();
   }

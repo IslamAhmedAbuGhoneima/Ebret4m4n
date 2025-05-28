@@ -26,7 +26,10 @@
       </a>
       }@else {
       <a
-        [routerLink]="['/doctor/deferred-children/doctor-child-details', childId]"
+        [routerLink]="[
+          '/doctor/deferred-children/doctor-child-details',
+          childId
+        ]"
         [queryParams]="{ from: 'deferred' }"
       >
         <span> بيانات الطفل</span>
@@ -90,7 +93,7 @@
                 rel="noopener"
                 class="underline"
               >
-                صورة 1
+                صورة/ملف {{ $index + 1 }}
               </a>
             </li>
             }

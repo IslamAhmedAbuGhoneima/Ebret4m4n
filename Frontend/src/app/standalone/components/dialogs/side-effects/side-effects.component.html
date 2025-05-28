@@ -6,13 +6,47 @@
   <div class="text-center px-[26px] pb-8 mt-5">
     <div class="mb-3">
       <h4 class="font-bold text-[22px] text-[#121212] mb-2">
-        الأعراض الجانبية المتوقعة
+        الآثار الجانبية للقاح {{ data.vaccineName }}
       </h4>
     </div>
 
+    <div *ngIf="!effects.excludeGeneral">
+      <h3 class="font-semibold">الأعراض العامة:</h3>
+      <ul class="list-disc list-inside font-semibold">
+        <li *ngFor="let item of effects.general" class="mb-[6px] text-base">
+          {{ item }}
+        </li>
+      </ul>
+    </div>
+
+    <h6 class="font-semibold mt-4">الأعراض الموضعية:</h6>
     <ul class="list-disc list-inside font-semibold">
-      <li class="mb-[6px] text-base">الأعراض الجانبية المتوقعة</li>
-      <li class="mb-[6px] text-base">الأعراض الجانبية المتوقعة</li>
+      <li *ngFor="let item of effects.local" class="mb-[6px] text-base">
+        {{ item }}
+      </li>
     </ul>
+
+    <h3 class="font-semibold mt-4">أعراض تظهر بمعدل منخفض:</h3>
+    <ul class="list-disc list-inside font-semibold">
+      <li *ngFor="let item of effects.lowFrequency" class="mb-[6px] text-base">
+        {{ item }}
+      </li>
+    </ul>
+
+    <h3 class="font-semibold mt-4">متى يجب التواصل مع الطبيب:</h3>
+    <ul class="list-disc list-inside font-semibold">
+      <li *ngFor="let item of effects.contactDoctor" class="mb-[6px] text-base">
+        {{ item }}
+      </li>
+    </ul>
+
+    <div *ngIf="effects.rare?.length">
+      <h3 class="font-semibold mt-4">أعراض نادرة:</h3>
+      <ul class="list-disc list-inside font-semibold">
+        <li *ngFor="let item of effects.rare" class="mb-[6px] text-base">
+          {{ item }}
+        </li>
+      </ul>
+    </div>
   </div>
 </section>

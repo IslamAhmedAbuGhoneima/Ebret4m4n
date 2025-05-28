@@ -25,7 +25,7 @@ export class MinistryAdminDashboardComponent implements OnInit {
     this._HealthMinistryService.getStatisticsOfAdmin().subscribe({
       next: (res) => {
         this.data = res;
-        console.log(this.data);
+
         const labels1 = this.data.vaccineRequests.map(
           (item: any) => item.vaccineName
         );
@@ -36,11 +36,11 @@ export class MinistryAdminDashboardComponent implements OnInit {
         this.barChartData1.datasets[0].data = data1;
         this.barChartData1 = { ...this.barChartData1 };
 
-        const labels2 = this.data.governoratesReport.map(
+        const labels2 = this.data.topGovernoratesByVaccines.map(
           (item: any) => item.governorate
         );
-        const data2 = this.data.governoratesReport.map(
-          (item: any) => item.vaccinesTaken
+        const data2 = this.data.topGovernoratesByVaccines.map(
+          (item: any) => item.totalVaccinesRequested
         );
         this.barChartData2.labels = labels2;
         this.barChartData2.datasets[0].data = data2;

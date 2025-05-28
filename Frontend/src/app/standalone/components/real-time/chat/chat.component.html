@@ -1,1 +1,73 @@
-<p>chat works!</p>
+<section class="font-arabic h-screen flex flex-row-reverse">
+  @if (role=='doctor') {
+  <aside class="w-[300px] bg-white border border-r-third-border pt-6">
+    <h4 class="text-[28px] font-semibold text-center">المحادثات</h4>
+    <ul class="mt-6">
+      <li>
+        <a
+          routerLink=""
+          routerLinkActive="bg-[#B6D4CA]"
+          class="flex justify-between items-center pr-6 pl-4 py-3 hover:bg-third-bg"
+        >
+          <div class="flex gap-4">
+            <div>
+              <h6 class="text-semibold text-xl text-[#151419]">د/ محمد أحمد</h6>
+              <span class="font-normal text-sm">مساء الخير ...</span>
+            </div>
+          </div>
+          <small
+            class="block bg-[#099250] text-white rounded-full w-7 h-7 text-center leading-7 text-sm"
+            >2</small
+          >
+        </a>
+      </li>
+    </ul>
+  </aside>
+  }
+
+  <div class="content flex flex-col bg-[#F9FAFB] flex-1">
+    <h6
+      class="font-bold text-lg text-[#151419] w-full px-6 py-4 bg-white border border-b-third-border"
+    >
+      د/ محمد أحمد
+    </h6>
+
+    <div class="flex-1 overflow-y-auto content-end">
+      <ul class="relative flex justify-start mr-2 mb-40 text-right">
+        @for (msg of messages; track $index) {
+        <li
+          class="bg-primary-bg w-fit text-white font-semibold rounded-2xl px-5 py-1 relative"
+        >
+          <span>{{ msg }}</span>
+          <img
+            src="/icons/Union-green.svg"
+            alt=""
+            class="absolute -right-[10px] bottom-0"
+          />
+        </li>
+        }
+      </ul>
+    </div>
+
+    <div
+      class="flex items-center gap-3 px-6 py-2 bg-white border border-t-third-border"
+    >
+      <button (click)="sendMessage()">
+        <img src="/icons/Send.svg" alt="" />
+      </button>
+      <input
+        [(ngModel)]="newMessage"
+        (keyup.enter)="sendMessage()"
+        type="text"
+        class="flex-1 placeholder:text-third-txt"
+        placeholder="أكتب رسالة"
+      />
+      <div>
+        <label for="files">
+          <img src="/icons/Outline.svg" alt="" />
+        </label>
+        <input type="file" name="files" id="files" class="hidden" />
+      </div>
+    </div>
+  </div>
+</section>

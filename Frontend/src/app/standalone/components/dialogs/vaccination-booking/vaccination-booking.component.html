@@ -27,13 +27,24 @@
     </div>
   </div>
 
-  <button
-    (click)="bookAppointment()"
-    *ngIf="selectedDay"
-    class="mx-auto block cursor-pointer py-[11px] px-6 rounded-lg text-sm font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
-  >
-    <span>
-      {{ data.bookingExists ? "تعديل" : "حجز" }}
-    </span>
-  </button>
+  <div class="mx-auto flex items-center justify-center gap-6 w-fit">
+    <button
+
+      (click)="bookAppointment()"
+      
+      class="mx-auto block cursor-pointer py-[11px] px-6 rounded-lg text-sm font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+    >
+      <span>
+        {{ data.bookingExists ? "تعديل" : "حجز" }}
+      </span>
+    </button>
+
+    <button
+      *ngIf="!data.bookingExists"
+      (click)="deleteAppointment()"
+      class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-error text-mainBg-100 transition duration-200 hover:bg-errorHov"
+    >
+      <span class="inline- text-sm"> ألغاء الحجز</span>
+    </button>
+  </div>
 </section>

@@ -23,6 +23,7 @@ export class ChildVaccinationScheduleComponent implements OnInit {
   appointmentId: any;
   allVaccinesTaken: boolean = false;
   timeTakenVaccine: any;
+
   constructor(
     private matDialog: MatDialog,
     private _ActivatedRoute: ActivatedRoute,
@@ -40,7 +41,6 @@ export class ChildVaccinationScheduleComponent implements OnInit {
     this._ParentService.childVaccineSchedule(this.childId).subscribe({
       next: (res) => {
         this.data = res.data;
-        console.log(this.data);
         this.childName = this.data.name;
         this.vaccines = this.formateData(this.data.vaccines);
         this.ageInMonth = this.data.ageInMonth;
@@ -99,16 +99,17 @@ export class ChildVaccinationScheduleComponent implements OnInit {
       });
     }, 0);
   }
-  expectedSideEffects() {
+  expectedSideEffects(vaccineName: any) {
     (document.activeElement as HTMLElement)?.blur();
 
     setTimeout(() => {
       const dialogRef = this.matDialog.open(SideEffectsComponent, {
-        width: '350px',
+        width: '600px',
         panelClass: 'dialog-side-effects-container',
         autoFocus: true,
         restoreFocus: false,
         disableClose: true,
+        data: { vaccineName },
       });
     }, 0);
   }

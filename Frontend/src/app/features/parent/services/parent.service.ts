@@ -118,6 +118,11 @@ export class ParentService {
       model
     );
   }
+  appointmentCancel(appointmentId: any) {
+    return this.http.delete<any>(
+      `${environment.apiUrl}/Parent/${appointmentId}/appointment-cancle`
+    );
+  }
   childrenReservations() {
     return this.http.get<any>(
       `${environment.apiUrl}/Parent/children-reservations`
