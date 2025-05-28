@@ -18,8 +18,10 @@ public class ChatController(IUnitOfWork unitOfWork) : ControllerBase
     {
         var parentId = User.FindFirst("id")!.Value;
 
-        var messages = unitOfWork.ChatRepo.FindByCondition(message => message.SenderId == parentId
-        && message.ReceiverId == reciverId.ToString(), false)
+        var messages = unitOfWork.ChatRepo.FindByCondition(message =>
+            (message.SenderId == parentId && message.ReceiverId == reciverId.ToString()) ||
+            (message.SenderId == reciverId.ToString() && message.ReceiverId == parentId), false)
+            .OrderBy(message => message.SentAt)
             .ToList();
 
         var messagesDto = messages.Adapt<List<ChatMessageDetailsDto>>();
@@ -29,15 +31,20 @@ public class ChatController(IUnitOfWork unitOfWork) : ControllerBase
         return Ok(response);
     }
 
-    [HttpGet("parent-chat-list")]
+    [HttpGet("user-chat-list")]
     public IActionResult UserChatList()
     {
-        var doctorId = User.FindFirst("id")!.Value;
+        var userId = User.FindFirst("id")!.Value;
 
-        var userChatList = unitOfWork.ChatRepo.FindByCondition(chat => chat.ReceiverId == doctorId, false, ["Sender"])
-            .Distinct()
-            .Select(u => u.Adapt<ChatUsersListDto>())
-            .ToList() ?? [];
+        var chats = unitOfWork.ChatRepo.FindByCondition(chat => chat.ReceiverId == userId, false, ["Sender"])
+            .ToList();
+
+        var userChatList = chats
+            .GroupBy(chat => chat.SenderId)
+            .Select(group => group.OrderByDescending(c => c.SentAt).First())
+            .OrderByDescending(chat => chat.SentAt)
+            .Select(chat => chat.Adapt<ChatUsersListDto>())
+            .ToList();
 
         var response = GeneralResponse<List<ChatUsersListDto>>.SuccessResponse(userChatList);
 

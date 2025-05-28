@@ -1,9 +1,5 @@
 ﻿using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 using Ebret4m4n.Shared.DTOs.HealthCareDtos;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Ebret4m4n.Entities.Models;
 using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
@@ -13,8 +9,7 @@ namespace Ebret4m4n.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class HealthCareController(IUnitOfWork unitOfWork, 
-    UserManager<ApplicationUser> userManager) : ControllerBase
+public class HealthCareController(IUnitOfWork unitOfWork) : ControllerBase
 {
     [HttpGet("healthCare-locations")]
     public IActionResult HealthCareLocations()

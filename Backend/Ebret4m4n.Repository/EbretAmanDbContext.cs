@@ -35,6 +35,8 @@ public class EbretAmanDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<CityAdminStaff> CityAdminStaff { get; set; }   
 
+    public DbSet<MedicalStaff> MedicalStaff { get; set; }
+
     public DbSet<MainInventory> MainInventory { get; set; }
 
     public DbSet<Order> Orders { get; set; }

@@ -7,7 +7,7 @@ public class Chat
     #region Properties
     public Guid Id { get; set; }
 
-    public DateTime SentAt { get; private set; } = DateTime.UtcNow;
+    public DateTime SentAt { get; set; }
 
     public string? Message { get; set; } 
 

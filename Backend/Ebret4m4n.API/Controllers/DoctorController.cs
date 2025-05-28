@@ -12,7 +12,7 @@ namespace Ebret4m4n.API.Controllers;
 [Authorize(Roles ="doctor")]
 [ApiController]
 public class DoctorController
-    (IUnitOfWork unitOfWork,IEmailSender emailSender): ControllerBase
+    (IUnitOfWork unitOfWork, IEmailSender emailSender) : ControllerBase
 {
     [HttpGet("children-disease")]
     public IActionResult GetChildrenWithDisease()
@@ -50,6 +50,9 @@ public class DoctorController
     {
         var child = 
             await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false, ["User"]);
+
+        if(child is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("الطفل غير موجود"));
 
         if (child.IsNormal == false)
             return BadRequest(GeneralResponse<string>.FailureResponse("تم اضافه الطفل الي قائمه المؤجلين من قبل"));

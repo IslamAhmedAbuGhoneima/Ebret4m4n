@@ -14,6 +14,7 @@ public class ChatHub
     public async Task SendMessage([FromForm] ChatMessageDto message)
     {
         var chat = message.Adapt<Chat>();
+        chat.SentAt = DateTime.UtcNow;
 
         if (message.File is not null) 
             chat.File = Utility.UploadChatFile(message.File);

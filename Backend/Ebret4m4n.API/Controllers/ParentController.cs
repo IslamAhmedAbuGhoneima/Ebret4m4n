@@ -44,6 +44,30 @@ public class ParentController
         return Ok(response);
     }
 
+    [HttpGet("get-healthcare-doctor-id")]
+    public async Task<IActionResult> HealthCareDoctor()
+    {
+        var parentId = User.FindFirst("id")!.Value;
+
+        var parent = userManager.Users.Include(parent => parent.HealthCareCenter)
+            .FirstOrDefault(parent => parent.Id == parentId);
+
+
+        if (parent is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور على بيانات المستخدم"));
+
+        var doctor = await unitOfWork.StaffRepo.FindAsync(staff => staff.HCCenterId == parent.HealthCareCenterId &&
+        staff.StaffRole == StaffRole.Doctor, false);
+          
+
+        if (doctor is null)
+            return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور على طبيب في هذه الوحدة الصحية"));
+
+        var response = GeneralResponse<object>.SuccessResponse(new { DoctorId = doctor.UserId });
+
+        return Ok(response);
+    }
+
     [HttpGet("children-reservations")]
     public IActionResult ParentReservations()
     {
