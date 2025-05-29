@@ -1,84 +1,18 @@
- .chat-list {
-  margin-bottom: 100px;
-  min-height: calc(100vh - 400px);
-  
-  .message-wrapper {
-    margin-bottom: 1.5rem;
-    animation: fadeIn 0.3s ease-in-out;
-    
-    .message {
-      img {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        padding: 4px;
-        background: rgba(255, 255, 255, 0.1);
-      }
-      
-      .message-content {
-        position: relative;
-        max-width: 80%;
-        
-        .message-text {
-          background-color: #383838;
-          color: #e3e3e3;
-          margin-bottom: 0;
-          border-radius: 15px;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          word-break: break-word;
-        }
-        
-        .copy-btn {
-          position: absolute;
-          right: 10px;
-          bottom: -25px;
-          background: none;
-          border: none;
-          color: #6c757d;
-          cursor: pointer;
-          padding: 4px;
-          opacity: 0;
-          transition: opacity 0.2s ease-in-out;
-          
-          &:hover {
-            color: #4285f4;
-          }
-          
-          .material-symbols-outlined {
-            font-size: 18px;
-          }
-        }
-        
-        &:hover .copy-btn {
-          opacity: 1;
-        }
-      }
-    }
-    
-    &.user-message {
-      .message {
-        flex-direction: row-reverse;
-        
-        .message-text {
-          background-color: #4285f4;
-        }
-        
-        .copy-btn {
-          right: auto;
-          left: 10px;
-        }
-      }
-    }
-  }
+.scroll-container {
+  overflow-y: auto;
+
+  /* إخفاء الشريط لمتصفحات مختلفة */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-} 
+.scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+textarea {
+  line-height: 24px; /* ارتفاع السطر */
+  min-height: 24px; /* أقل ارتفاع - سطر واحد */
+  max-height: 120px; /* أقصى ارتفاع قبل ظهور scrollbar */
+  overflow-y: auto; /* يظهر scrollbar عمودي عند الحاجة */
+  resize: none; /* منع تغيير حجم يدوي */
+}

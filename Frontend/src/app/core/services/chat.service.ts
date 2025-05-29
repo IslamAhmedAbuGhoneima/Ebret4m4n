@@ -9,19 +9,19 @@ import { environment } from '../../../environments/environment';
 })
 export class ChatService {
   constructor(private http: HttpClient) {}
-
+  //parent
   getMessages(receiverId: string): Observable<Message[]> {
     return this.http.get<Message[]>(
       `${environment.apiUrl}/Chat/${receiverId}/user-messages`
     );
   }
 
-  getUserChatList(): Observable<any[]> {
-    return this.http.get<any[]>(`${environment.apiUrl}/Chat/user-chat-list`);
-  }
   getHealthcareDoctorId(): Observable<string> {
     return this.http.get<string>(
       `${environment.apiUrl}/Parent/get-healthcare-doctor-id`
     );
+  } //doctor
+  getUserChatList(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/Chat/user-chat-list`);
   }
 }

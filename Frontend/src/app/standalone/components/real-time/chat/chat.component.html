@@ -3,71 +3,94 @@
   <aside class="w-[300px] bg-white border border-r-third-border pt-6">
     <h4 class="text-[28px] font-semibold text-center">المحادثات</h4>
     <ul class="mt-6">
-      <li>
-        <a
-          routerLink=""
-          routerLinkActive="bg-[#B6D4CA]"
-          class="flex justify-between items-center pr-6 pl-4 py-3 hover:bg-third-bg"
-        >
-          <div class="flex gap-4">
-            <div>
-              <h6 class="text-semibold text-xl text-[#151419]">د/ محمد أحمد</h6>
-              <span class="font-normal text-sm">مساء الخير ...</span>
-            </div>
+      @for (item of userChatList; track $index) {
+      <li
+        (click)="selectUser(item.senderId)"
+        [class.selected]="selectedUserId === item.senderId"
+        class="cursor-pointer flex justify-between items-center pr-6 pl-4 py-3 hover:bg-third-bg"
+      >
+        <div class="flex gap-4">
+          <div>
+            <h6 class="font-semibold text-xl text-[#151419]">
+              {{ item.firstName }} {{ item.lastName }}
+            </h6>
+            {{ item.message.split(" ").slice(0, 4).join(" ") }}...
           </div>
-          <small
-            class="block bg-[#099250] text-white rounded-full w-7 h-7 text-center leading-7 text-sm"
-            >2</small
-          >
-        </a>
+        </div>
+        <small
+          class="block bg-[#099250] text-white rounded-full w-7 h-7 text-center leading-7 text-sm"
+          >{{ item.message.length }}</small
+        >
       </li>
+      }
     </ul>
   </aside>
-  }
-
+  } @if(selectedUser){
   <div class="content flex flex-col bg-[#F9FAFB] flex-1">
     <h6
-      class="font-bold text-lg text-[#151419] w-full px-6 py-4 bg-white border border-b-third-border"
+      class="font-bold mb-2 text-lg text-[#151419] w-full px-6 py-4 bg-white border border-b-third-border"
     >
+      @if (role=='parent') { د/
       {{ user }}
+      }@else {
+      {{ user }}
+      }
     </h6>
 
-    <div class="flex-1 overflow-y-auto content-end">
-      <ul class="relative flex justify-start mr-2 mb-40 text-right">
-        @for (msg of messages; track $index) {
+    <div class="flex-1 overflow-y-auto content-end scroll-container p-2">
+      <ul class="relative flex flex-col gap-0.5 mb-40 text-right">
+        @for (msg of messages; track $index) { @if (msg.file) {
         <li
-          class="bg-primary-bg w-fit text-white font-semibold rounded-2xl px-5 py-1 relative"
+          *ngIf="msg.File"
+          [ngClass]="{
+            'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
+            'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
+          }"
+          class="bg-primary-bg max-w-[55%] text-white font-semibold rounded-2xl px-5 py-1 relative"
         >
-          <span>{{ msg }}</span>
+          <a [href]="msg.File" target="_blank"> الصورة/عرض الملف</a>
+        </li>
+        }@else {
+        <li
+          [ngClass]="{
+            'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
+            'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
+          }"
+          class="w-fit max-w-[55%] font-semibold rounded-2xl px-5 py-1 relative"
+        >
+          <p>{{ msg.message }}</p>
+        
           <img
+            *ngIf="isLastMessageOfSender($index)"
             src="/icons/Union-green.svg"
             alt=""
             class="absolute -right-[10px] bottom-0"
           />
-        </li>
 
-        <div *ngIf="msg.File">
-          <a [href]="msg.File" target="_blank"> عرض الملف</a>
-        </div>
-        }
+
+          
+        </li>
+        } }
       </ul>
     </div>
 
     <div
-      class="flex items-center gap-3 px-6 py-2 bg-white border border-t-third-border"
+      class="flex items-center gap-3 px-6 h-16 bg-white border border-t-third-border"
     >
       <button (click)="sendMessage()">
         <img src="/icons/Send.svg" alt="" />
       </button>
-      <input
+      <textarea
+        #messageInput
         [(ngModel)]="newMessage"
-        (keyup.enter)="sendMessage()"
-        type="text"
-        class="flex-1 placeholder:text-third-txt"
+        (keydown.enter)="onEnter($event)"
         placeholder="أكتب رسالة"
-      />
+        class="flex-1 placeholder:text-third-txt resize-none overflow-hidden scroll-container"
+        rows="1"
+      ></textarea>
+
       <div>
-        <label for="files">
+        <label for="files" class="cursor-pointer">
           <img src="/icons/Outline.svg" alt="" />
         </label>
         <input
@@ -80,4 +103,10 @@
       </div>
     </div>
   </div>
+
+  }@else{
+  <div class="flex-1 h-full flex justify-center items-center">
+    <img src="/images/chat.svg" alt="" />
+  </div>
+  }
 </section>

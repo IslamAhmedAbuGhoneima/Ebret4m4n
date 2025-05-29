@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DoctorCreateScheduleComponent } from './components/doctor-create-schedule/create-schedule.component';
 import {
   RouterLink,
   RouterLinkActive,
@@ -21,13 +20,6 @@ const routes: Routes = [
     component: DoctorChildDetailsComponent,
   },
 
-
-
-
-
-
-
-  
   {
     path: 'deferred-children/doctor-child-details/:id',
     component: DoctorChildDetailsComponent,
@@ -40,12 +32,11 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    DoctorCreateScheduleComponent,
     ChildrenComponent,
     DeferredChildrenComponent,
     DoctorChildDetailsComponent,
   ],
-  imports: [CommonModule,FormsModule, RouterModule.forChild(routes)],
+  imports: [CommonModule, FormsModule, RouterModule.forChild(routes)],
   exports: [],
 })
 export class DoctorModule {}
