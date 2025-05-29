@@ -1,79 +1,93 @@
 <section class="font-arabic h-screen flex flex-row-reverse">
-  @if (role=='doctor') {
-  <aside class="w-[300px] bg-white border border-r-third-border pt-6">
+  <!-- فقط للدكتور: تظهر القائمة -->
+  <aside
+    *ngIf="role == 'doctor'"
+    class="w-[300px] bg-white border border-r-third-border pt-6"
+  >
     <h4 class="text-[28px] font-semibold text-center">المحادثات</h4>
     <ul class="mt-6">
-      @for (item of userChatList; track $index) {
-      <li
-        (click)="selectUser(item.senderId)"
-        [class.selected]="selectedUserId === item.senderId"
-        class="cursor-pointer flex justify-between items-center pr-6 pl-4 py-3 hover:bg-third-bg"
-      >
-        <div class="flex gap-4">
-          <div>
-            <h6 class="font-semibold text-xl text-[#151419]">
-              {{ item.firstName }} {{ item.lastName }}
-            </h6>
-            {{ item.message.split(" ").slice(0, 4).join(" ") }}...
-          </div>
-        </div>
-        <small
-          class="block bg-[#099250] text-white rounded-full w-7 h-7 text-center leading-7 text-sm"
-          >{{ item.message.length }}</small
+      <li *ngFor="let item of userChatList">
+        <a
+          [routerLink]="['/chat', item.senderId]"
+          routerLinkActive="bg-[#B6D4CA]"
+          class="flex justify-between items-center pr-6 pl-4 py-3 hover:bg-third-bg"
         >
+          <div class="flex gap-4">
+            <div>
+              <h6 class="text-semibold text-xl text-[#151419]">
+                {{ item.firstName }} {{ item.lastName }}
+              </h6>
+              <span class="font-normal text-sm">
+                {{ item.message.split(" ").slice(0, 4).join(" ") }}...
+              </span>
+            </div>
+          </div>
+          <small
+            class="block bg-[#099250] text-white rounded-full w-7 h-7 text-center leading-7 text-sm"
+          >
+            {{ item.message.length }}
+          </small>
+        </a>
       </li>
-      }
     </ul>
   </aside>
-  } @if(selectedUser){
-  <div class="content flex flex-col bg-[#F9FAFB] flex-1">
+
+  <div
+    *ngIf="selectedUserId || role === 'parent'; else showChatImage"
+    class="content flex flex-col bg-[#F9FAFB]"
+    [ngClass]="{ 'flex-1': role === 'doctor', 'w-full': role === 'parent' }"
+  >
     <h6
       class="font-bold mb-2 text-lg text-[#151419] w-full px-6 py-4 bg-white border border-b-third-border"
     >
-      @if (role=='parent') { د/
-      {{ user }}
-      }@else {
-      {{ user }}
-      }
+      {{ role == "parent" ? "د/ " + user : user }}
     </h6>
 
+    <!-- رسائل -->
     <div class="flex-1 overflow-y-auto content-end scroll-container p-2">
       <ul class="relative flex flex-col gap-0.5 mb-40 text-right">
-        @for (msg of messages; track $index) { @if (msg.file) {
         <li
-          *ngIf="msg.File"
-          [ngClass]="{
-            'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
-            'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
-          }"
-          class="bg-primary-bg max-w-[55%] text-white font-semibold rounded-2xl px-5 py-1 relative"
-        >
-          <a [href]="msg.File" target="_blank"> الصورة/عرض الملف</a>
-        </li>
-        }@else {
-        <li
+          *ngFor="let msg of messages; let i = index"
           [ngClass]="{
             'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
             'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
           }"
           class="w-fit max-w-[55%] font-semibold rounded-2xl px-5 py-1 relative"
         >
-          <p>{{ msg.message }}</p>
-        
+          @if (msg.message.length<10) {
+          <div class="flex items-end gap-1">
+            <small class="text-[10px] text-whitetext-left">
+              {{ formatTime(msg.sentAt) }}
+            </small>
+            <p class="flex-1">{{ msg.message }}</p>
+          </div>
+
+          }@else {
+          <div class="flex flex-col">
+            <p class="flex-1">{{ msg.message }}</p>
+            <small class="text-[10px] text-white ml-auto text-left">
+              {{ formatTime(msg.sentAt) }}
+            </small>
+          </div>
+          }
+
           <img
-            *ngIf="isLastMessageOfSender($index)"
+            *ngIf="isLastMessageOfSender(i) && msg.senderId == senderId"
             src="/icons/Union-green.svg"
             alt=""
             class="absolute -right-[10px] bottom-0"
           />
-
-
-          
+          <img
+            *ngIf="isLastMessageOfSender(i) && msg.senderId !== senderId"
+            src="/icons/Unio-gray.svg"
+            alt=""
+            class="absolute -left-[10px] bottom-0"
+          />
         </li>
-        } }
       </ul>
     </div>
 
+    <!-- إدخال الرسالة -->
     <div
       class="flex items-center gap-3 px-6 h-16 bg-white border border-t-third-border"
     >
@@ -104,9 +118,14 @@
     </div>
   </div>
 
-  }@else{
-  <div class="flex-1 h-full flex justify-center items-center">
-    <img src="/images/chat.svg" alt="" />
-  </div>
-  }
+  <!-- صورة الشات تظهر إذا لم يتم اختيار مستخدم -->
+  <!-- ✅ تُعرض الصورة فقط للطبيب ولم يختر مستخدمًا -->
+  <ng-template #showChatImage>
+    <div
+      *ngIf="role === 'doctor'"
+      class="flex-1 h-full flex justify-center items-center"
+    >
+      <img src="/images/chat.svg" alt="chat image" />
+    </div>
+  </ng-template>
 </section>

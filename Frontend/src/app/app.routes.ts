@@ -109,7 +109,16 @@ export const routes: Routes = [
             (c) => c.ChatComponent
           ),
         canActivate: [roleGuard],
-        data: { roles: ['parent', 'doctor'] }, // أو أي رول مناسب
+        data: { roles: ['parent', 'doctor'] },
+      },
+      {
+        path: 'chat/:userId',
+        loadComponent: () =>
+          import('./standalone/components/real-time/chat/chat.component').then(
+            (c) => c.ChatComponent
+          ),
+        canActivate: [roleGuard],
+        data: { roles: ['doctor'] },
       },
       {
         path: 'notifications',
