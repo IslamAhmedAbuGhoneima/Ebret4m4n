@@ -25,6 +25,6 @@ public class ChatHub
 
         var chatDto = chat.Adapt<ChatMessageDetailsDto>();
 
-        await Clients.Users(chat.SenderId!, chat.ReceiverId!).SendAsync("ReceiveMessage", chatDto);
+        await Clients.Users([chat.SenderId!, chat.ReceiverId!]).SendAsync("ReceiveMessage", chatDto);
     }
 }

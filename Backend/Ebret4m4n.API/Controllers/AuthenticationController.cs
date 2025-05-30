@@ -1,12 +1,10 @@
 ﻿using Ebret4m4n.Shared.DTOs.AuthenticationDtos;
 using Ebret4m4n.Entities.ConfigurationModels;
 using Microsoft.AspNetCore.Authorization;
-using Ebret4m4n.Shared.DTOs.ChildDtos;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Security.Cryptography;
 using Ebret4m4n.Entities.Models;
@@ -14,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Ebret4m4n.Shared.DTOs;
 using Ebret4m4n.Contracts;
-using System.Data;
 using System.Text;
 using System.Net;
 using Mapster;
@@ -265,6 +262,7 @@ public class AuthenticationController(UserManager<ApplicationUser> userManager,
         List<Claim> claims = [
             new(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
             new("id",_user!.Id),
+            new (JwtRegisteredClaimNames.Sub, _user!.Id), // Key change: Map user ID to "sub"
             new("name",$"{_user.FirstName} {_user.LastName}"),
             new("email",_user.Email!),
         ];
