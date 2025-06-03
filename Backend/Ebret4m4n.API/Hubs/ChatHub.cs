@@ -27,4 +27,29 @@ public class ChatHub
 
         await Clients.Users([chat.SenderId!, chat.ReceiverId!]).SendAsync("ReceiveMessage", chatDto);
     }
+
+    public async Task DeleteMessage(Guid messageId)
+    {
+        var chatMessage = 
+            await unitOfWork.ChatRepo.FindAsync(message => message.Id == messageId, true);
+
+        if (chatMessage is null)
+        {
+            await Clients.Caller.SendAsync("DeleteMessageError", "هذه الرساله غير موجوده");
+            return;
+        }
+
+        if(chatMessage.SenderId != Context.UserIdentifier)
+        {
+            await Clients.Caller.SendAsync("DeleteMessageError", "يمكنك حذف الرساله الخاصه بك فقط");
+            return;
+        }
+
+        unitOfWork.ChatRepo.Remove(chatMessage);
+
+        await unitOfWork.SaveAsync();
+
+        await Clients.Users([chatMessage.SenderId, chatMessage.ReceiverId])
+            .SendAsync("MessageDeleted", messageId);
+    }
 }

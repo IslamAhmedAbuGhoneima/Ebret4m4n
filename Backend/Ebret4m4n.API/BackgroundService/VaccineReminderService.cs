@@ -1,5 +1,4 @@
 ﻿using Ebret4m4n.Shared.DTOs.SignalRDtos;
-using Ebret4m4n.Entities.Exceptions;
 using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.API.Utilites;
 using Ebret4m4n.Contracts;
@@ -12,7 +11,7 @@ public class VaccineReminderService(IUnitOfWork unitOfWork,
     IHubContext<NotificationHub> hubContext)
 {
     public async Task CheckVaccineRemindersAndSendNotificationsAsync()
-    {
+     {
         await unitOfWork.BeginTransactionAsync();
         try
         {
@@ -41,10 +40,7 @@ public class VaccineReminderService(IUnitOfWork unitOfWork,
                 await unitOfWork.NotificationRepo.AddAsync(notification);
             }
 
-            var result = await unitOfWork.SaveAsync();
-
-            if (result == 0)
-                throw new BadRequestException("لم يتم حفظ التنبيهات");
+            await unitOfWork.SaveAsync();
 
             await unitOfWork.CommitTransactionAsync();
         }
