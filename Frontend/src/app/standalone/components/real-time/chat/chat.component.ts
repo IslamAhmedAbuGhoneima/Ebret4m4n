@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../../../../features/auth/services/auth.service';
-import { SignalRService } from '../../../../core/services/signalR.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Message } from '../../../../core/interfaces/message';
@@ -10,7 +9,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 @Component({
   selector: 'app-chat',
   imports: [CommonModule, FormsModule, RouterModule],
-  providers: [SignalRService],
+  providers: [],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
@@ -30,7 +29,6 @@ export class ChatComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private _ChatService: ChatService,
-    private _SignalRService: SignalRService,
     private _ActivatedRoute: ActivatedRoute
   ) {}
 
@@ -46,12 +44,10 @@ export class ChatComponent implements OnInit {
           this._ChatService
             .getMessages(this.selectedDoctorId)
             .subscribe((msgs: any) => {
-              console.log('messages from API:', msgs.data);
-
               this.messages = msgs.data;
             });
 
-          this._SignalRService.getMessageStream().subscribe((msg: Message) => {
+          this._ChatService.getMessageStream().subscribe((msg: Message) => {
             if (
               msg.senderId === this.selectedDoctorId ||
               msg.receiverId === this.selectedDoctorId
@@ -89,7 +85,7 @@ export class ChatComponent implements OnInit {
         this.messages = msgs.data;
       });
 
-    this._SignalRService.getMessageStream().subscribe((msg: Message) => {
+    this._ChatService.getMessageStream().subscribe((msg: Message) => {
       if (
         msg.senderId === this.selectedUserId ||
         msg.receiverId === this.selectedUserId
@@ -113,7 +109,7 @@ export class ChatComponent implements OnInit {
       };
 
       this.messages.push(msg);
-      this._SignalRService.sendMessage(msg);
+      this._ChatService.sendMessage(msg);
       this.newMessage = '';
 
       if (this.messageInput) {
@@ -141,7 +137,7 @@ export class ChatComponent implements OnInit {
       };
 
       this.messages.push(msg);
-      this._SignalRService.sendMessage(msg);
+      this._ChatService.sendMessage(msg);
     };
     reader.readAsDataURL(file);
   }

@@ -186,8 +186,9 @@
           <a routerLink="/notifications" routerLinkActive="present"
             ><img src="/icons/Frame.svg" alt="" /><span>الإشعارات</span>
             <small
+              *ngIf="unreadCount"
               class="mr-auto text-base rounded-lg w-[41px] h-7 flex justify-center items-center bg-[#B4231B] text-white"
-              >9+</small
+              >{{ unreadCount }}+</small
             ></a
           >
         </li>

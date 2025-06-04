@@ -54,22 +54,29 @@
           }"
           class="w-fit max-w-[55%] font-semibold rounded-2xl px-5 py-1 relative"
         >
-          @if (msg.message.length<10) {
-          <div class="flex items-end gap-1">
-            <small class="text-[10px] text-whitetext-left">
+          <!-- [ngClass]="{
+              '': msg.message.length < 10,
+              'flex-col': msg.message.length >= 10
+            }" -->
+          <div class="flex items-end  gap-1"  [ngClass]="{
+                'flex-row-reverse':
+                  msg.senderId === senderId,
+                'flex-row':
+                  msg.senderId !== senderId
+              }">
+            <p class="flex-1">{{ msg.message }}</p>
+            <small
+              [ngClass]="{
+                'ml-auto text-left':
+                  msg.message.length >= 10 && msg.senderId === senderId,
+                'mr-auto text-right':
+                  msg.message.length >= 10 && msg.senderId !== senderId
+              }"
+              class="text-[10px] text-left"
+            >
               {{ formatTime(msg.sentAt) }}
             </small>
-            <p class="flex-1">{{ msg.message }}</p>
           </div>
-
-          }@else {
-          <div class="flex flex-col">
-            <p class="flex-1">{{ msg.message }}</p>
-            <small class="text-[10px] text-white ml-auto text-left">
-              {{ formatTime(msg.sentAt) }}
-            </small>
-          </div>
-          }
 
           <img
             *ngIf="isLastMessageOfSender(i) && msg.senderId == senderId"

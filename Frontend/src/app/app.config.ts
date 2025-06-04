@@ -1,4 +1,9 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  provideZoneChangeDetection,
+  isDevMode,
+  importProvidersFrom,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { routes } from './app.routes';
@@ -11,6 +16,8 @@ import {
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { loaderInterceptor } from './core/interceptors/loader.interceptor';
 import { refreshTokenInterceptor } from './core/interceptors/refresh-token.interceptor';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { ToastrModule } from 'ngx-toastr';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -22,6 +29,16 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withFetch(),
       withInterceptors([loaderInterceptor, refreshTokenInterceptor])
+    ),
+    importProvidersFrom(
+      BrowserAnimationsModule,
+      NgxSpinnerModule,
+      ToastrModule.forRoot({
+        timeOut: 10000,
+        preventDuplicates: true,
+        closeButton: true,
+        tapToDismiss: true,
+      })
     ),
   ],
 };

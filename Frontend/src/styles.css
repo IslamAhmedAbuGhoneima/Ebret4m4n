@@ -153,3 +153,10 @@ input[type="password"]::-webkit-textfield-decoration-container {
   opacity: 0;
   pointer-events: none;
 }
+
+.toast-success {
+  background-color: #127453 !important;
+  box-shadow: none !important;
+  margin-top: 10px !important;
+}
+

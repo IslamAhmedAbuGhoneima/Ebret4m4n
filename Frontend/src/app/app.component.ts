@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { RouterOutlet } from '@angular/router';
 import { NgxSpinnerModule } from 'ngx-spinner';
-import { AuthService } from './features/auth/services/auth.service';
 
 @Component({
   selector: 'app-root',

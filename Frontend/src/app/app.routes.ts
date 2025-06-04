@@ -127,7 +127,16 @@ export const routes: Routes = [
             './standalone/components/real-time/notifications/notifications.component'
           ).then((c) => c.NotificationsComponent),
         canActivate: [roleGuard],
-        data: { roles: ['parent', 'doctor'] },
+        data: {
+          roles: [
+            'parent',
+            'doctor',
+            'governorateAdmin',
+            'cityAdmin',
+            'organizer',
+            'admin',
+          ],
+        },
       },
       {
         path: 'vaccines',
