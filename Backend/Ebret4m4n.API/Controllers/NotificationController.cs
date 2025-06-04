@@ -20,6 +20,7 @@ public class NotificationController
 
         var notification =
             unitOfWork.NotificationRepo.FindByCondition(not => not.UserId == userId && not.IsRead == false, false)
+            .OrderByDescending(not => not.RecievedAt)
             .ToList() ?? [];
 
         var notificationDto = notification.Adapt<List<NotificatioDto>>();

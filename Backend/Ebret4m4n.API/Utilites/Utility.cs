@@ -122,27 +122,35 @@ public class Utility
         return healthReports;
     }
 
-    public static string UploadChatFile(IFormFile file)
+    public static string SaveBase64File(string base64String)
     {
-        string path = Path.Combine(Directory.GetCurrentDirectory(), "Files", "ChatFiles");
+        var parts = base64String.Split(',');
+
+        if (parts.Length != 2)
+            throw new BadRequestException("ملف غير صالح");
+
+        var data = Convert.FromBase64String(parts[1]);
+
+        var mime = parts[0];
+        var extension = mime switch
+        {
+            var m when m.Contains("image/jpeg") => ".jpg",
+            var m when m.Contains("image/png") => ".png",
+            var m when m.Contains("image/gif") => ".gif",
+            var m when m.Contains("application/pdf") => ".pdf",
+            _ => ".bin"
+        };
+
+        var fileName = $"{Guid.NewGuid()}{extension}";
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Files", "ChatFiles");
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
 
-        if (file.Length > 5_242_880)
-            throw new BadRequestException("لايمكن رفع ملف بهذا الحجم");
+        var filePath = Path.Combine(path, fileName);
+        File.WriteAllBytes(filePath, data);
 
-        var fileName = Guid.NewGuid().ToString();
-        var fileExtension = Path.GetExtension(file.FileName);
-
-        var filePath = Path.Combine(path, $"{fileName}{fileExtension}");
-
-        using (var strem = new FileStream(filePath, FileMode.Create))
-        {
-            file.CopyTo(strem);
-        }
-
-        return $"/Files/ChatFiles/{fileName}{fileExtension}";
+        return $"/Files/ChatFiles/{fileName}";
     }
 
     public static async Task<Session> CreateSessionPayment(string parentId, string parentEmail, string childId, string childName)

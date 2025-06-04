@@ -23,15 +23,21 @@ export class NotificationService {
       })
       .withAutomaticReconnect()
       .build();
-
-    this.hubConnection.on('ReceiveNotification', (data) => {
+      
+    this.hubConnection.on('NotificationMessage', (data) => {
+      console.log(`from On Metjod `,data);
       this.notificationReceived$.next(data);
-
-      this.toastr.success(data.message, data.title, {
-        positionClass: 'toast-top-center',
-      }); 
-
-      this.showNotification(data.title, data.message); 
+      
+      if (data && data.message && data.title) {
+        this.toastr.success(data.message, data.title, {
+          timeOut: 5000,
+          positionClass: 'toast-top-left',
+          closeButton: true,
+          progressBar: true
+        });
+      } else {
+        console.error('Invalid notification data:', data);
+      }
     });
 
     this.startConnection();

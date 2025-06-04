@@ -85,7 +85,7 @@ public static class ServiceExtenstions
                     // If the request is for our SignalR hub...
                     var path = context.HttpContext.Request.Path;
                     if (!string.IsNullOrEmpty(accessToken) &&
-                        (path.StartsWithSegments("/chat")))
+                        (path.StartsWithSegments("/chat") || path.StartsWithSegments("/notification")))
                     {
                         // Read the token out of the query string
                         context.Token = accessToken;
@@ -113,7 +113,11 @@ public static class ServiceExtenstions
         => service.AddScoped<IUnitOfWork, UnitOfWork>();
 
     public static void AddSignalRConfiguration(this IServiceCollection service)
-        => service.AddSignalR(config => config.EnableDetailedErrors = true);
+        => service.AddSignalR(config =>
+        {
+            config.EnableDetailedErrors = true;
+            config.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10 MB
+        });
 
     public static void AddHangfireConfiguration(this IServiceCollection service, IConfiguration configuration)
     {

@@ -9,21 +9,41 @@ using Mapster;
 namespace Ebret4m4n.API.Hubs;
 
 public class ChatHub
-    (IUnitOfWork unitOfWork) : Hub
+    (IUnitOfWork unitOfWork, IHubContext<NotificationHub> hubContext) : Hub
 {
-    public async Task SendMessage([FromForm] ChatMessageDto message)
+    public async Task SendMessage(ChatMessageDto message)
     {
         var chat = message.Adapt<Chat>();
         chat.SentAt = DateTime.UtcNow;
 
         if (message.File is not null) 
-            chat.File = Utility.UploadChatFile(message.File);
+            chat.File = Utility.SaveBase64File(message.File);
 
         await unitOfWork.ChatRepo.AddAsync(chat);
+
+        string preview;
+
+        if (chat.Message is not null)
+            preview = chat.Message.Length > 50 ? $"{chat.Message.Substring(0, 45)}..." : chat.Message;
+        else
+            preview = "تم ارسال ملف جديد";
+
+        var notification = Utility.CreateNotification("رساله جديده",
+            preview
+            , chat.ReceiverId);
+
+        await unitOfWork.NotificationRepo.AddAsync(notification);
 
         await unitOfWork.SaveAsync();
 
         var chatDto = chat.Adapt<ChatMessageDetailsDto>();
+
+        // Notify the NotificationHub about the new message
+
+        var notificationDto = notification.Adapt<NotificationDto>();
+
+        await hubContext.Clients.User(chat.ReceiverId)
+           .SendAsync("NotificationMessage", notificationDto);
 
         await Clients.Users([chat.SenderId!, chat.ReceiverId!]).SendAsync("ReceiveMessage", chatDto);
     }
