@@ -12,7 +12,7 @@ public static class ScheduleJob
 
         RecurringJob.AddOrUpdate<VaccineReminderService>("vaccine-reminders",
             service => service.CheckVaccineRemindersAndSendNotificationsAsync(),
-            Cron.Monthly(1));
+            Cron.Weekly(DayOfWeek.Tuesday));
     }
  
 }

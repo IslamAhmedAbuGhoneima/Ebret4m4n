@@ -31,10 +31,12 @@ public class OrderController
 
         var orders =
             adminRole == "governorateAdmin" ?
-                unitOfWork.OrderRepo.FindByCondition(order => order.GovernorateAdminStaffId == adminId, false) :
+                unitOfWork.OrderRepo.FindByCondition(order => order.GovernorateAdminStaffId == adminId, false).ToList() :
             adminRole == "cityAdmin" ?
-                unitOfWork.OrderRepo.FindByCondition(order => order.CityAdminStaffId == adminId, false) :
-                unitOfWork.OrderRepo.FindByCondition(order => order.MedicalStaffId == adminId, false);
+                unitOfWork.OrderRepo.FindByCondition(order => order.CityAdminStaffId == adminId, false).ToList() :
+                unitOfWork.OrderRepo.FindByCondition(order => order.MedicalStaffId == adminId, false).ToList();
+
+        orders = orders.OrderByDescending(order => order.DateRequested).ToList();
 
         var ordersDto = orders.Adapt<List<MyOrderDetailsDto>>();
 
@@ -235,6 +237,7 @@ public class OrderController
         var orders =
             unitOfWork.OrderRepo
             .FindByCondition(order => order.MedicalStaff.CityAdminStaffId == adminId, false, ["MedicalStaff"])
+            .OrderByDescending(order => order.DateRequested)
             .Select(order => order.Adapt<HealthCareOrdersDto>())
             .ToList() ?? [];
 
@@ -251,6 +254,7 @@ public class OrderController
 
         var cityOrders =
             unitOfWork.OrderRepo.FindByCondition(order => order.CityAdminStaff.GovernorateAdminId == governorateAdminId, false, ["CityAdminStaff"])
+            .OrderByDescending(order => order.DateRequested)
             .Select(order => order.Adapt<CityOrderDetails>())
             .ToList() ?? [];
 
@@ -265,6 +269,7 @@ public class OrderController
     {
         var governorateOrders =
             unitOfWork.OrderRepo.FindByCondition(order => order.GovernorateAdminStaffId != null, false, ["GovernorateAdminStaff"])
+            .OrderByDescending(order => order.DateRequested)
             .ToList() ?? [];
 
         var governorateOrdersDto = governorateOrders.Adapt<List<GovernorateOrderDto>>();
@@ -297,7 +302,8 @@ public class OrderController
             if (result == 0)
                 return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات"));
 
-            await hubContext.Clients.User(order.GovernorateAdminStaffId!).SendAsync("NotificationMessage");
+            var notificationDto = notification.Adapt<NotificationDto>();
+            await hubContext.Clients.User(notification.UserId).SendAsync("NotificationMessage", notificationDto);
 
             await unitOfWork.CommitTransactionAsync();
 
@@ -317,11 +323,12 @@ public class OrderController
     public async Task<IActionResult> OrgnizerRecivedOrder(Guid orderId)
     {
         var orgnizerHcId = User.FindFirst("healthCareId")!.Value;
+        var adminRole = User.FindFirst(ClaimTypes.Role)!.Value;
 
         await unitOfWork.BeginTransactionAsync();
         try
         {
-            var order = await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, true, ["OrderItems"]);
+            var order = await unitOfWork.OrderRepo.FindAsync(order => order.Id == orderId, true, ["OrderItems", "MedicalStaff"]);
 
             if (order is null)
                 return NotFound(GeneralResponse<string>.FailureResponse("لم يتم العثور على الطلب"));
@@ -347,10 +354,18 @@ public class OrderController
 
             unitOfWork.OrderRepo.Update(order);
 
+            var notification = await Notification(adminRole, order);
+
+            await unitOfWork.NotificationRepo.AddAsync(notification);
+
             var result = await unitOfWork.SaveAsync();
 
             if (result == 0)
                 return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات"));
+
+            var notificationDto = notification.Adapt<NotificationDto>();
+
+            await SendNotification(notification.UserId, notificationDto);
 
             await unitOfWork.CommitTransactionAsync();
         }

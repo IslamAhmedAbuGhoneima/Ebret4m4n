@@ -85,7 +85,7 @@ public static class ServiceExtenstions
                     // If the request is for our SignalR hub...
                     var path = context.HttpContext.Request.Path;
                     if (!string.IsNullOrEmpty(accessToken) &&
-                        (path.StartsWithSegments("/chat")))
+                        (path.StartsWithSegments("/chat") || path.StartsWithSegments("/notification")))
                     {
                         // Read the token out of the query string
                         context.Token = accessToken;
