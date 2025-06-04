@@ -11,13 +11,13 @@ namespace Ebret4m4n.API.Hubs;
 public class ChatHub
     (IUnitOfWork unitOfWork, IHubContext<NotificationHub> hubContext) : Hub
 {
-    public async Task SendMessage([FromForm] ChatMessageDto message)
+    public async Task SendMessage(ChatMessageDto message)
     {
         var chat = message.Adapt<Chat>();
         chat.SentAt = DateTime.UtcNow;
 
         if (message.File is not null) 
-            chat.File = Utility.UploadChatFile(message.File);
+            chat.File = Utility.SaveBase64File(message.File);
 
         await unitOfWork.ChatRepo.AddAsync(chat);
 

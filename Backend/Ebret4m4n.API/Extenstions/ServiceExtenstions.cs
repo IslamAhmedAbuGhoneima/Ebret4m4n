@@ -113,7 +113,11 @@ public static class ServiceExtenstions
         => service.AddScoped<IUnitOfWork, UnitOfWork>();
 
     public static void AddSignalRConfiguration(this IServiceCollection service)
-        => service.AddSignalR(config => config.EnableDetailedErrors = true);
+        => service.AddSignalR(config =>
+        {
+            config.EnableDetailedErrors = true;
+            config.MaximumReceiveMessageSize = 10 * 1024 * 1024; // 10 MB
+        });
 
     public static void AddHangfireConfiguration(this IServiceCollection service, IConfiguration configuration)
     {
