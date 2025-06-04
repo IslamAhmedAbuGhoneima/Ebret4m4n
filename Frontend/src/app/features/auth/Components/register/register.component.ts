@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { passwordMatch } from '../../../../core/customValidation/passwordMatch.validator';
 import { AuthService } from '../../services/auth.service';
 import { Register } from '../../../../core/interfaces/register';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -285,7 +286,8 @@ export class RegisterComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private _AuthService: AuthService
+    private _AuthService: AuthService,
+    private _ToastrService: ToastrService
   ) {}
 
   ngOnInit() {
@@ -339,6 +341,7 @@ export class RegisterComponent implements OnInit {
       const model: Register = this.formatData();
       this._AuthService.signUp(model).subscribe({
         next: (res) => {
+     
           this.router.navigate(['/auth/login']);
         },
         error: (error) => {

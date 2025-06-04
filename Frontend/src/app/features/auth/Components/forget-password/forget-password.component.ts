@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Route, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { MatDialog } from '@angular/material/dialog';
-import { GoToMailComponent } from '../../../../standalone/components/dialogs/go-to-mail/go-to-mail.component';
 
 @Component({
   selector: 'app-forget-password',
@@ -33,12 +32,12 @@ export class ForgetPasswordComponent {
       this.authService.forgetPassword(this.forgetPasswordForm.value).subscribe({
         next: (res) => {
           (document.activeElement as HTMLElement)?.blur();
-          this.matDialog.open(GoToMailComponent, {
-            width: '400px',
-            disableClose: true,
-            data: res,
-            panelClass: 'dialog-goto-mail-container',
-          });
+          // this.matDialog.open(GoToMailComponent, {
+          //   width: '400px',
+          //   disableClose: true,
+          //   data: res,
+          //   panelClass: 'dialog-goto-mail-container',
+          // });
         },
         error: (err) => {
           this.errorMessage = err.error.Message ;

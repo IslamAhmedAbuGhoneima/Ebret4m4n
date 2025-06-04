@@ -1,5 +1,4 @@
 <section class="font-arabic h-screen flex flex-row-reverse">
-  <!-- فقط للدكتور: تظهر القائمة -->
   <aside
     *ngIf="role == 'doctor'"
     class="w-[300px] bg-white border border-r-third-border pt-6"
@@ -18,7 +17,7 @@
                 {{ item.firstName }} {{ item.lastName }}
               </h6>
               <span class="font-normal text-sm">
-                {{ item.message.split(" ").slice(0, 4).join(" ") }}...
+                {{ item.message.split(" ").slice(0, 1).join(" ") }}
               </span>
             </div>
           </div>
@@ -35,7 +34,7 @@
   <div
     *ngIf="selectedUserId || role === 'parent'; else showChatImage"
     class="content flex flex-col bg-[#F9FAFB]"
-    [ngClass]="{ 'flex-1': role === 'doctor', 'w-full': role === 'parent' }"
+    [ngClass]="{ 'flex-1': role === 'doctor', 'w-full': role == 'parent' }"
   >
     <h6
       class="font-bold mb-2 text-lg text-[#151419] w-full px-6 py-4 bg-white border border-b-third-border"
@@ -43,58 +42,103 @@
       {{ role == "parent" ? "د/ " + user : user }}
     </h6>
 
-    <!-- رسائل -->
     <div class="flex-1 overflow-y-auto content-end scroll-container p-2">
-      <ul class="relative flex flex-col gap-0.5 mb-40 text-right">
+      <ul class="relative flex flex-col gap-1 mb-40 text-right">
+        @for (msg of messages; track $index) { @if (msg.File) {
         <li
-          *ngFor="let msg of messages; let i = index"
           [ngClass]="{
             'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
             'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
           }"
-          class="w-fit max-w-[55%] font-semibold rounded-2xl px-5 py-1 relative"
+          class="max-w-[60%] font-normal rounded-md px-3 py-2 relative shadow-md break-words"
         >
-          <!-- [ngClass]="{
-              '': msg.message.length < 10,
-              'flex-col': msg.message.length >= 10
-            }" -->
-          <div class="flex items-end  gap-1"  [ngClass]="{
-                'flex-row-reverse':
-                  msg.senderId === senderId,
-                'flex-row':
-                  msg.senderId !== senderId
-              }">
-            <p class="flex-1">{{ msg.message }}</p>
+          <div
+            class="flex items-end gap-1 relative"
+            [ngClass]="{
+              'flex-row-reverse': msg.senderId === senderId,
+              'flex-row': msg.senderId !== senderId,
+            }"
+          >
+            {{ msg.File.type }}
+            <ng-container [ngSwitch]="msg.File.type">
+              <img
+                *ngSwitchCase="'image'"
+                [src]="msg.File.preview"
+                alt="صورة"
+                class="w-20 h-20 object-cover rounded-md"
+              />
+              <div *ngSwitchCase="'file'" class="flex items-center gap-2">
+                <span class="text-xl">📄</span>
+                <span class="truncate w-40">{{ msg.File.name }}</span>
+              </div>
+            </ng-container>
+            <!-- 
+            <button class="">
+              <img [src]="msg.File" alt="sent image" class="object-cover" />
+            </button> -->
             <small
-              [ngClass]="{
-                'ml-auto text-left':
-                  msg.message.length >= 10 && msg.senderId === senderId,
-                'mr-auto text-right':
-                  msg.message.length >= 10 && msg.senderId !== senderId
-              }"
-              class="text-[10px] text-left"
+              class="text-[10px] whitespace-nowrap absolute right-1 bottom-1"
             >
               {{ formatTime(msg.sentAt) }}
             </small>
           </div>
 
           <img
-            *ngIf="isLastMessageOfSender(i) && msg.senderId == senderId"
+            *ngIf="isLastMessageOfSender($index) && msg.senderId == senderId"
             src="/icons/Union-green.svg"
             alt=""
             class="absolute -right-[10px] bottom-0"
           />
           <img
-            *ngIf="isLastMessageOfSender(i) && msg.senderId !== senderId"
+            *ngIf="isLastMessageOfSender($index) && msg.senderId !== senderId"
             src="/icons/Unio-gray.svg"
             alt=""
             class="absolute -left-[10px] bottom-0"
           />
         </li>
+        } @else{
+        <li
+          [ngClass]="{
+            'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
+            'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
+          }"
+          class="max-w-[60%] font-normal rounded-2xl px-4 py-2 relative shadow-md break-words"
+        >
+          <div
+            class="flex items-end gap-1"
+            [ngClass]="{
+              'flex-row-reverse': msg.senderId === senderId,
+              'flex-row': msg.senderId !== senderId,
+            }"
+          >
+            <p
+              class="flex-1 text-right text-sm font-semibold break-words break-all whitespace-pre-wrap"
+            >
+              {{ msg.message }}
+            </p>
+
+            <small class="text-[10px] whitespace-nowrap">
+              {{ formatTime(msg.sentAt) }}
+            </small>
+          </div>
+
+          <img
+            *ngIf="isLastMessageOfSender($index) && msg.senderId == senderId"
+            src="/icons/Union-green.svg"
+            alt=""
+            class="absolute -right-[10px] bottom-0"
+          />
+          <img
+            *ngIf="isLastMessageOfSender($index) && msg.senderId !== senderId"
+            src="/icons/Unio-gray.svg"
+            alt=""
+            class="absolute -left-[10px] bottom-0"
+          />
+        </li>
+        }}
       </ul>
     </div>
 
-    <!-- إدخال الرسالة -->
     <div
       class="flex items-center gap-3 px-6 h-16 bg-white border border-t-third-border"
     >
@@ -119,14 +163,13 @@
           name="files"
           id="files"
           class="hidden"
+          (change)="getPath($event)"
           (change)="sendFile($event)"
         />
       </div>
     </div>
   </div>
 
-  <!-- صورة الشات تظهر إذا لم يتم اختيار مستخدم -->
-  <!-- ✅ تُعرض الصورة فقط للطبيب ولم يختر مستخدمًا -->
   <ng-template #showChatImage>
     <div
       *ngIf="role === 'doctor'"

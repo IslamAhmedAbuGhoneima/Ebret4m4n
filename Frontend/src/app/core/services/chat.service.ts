@@ -21,7 +21,6 @@ export class ChatService {
       .withUrl('http://localhost:5112/chat', {
         accessTokenFactory: () => {
           const token = this.authService.getToken();
-          console.log('SignalR Token:', token);
           return token || '';
         },
       })

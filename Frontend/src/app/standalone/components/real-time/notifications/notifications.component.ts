@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { Notification } from '../../../../core/interfaces/Notification';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -38,9 +37,4 @@ export class NotificationsComponent {
     });
   }
 
-  private updateUnreadCount() {
-    this.unreadCount = this.notifications.filter(
-      (n: Notification) => !n.isRead
-    ).length;
-  }
 }

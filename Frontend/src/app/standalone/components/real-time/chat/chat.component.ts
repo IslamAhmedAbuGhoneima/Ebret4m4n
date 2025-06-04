@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,11 +25,12 @@ export class ChatComponent implements OnInit {
   selectedUserId: any;
   selectedUser: any;
   showWelcomeImage = true; // ✅ [NEW] تحكم في ظهور صورة البداية للطبيب
-
+  chatImages: any;
   constructor(
     private authService: AuthService,
     private _ChatService: ChatService,
-    private _ActivatedRoute: ActivatedRoute
+    private _ActivatedRoute: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +61,7 @@ export class ChatComponent implements OnInit {
     } else if (this.role === 'doctor') {
       this._ChatService.getUserChatList().subscribe({
         next: (res: any) => {
+          console.log(res);
           this.userChatList = res.data;
           this._ActivatedRoute.paramMap.subscribe((params) => {
             const userId = params.get('userId');
@@ -135,7 +137,6 @@ export class ChatComponent implements OnInit {
         receiverId: receiverId,
         sentAt: new Date().toISOString(),
       };
-
       this.messages.push(msg);
       this._ChatService.sendMessage(msg);
     };
@@ -143,10 +144,11 @@ export class ChatComponent implements OnInit {
   }
   formatTime(dateString: string | null | undefined): string {
     if (!dateString) return '';
+
     const date = new Date(dateString);
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const ampm = hours >= 12 ? 'م' : 'ص';
     hours = hours % 12 || 12;
     return `${hours}:${minutes} ${ampm}`;
   }
@@ -169,5 +171,34 @@ export class ChatComponent implements OnInit {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
+  }
+  getPath(event: Event) {
+    const files = (event.target as HTMLInputElement).files;
+    if (files && files.length > 0) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        this.chatImages.push(file); // إضافة الملف إلى الـ FormArray
+
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          const fileType = file.type;
+
+          if (fileType.startsWith('image/')) {
+            this.chatImages.push({
+              preview: e.target.result,
+              type: 'image',
+            });
+          } else {
+            this.chatImages.push({
+              name: file.name,
+              preview: '📄',
+              type: 'file',
+            });
+          }
+          this.cdr.detectChanges();
+        };
+        reader.readAsDataURL(file);
+      }
+    }
   }
 }

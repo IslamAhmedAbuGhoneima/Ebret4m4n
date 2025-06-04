@@ -24,7 +24,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withFetch(), withInterceptors([])),
     provideAnimationsAsync(),
-    BrowserAnimationsModule,
     provideCharts(withDefaultRegisterables()),
     provideHttpClient(
       withFetch(),
@@ -34,10 +33,16 @@ export const appConfig: ApplicationConfig = {
       BrowserAnimationsModule,
       NgxSpinnerModule,
       ToastrModule.forRoot({
-        timeOut: 10000,
+        timeOut: 1000000,
+        positionClass: 'toast-bottom-center',
+        toastClass: 'ngx-toastr',
         preventDuplicates: true,
         closeButton: true,
         tapToDismiss: true,
+        iconClasses: {
+          // success: '',
+          // error: '',
+        },
       })
     ),
   ],

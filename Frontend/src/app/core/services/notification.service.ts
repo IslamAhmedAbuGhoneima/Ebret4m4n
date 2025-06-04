@@ -4,7 +4,6 @@ import { Observable, Subject, map } from 'rxjs';
 import { AuthService } from '../../features/auth/services/auth.service';
 import * as signalR from '@microsoft/signalr';
 import { environment } from '../../../environments/environment';
-import { Notification } from '../interfaces/Notification';
 import { ToastrService } from 'ngx-toastr';
 @Injectable({
   providedIn: 'root',
@@ -27,7 +26,12 @@ export class NotificationService {
 
     this.hubConnection.on('ReceiveNotification', (data) => {
       this.notificationReceived$.next(data);
-      this.toastr.success(data.message, data.title);
+
+      this.toastr.success(data.message, data.title, {
+        positionClass: 'toast-top-center',
+      }); 
+
+      this.showNotification(data.title, data.message); 
     });
 
     this.startConnection();
@@ -41,6 +45,21 @@ export class NotificationService {
     } catch (err) {
       console.error('Notification SignalR Error:', err);
       setTimeout(() => this.startConnection(), 5000);
+    }
+  }
+
+  requestPermission(): void {
+    if ('Notification' in window) {
+      Notification.requestPermission().then((permission) => {});
+    }
+  }
+
+  showNotification(title: string, body: string): void {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, {
+        body: body,
+        icon: 'assets/icons/notification.png',
+      });
     }
   }
   getUnreadCount(): Observable<any> {

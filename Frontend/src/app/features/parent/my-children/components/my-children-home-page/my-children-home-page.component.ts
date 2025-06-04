@@ -1,7 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { ParentService } from '../../../services/parent.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmComponent } from '../../../../../standalone/components/dialogs/confirm/confirm.component';
 import { Router } from '@angular/router';
 import { PaymentRequiredComponent } from '../../../../../standalone/components/dialogs/payment-required/payment-required.component';
 
@@ -35,23 +34,23 @@ export class MyChildrenHomePageComponent {
   }
   deleteChild(id: any) {
     (document.activeElement as HTMLElement)?.blur();
-    setTimeout(() => {
-      const dialogRef = this.matDialog
-        .open(ConfirmComponent, {
-          width: '690px',
-          panelClass: 'dialog-delete-container',
-          autoFocus: true,
-          restoreFocus: false,
-          disableClose: true,
-          data: [id],
-        })
-        .afterClosed()
-        .subscribe((confirmed) => {
-          if (confirmed) {
-            this.getAllChildren();
-          }
-        });
-    }, 0);
+    // setTimeout(() => {
+    //   const dialogRef = this.matDialog
+    //     .open(ConfirmComponent, {
+    //       width: '690px',
+    //       panelClass: 'dialog-delete-container',
+    //       autoFocus: true,
+    //       restoreFocus: false,
+    //       disableClose: true,
+    //       data: [id],
+    //     })
+    //     .afterClosed()
+    //     .subscribe((confirmed) => {
+    //       if (confirmed) {
+    //         this.getAllChildren();
+    //       }
+    //     });
+    // }, 0);
   }
   onNavigateToVaccineSchedule(id: any) {
     const childId = id;
