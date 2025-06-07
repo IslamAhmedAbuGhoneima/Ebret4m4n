@@ -52,7 +52,6 @@
       <ul class="relative flex flex-col gap-1 mb-40 text-right">
         @for (msg of messages; track $index) { @if (msg.file) {
         <li
-          (click)="selectMessage(msg)"
           [ngClass]="{
             'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
             'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
@@ -107,17 +106,16 @@
             class="absolute -left-[10px] bottom-0"
           />
           <button
-            *ngIf="selectedMessage === msg && canDelete(msg)"
             (click)="deleteMessage(msg)"
             title="حذف الملف"
-            class="text-xs text-red-500 absolute top-1 right-1"
+            class="text-xs text-red-500"
           >
             ❌
           </button>
         </li>
         } @else{
         <li
-          (click)="selectMessage(msg)"
+          
           [ngClass]="{
             'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
             'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
@@ -156,10 +154,9 @@
           />
 
           <button
-            *ngIf="selectedMessage === msg && canDelete(msg)"
             (click)="deleteMessage(msg)"
             title="حذف الملف"
-            class="text-xs text-red-500 absolute top-0.5 -left-4"
+            class="text-xs text-red-500"
           >
             ❌
           </button>

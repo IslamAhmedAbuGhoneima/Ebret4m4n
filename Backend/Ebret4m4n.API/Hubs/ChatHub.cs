@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Contracts;
-using Microsoft.AspNetCore.Mvc;
 using Ebret4m4n.API.Utilites;
 using Mapster;
 

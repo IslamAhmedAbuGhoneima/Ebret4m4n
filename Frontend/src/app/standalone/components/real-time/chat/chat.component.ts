@@ -55,6 +55,22 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.role = this.authService.getRole();
     this.senderId = this.authService.getUserId();
 
+    // Set up message stream subscription for both roles
+    this._ChatService.getMessageStream().subscribe((msg: Message) => {
+      // Only add the message if we're the receiver
+      if (msg.receiverId === this.senderId) {
+        if (this.role === 'parent') {
+          if (msg.senderId === this.selectedDoctorId) {
+            this.messages.push(msg);
+          }
+        } else if (this.role === 'doctor' && this.selectedUserId) {
+          if (msg.senderId === this.selectedUserId) {
+            this.messages.push(msg);
+          }
+        }
+      }
+    });
+
     this._ChatService
       .getDeletedMessageStream()
       .subscribe((messageId: string) => {
@@ -77,15 +93,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
             .subscribe((msgs: any) => {
               this.messages = msgs.data;
             });
-
-          this._ChatService.getMessageStream().subscribe((msg: Message) => {
-            if (
-              msg.senderId === this.selectedDoctorId ||
-              msg.receiverId === this.selectedDoctorId
-            ) {
-              this.messages.push(msg);
-            }
-          });
         },
       });
     } else if (this.role === 'doctor') {
@@ -219,11 +226,15 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     }
   }
   deleteMessage(msg: any): void {
-    const index = this.messages.indexOf(msg);
-    if (index !== -1) {
-      this.messages.splice(index, 1);
-      this._ChatService.deleteMessage(msg.id!);
-    }
+    console.log("deleted clicked");
+    //if (this.canDelete(msg)) {
+      
+      const index = this.messages.indexOf(msg);
+      if (index !== -1) {
+        this.messages.splice(index, 1);
+        this._ChatService.deleteMessage(msg.id!);
+      }
+    //}
   }
 
   canDelete(msg: any): boolean {
@@ -235,10 +246,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     const thMinutes = 30 * 60 * 1000;
     return msg.senderId === this.senderId && now - sentTime < thMinutes;
   }
-  selectMessage(msg: any): void {
-    console.log(msg);
-    if (this.canDelete(msg)) {
-      this.deleteMessage(msg);
-    }
-  }
+  // selectMessage(msg: any): void {
+  //   console.log(msg);
+    
+  // }
 }

@@ -40,9 +40,9 @@ export class DashboardComponent implements OnInit {
     this.userId = this.authService.getUserId();
     this.loadUnreadCount();
 
-    setInterval(() => {
-      this.loadUnreadCount();
-    }, 15000);
+    // setInterval(() => {
+    //   this.loadUnreadCount();
+    // }, 15000);
 
     this._notificationService.getNotificationStream().subscribe(() => {
       this.loadUnreadCount();

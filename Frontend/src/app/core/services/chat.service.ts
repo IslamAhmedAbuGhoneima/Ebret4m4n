@@ -44,6 +44,7 @@ export class ChatService {
 
     // Add message received handler with duplicate prevention
     this.hubConnection.on('ReceiveMessage', (data) => {
+      console.log("recieved message ",data);
       // Only process the message if we're the receiver
       if (data.receiverId === this.currentUserId) {
         this.messageReceived$.next(data);
