@@ -17,9 +17,6 @@ export class NotificationsComponent {
   constructor(private notificationService: NotificationService) {}
 
   ngOnInit(): void {
-    if (!localStorage.getItem('hasVisitedNotifications')) {
-      localStorage.setItem('hasVisitedNotifications', 'true');
-    }
     this.notificationService.getNotifications().subscribe((n: any) => {
       this.notifications = n.data;
     });
@@ -36,5 +33,4 @@ export class NotificationsComponent {
       });
     });
   }
-
 }

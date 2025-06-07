@@ -17,14 +17,17 @@
                 {{ item.firstName }} {{ item.lastName }}
               </h6>
               <span class="font-normal text-sm">
-                {{ item.message.split(" ").slice(0, 1).join(" ") }}
+                {{
+                  item.message == null ? "ملف/صورة" : item.message.slice(0, 20)
+                }}
               </span>
             </div>
           </div>
           <small
+            *ngIf="unreadCount"
             class="block bg-[#099250] text-white rounded-full w-7 h-7 text-center leading-7 text-sm"
           >
-            {{ item.message.length }}
+            {{ unreadCount }}+
           </small>
         </a>
       </li>
@@ -32,9 +35,9 @@
   </aside>
 
   <div
-    *ngIf="selectedUserId || role === 'parent'; else showChatImage"
+    *ngIf="selectedUserId || role == 'parent'; else showChatImage"
     class="content flex flex-col bg-[#F9FAFB]"
-    [ngClass]="{ 'flex-1': role === 'doctor', 'w-full': role == 'parent' }"
+    [ngClass]="{ 'flex-1': role == 'doctor', 'w-full': role == 'parent' }"
   >
     <h6
       class="font-bold mb-2 text-lg text-[#151419] w-full px-6 py-4 bg-white border border-b-third-border"
@@ -42,15 +45,19 @@
       {{ role == "parent" ? "د/ " + user : user }}
     </h6>
 
-    <div class="flex-1 overflow-y-auto content-end scroll-container p-2">
+    <div
+      #scrollContainer
+      class="flex-1 overflow-y-auto content-end scroll-container p-2"
+    >
       <ul class="relative flex flex-col gap-1 mb-40 text-right">
-        @for (msg of messages; track $index) { @if (msg.File) {
+        @for (msg of messages; track $index) { @if (msg.file) {
         <li
+          (click)="selectMessage(msg)"
           [ngClass]="{
             'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
             'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
           }"
-          class="max-w-[60%] font-normal rounded-md px-3 py-2 relative shadow-md break-words"
+          class="max-w-[60%] font-normal rounded-md px-4 py-2 relative shadow-md break-words"
         >
           <div
             class="flex items-end gap-1 relative"
@@ -59,28 +66,32 @@
               'flex-row': msg.senderId !== senderId,
             }"
           >
-            {{ msg.File.type }}
-            <ng-container [ngSwitch]="msg.File.type">
-              <img
-                *ngSwitchCase="'image'"
-                [src]="msg.File.preview"
-                alt="صورة"
-                class="w-20 h-20 object-cover rounded-md"
-              />
-              <div *ngSwitchCase="'file'" class="flex items-center gap-2">
-                <span class="text-xl">📄</span>
-                <span class="truncate w-40">{{ msg.File.name }}</span>
-              </div>
-            </ng-container>
-            <!-- 
-            <button class="">
-              <img [src]="msg.File" alt="sent image" class="object-cover" />
-            </button> -->
+            @if (isImage(msg.file)) {
+            <a [href]="'http://localhost:5112' + msg.file" target="_blank"
+              ><img
+                [src]="'http://localhost:5112' + msg.file"
+                alt="sent image"
+                class="object-cover w-48 h-56"
+            /></a>
             <small
-              class="text-[10px] whitespace-nowrap absolute right-1 bottom-1"
+              [ngClass]="{
+              'right-1': msg.senderId === senderId,
+              'left-1': msg.senderId !== senderId,
+            }"
+              class="text-[10px] whitespace-nowrap absolute text-white bottom-1"
             >
               {{ formatTime(msg.sentAt) }}
             </small>
+
+            }@else {
+
+            <a [href]="'http://localhost:5112' + msg.file" target="_blank">
+              📄 عرض الملف
+            </a>
+            <small class="text-[10px] whitespace-nowrap">
+              {{ formatTime(msg.sentAt) }}
+            </small>
+            }
           </div>
 
           <img
@@ -95,9 +106,18 @@
             alt=""
             class="absolute -left-[10px] bottom-0"
           />
+          <button
+            *ngIf="selectedMessage === msg && canDelete(msg)"
+            (click)="deleteMessage(msg)"
+            title="حذف الملف"
+            class="text-xs text-red-500 absolute top-1 right-1"
+          >
+            ❌
+          </button>
         </li>
         } @else{
         <li
+          (click)="selectMessage(msg)"
           [ngClass]="{
             'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
             'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
@@ -134,7 +154,17 @@
             alt=""
             class="absolute -left-[10px] bottom-0"
           />
+
+          <button
+            *ngIf="selectedMessage === msg && canDelete(msg)"
+            (click)="deleteMessage(msg)"
+            title="حذف الملف"
+            class="text-xs text-red-500 absolute top-0.5 -left-4"
+          >
+            ❌
+          </button>
         </li>
+
         }}
       </ul>
     </div>
@@ -163,7 +193,6 @@
           name="files"
           id="files"
           class="hidden"
-          (change)="getPath($event)"
           (change)="sendFile($event)"
         />
       </div>

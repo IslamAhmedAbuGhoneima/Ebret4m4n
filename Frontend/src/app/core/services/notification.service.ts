@@ -23,18 +23,13 @@ export class NotificationService {
       })
       .withAutomaticReconnect()
       .build();
-      
+
     this.hubConnection.on('NotificationMessage', (data) => {
-      console.log(`from On Metjod `,data);
       this.notificationReceived$.next(data);
-      
       if (data && data.message && data.title) {
-        this.toastr.success(data.message, data.title, {
-          timeOut: 5000,
-          positionClass: 'toast-top-left',
-          closeButton: true,
-          progressBar: true
-        });
+        this.toastr.success(data.message, data.title);
+
+        this.showNotification(data.title, data.message);
       } else {
         console.error('Invalid notification data:', data);
       }
@@ -64,7 +59,6 @@ export class NotificationService {
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, {
         body: body,
-        icon: 'assets/icons/notification.png',
       });
     }
   }
@@ -73,6 +67,7 @@ export class NotificationService {
       .get<any>(`${environment.apiUrl}/Notification/notifications`)
       .pipe(map((response) => response.data));
   }
+
   getNotifications(): Observable<Notification[]> {
     return this.http.get<Notification[]>(
       `${environment.apiUrl}/Notification/notifications`
@@ -80,9 +75,12 @@ export class NotificationService {
   }
 
   markAsRead(id: string): Observable<void> {
-    return this.http.post<void>(
-      `${environment.apiUrl}/Notification/${id}/mark-as-read`,
-      {}
-    );
+    return this.http
+      .post<void>(`${environment.apiUrl}/Notification/${id}/mark-as-read`, {})
+      .pipe(
+        map(() => {
+          this.notificationReceived$.next(true);
+        })
+      );
   }
 }

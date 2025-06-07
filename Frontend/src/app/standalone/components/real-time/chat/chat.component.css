@@ -16,3 +16,7 @@ textarea {
   overflow-y: auto; /* يظهر scrollbar عمودي عند الحاجة */
   resize: none; /* منع تغيير حجم يدوي */
 }
+.selected {
+  border: 1px solid #0b4632;
+  background-color: #e6f0ff;
+}

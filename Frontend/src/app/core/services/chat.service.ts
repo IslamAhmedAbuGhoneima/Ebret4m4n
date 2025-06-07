@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Message } from '../interfaces/message';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '../../features/auth/services/auth.service';
@@ -13,6 +13,8 @@ export class ChatService {
   private hubConnection: signalR.HubConnection;
   private messageReceived$ = new Subject<any>();
   private currentUserId: string | null = null;
+  private messageDeleted$ = new Subject<string>();
+
   constructor(private authService: AuthService, private http: HttpClient) {
     // Get current user ID from token
     this.currentUserId = this.authService.getUserId();
@@ -44,12 +46,14 @@ export class ChatService {
     this.hubConnection.on('ReceiveMessage', (data) => {
       // Only process the message if we're the receiver
       if (data.receiverId === this.currentUserId) {
-        console.log('On SignalR target - Received message as receiver:', data);
         this.messageReceived$.next(data);
       } else if (data.senderId === this.currentUserId) {
         // If we're the sender, just log it but don't emit
-        console.log('On SignalR target - Sent message as sender:', data);
       }
+    });
+
+    this.hubConnection.on('MessageDeleted', (messageId: any) => {
+      this.messageDeleted$.next(messageId);
     });
 
     // Start the connection
@@ -67,7 +71,8 @@ export class ChatService {
     return this.http.get<string>(
       `${environment.apiUrl}/Parent/get-healthcare-doctor-id`
     );
-  } //doctor
+  }
+  //doctor
   getUserChatList(): Observable<any[]> {
     return this.http.get<any[]>(`${environment.apiUrl}/Chat/user-chat-list`);
   }
@@ -93,5 +98,14 @@ export class ChatService {
       .catch((err) => {
         console.error('Error sending message:', err);
       });
+  }
+  public getDeletedMessageStream() {
+    return this.messageDeleted$.asObservable();
+  }
+
+  public deleteMessage(messageId: any) {
+    this.hubConnection
+      .invoke('DeleteMessage', messageId)
+      .catch((err) => console.error('Error deleting message:', err));
   }
 }

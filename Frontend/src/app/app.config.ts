@@ -34,11 +34,12 @@ export const appConfig: ApplicationConfig = {
       NgxSpinnerModule,
       ToastrModule.forRoot({
         timeOut: 1000000,
-        positionClass: 'toast-bottom-center',
+        positionClass: 'toast-top-center',
         toastClass: 'ngx-toastr',
         preventDuplicates: true,
         closeButton: true,
         tapToDismiss: true,
+        progressBar: false,
         iconClasses: {
           // success: '',
           // error: '',

@@ -174,16 +174,33 @@
             *ngIf="hasRole(['parent', 'doctor'])"
             routerLink="/chat"
             routerLinkActive="present"
-            ><img src="/icons/bx_chat.svg" alt="" /><span>الرسائل </span>
+            ><img src="/icons/bx_chat.svg" alt="" /><span>الرسائل </span
+            ><small
+              *ngIf="unreadCountMessages"
+              class="mr-auto text-base rounded-lg w-[41px] h-7 flex justify-center items-center bg-[#B4231B] text-white"
+              >{{ unreadCountMessages }}+</small
+            >
           </a>
         </li>
         <li>
-          <a routerLink="/notifications" routerLinkActive="present"
+          <a
+            *ngIf="
+              hasRole([
+                'parent',
+                'doctor',
+                'organizer',
+                'admin',
+                'governorateAdmin',
+                'cityAdmin'
+              ])
+            "
+            routerLink="/notifications"
+            routerLinkActive="present"
             ><img src="/icons/Frame.svg" alt="" /><span>الإشعارات</span>
             <small
-              *ngIf="unreadCount"
+              *ngIf="unreadCountNotify"
               class="mr-auto text-base rounded-lg w-[41px] h-7 flex justify-center items-center bg-[#B4231B] text-white"
-              >{{ unreadCount }}+</small
+              >{{ unreadCountNotify }}+</small
             ></a
           >
         </li>

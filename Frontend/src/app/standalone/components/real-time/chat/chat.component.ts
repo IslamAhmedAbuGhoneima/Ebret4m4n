@@ -1,10 +1,23 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  AfterViewChecked,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Message } from '../../../../core/interfaces/message';
 import { ChatService } from '../../../../core/services/chat.service';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import {
+  ActivatedRoute,
+  NavigationEnd,
+  Router,
+  RouterModule,
+} from '@angular/router';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-chat',
@@ -13,7 +26,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css',
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, AfterViewChecked {
   role: any;
   messages: any = [];
   user: any;
@@ -24,18 +37,35 @@ export class ChatComponent implements OnInit {
   userChatList: any;
   selectedUserId: any;
   selectedUser: any;
-  showWelcomeImage = true; // ✅ [NEW] تحكم في ظهور صورة البداية للطبيب
+  showWelcomeImage = true;
   chatImages: any;
+  unreadCount: any;
+  @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
+  selectedMessage: Message | null = null;
+
   constructor(
     private authService: AuthService,
     private _ChatService: ChatService,
+    private _NotificationService: NotificationService,
     private _ActivatedRoute: ActivatedRoute,
-    private cdr: ChangeDetectorRef
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.role = this.authService.getRole();
     this.senderId = this.authService.getUserId();
+
+    this._ChatService
+      .getDeletedMessageStream()
+      .subscribe((messageId: string) => {
+        const index = this.messages.findIndex(
+          (msg: Message) => msg.id === messageId
+        );
+        if (index !== -1) {
+          this.messages.splice(index, 1);
+        }
+      });
+
     if (this.role == 'parent') {
       this._ChatService.getHealthcareDoctorId().subscribe({
         next: (res: any) => {
@@ -61,7 +91,6 @@ export class ChatComponent implements OnInit {
     } else if (this.role === 'doctor') {
       this._ChatService.getUserChatList().subscribe({
         next: (res: any) => {
-          console.log(res);
           this.userChatList = res.data;
           this._ActivatedRoute.paramMap.subscribe((params) => {
             const userId = params.get('userId');
@@ -86,15 +115,16 @@ export class ChatComponent implements OnInit {
       .subscribe((msgs: any) => {
         this.messages = msgs.data;
       });
-
-    this._ChatService.getMessageStream().subscribe((msg: Message) => {
-      if (
-        msg.senderId === this.selectedUserId ||
-        msg.receiverId === this.selectedUserId
-      ) {
-        this.messages.push(msg);
-      }
-    });
+    this._ChatService
+      .getDeletedMessageStream()
+      .subscribe((messageId: string) => {
+        const index = this.messages.findIndex(
+          (msg: Message) => msg.id === messageId
+        );
+        if (index !== -1) {
+          this.messages.splice(index, 1);
+        }
+      });
   }
 
   sendMessage(): void {
@@ -104,7 +134,7 @@ export class ChatComponent implements OnInit {
 
       const msg: Message = {
         message: this.newMessage,
-        File: null,
+        file: null,
         senderId: this.senderId,
         receiverId: receiverId,
         sentAt: new Date().toISOString(),
@@ -132,7 +162,7 @@ export class ChatComponent implements OnInit {
 
       const msg: Message = {
         message: null,
-        File: base64File,
+        file: base64File,
         senderId: this.senderId,
         receiverId: receiverId,
         sentAt: new Date().toISOString(),
@@ -172,33 +202,43 @@ export class ChatComponent implements OnInit {
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
   }
-  getPath(event: Event) {
-    const files = (event.target as HTMLInputElement).files;
-    if (files && files.length > 0) {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        this.chatImages.push(file); // إضافة الملف إلى الـ FormArray
+  isImage(filePath: string): boolean {
+    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'];
+    const ext = filePath.split('.').pop()?.toLowerCase();
+    return !!ext && imageExtensions.includes('.' + ext);
+  }
 
-        const reader = new FileReader();
-        reader.onload = (e: any) => {
-          const fileType = file.type;
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
 
-          if (fileType.startsWith('image/')) {
-            this.chatImages.push({
-              preview: e.target.result,
-              type: 'image',
-            });
-          } else {
-            this.chatImages.push({
-              name: file.name,
-              preview: '📄',
-              type: 'file',
-            });
-          }
-          this.cdr.detectChanges();
-        };
-        reader.readAsDataURL(file);
-      }
+  private scrollToBottom(): void {
+    if (this.scrollContainer?.nativeElement) {
+      this.scrollContainer.nativeElement.scrollTop =
+        this.scrollContainer.nativeElement.scrollHeight;
+    }
+  }
+  deleteMessage(msg: any): void {
+    const index = this.messages.indexOf(msg);
+    if (index !== -1) {
+      this.messages.splice(index, 1);
+      this._ChatService.deleteMessage(msg.id!);
+    }
+  }
+
+  canDelete(msg: any): boolean {
+    if (!msg || !msg.sentAt) {
+      return false;
+    }
+    const now = Date.now();
+    const sentTime = new Date(msg.sentAt).getTime();
+    const thMinutes = 30 * 60 * 1000;
+    return msg.senderId === this.senderId && now - sentTime < thMinutes;
+  }
+  selectMessage(msg: any): void {
+    console.log(msg);
+    if (this.canDelete(msg)) {
+      this.deleteMessage(msg);
     }
   }
 }

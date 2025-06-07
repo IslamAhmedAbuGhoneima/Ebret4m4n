@@ -9,7 +9,7 @@ import {
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { count } from 'rxjs';
+import { count, filter } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,7 +23,8 @@ export class DashboardComponent implements OnInit {
   email: string | null = null;
   userName: string | null = null;
   userId: any;
-  unreadCount = 0;
+  unreadCountNotify = 0;
+  unreadCountMessages = 0;
 
   constructor(
     private authService: AuthService,
@@ -32,23 +33,50 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // بيانات المستخدم
     this.role = this.authService.getRole();
     this.email = this.authService.getUserEmail();
     this.userName = this.authService.getUserName();
     this.userId = this.authService.getUserId();
     this.loadUnreadCount();
 
-    this.router.events.subscribe((event) => {
-      if (event instanceof NavigationEnd) {
-        if (
-          event.urlAfterRedirects === '/notifications' &&
-          !this.hasVisitedNotifications
-        ) {
-          this.hasVisitedNotifications = true;
-          this.unreadCount = 0;
-        }
-      }
+    setInterval(() => {
+      this.loadUnreadCount();
+    }, 15000);
+
+    this._notificationService.getNotificationStream().subscribe(() => {
+      this.loadUnreadCount();
     });
+
+    this.router.events
+      .pipe(
+        filter(
+          (event): event is NavigationEnd => event instanceof NavigationEnd
+        )
+      )
+      .subscribe((event: NavigationEnd) => {
+        if (event.urlAfterRedirects === '/chat') {
+          this._notificationService
+            .getUnreadCount()
+            .subscribe((notifications) => {
+              const unreadChatMessages = notifications?.filter(
+                (msg: any) => msg.title === 'رساله جديده' && !msg.isRead
+              );
+
+              if (unreadChatMessages?.length) {
+                let completed = 0;
+                unreadChatMessages.forEach((msg: any) => {
+                  this._notificationService.markAsRead(msg.id).subscribe(() => {
+                    completed++;
+                    if (completed === unreadChatMessages.length) {
+                      this.loadUnreadCount(); 
+                    }
+                  });
+                });
+              }
+            });
+        }
+      });
   }
 
   hasRole(allowedRoles: string[]): boolean {
@@ -58,24 +86,14 @@ export class DashboardComponent implements OnInit {
     this.authService.logout();
   }
   loadUnreadCount() {
-    this.unreadCount = 0;
-
-    // لو دخل قبل كده على صفحة الإشعارات، منجبش عدد غير المقروء
-    if (this.hasVisitedNotifications) return;
-
     this._notificationService.getUnreadCount().subscribe((notifications) => {
-      notifications?.forEach((element: any) => {
-        if (!element.isRead) {
-          this.unreadCount += 1;
-        }
-      });
-    });
-  }
+      const allUnread = notifications?.filter((n: any) => !n.isRead) || [];
+      const unreadMessages = allUnread.filter(
+        (msg: any) => msg.title === 'رساله جديده'
+      );
 
-  get hasVisitedNotifications(): boolean {
-    return localStorage.getItem('hasVisitedNotifications') === 'true';
-  }
-  set hasVisitedNotifications(value: boolean) {
-    localStorage.setItem('hasVisitedNotifications', value.toString());
+      this.unreadCountNotify = allUnread.length;
+      this.unreadCountMessages = unreadMessages.length;
+    });
   }
 }
