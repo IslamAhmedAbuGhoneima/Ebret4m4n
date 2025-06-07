@@ -42,15 +42,10 @@ export class ChatService {
       console.log('SignalR Connection Closed:', error);
     });
 
-    // Add message received handler with duplicate prevention
+    // Add message received handler
     this.hubConnection.on('ReceiveMessage', (data) => {
-      console.log("recieved message ",data);
-      // Only process the message if we're the receiver
-      if (data.receiverId === this.currentUserId) {
-        this.messageReceived$.next(data);
-      } else if (data.senderId === this.currentUserId) {
-        // If we're the sender, just log it but don't emit
-      }
+      console.log("received message ", data);
+      this.messageReceived$.next(data);
     });
 
     this.hubConnection.on('MessageDeleted', (messageId: any) => {
@@ -81,9 +76,9 @@ export class ChatService {
   private async startConnection() {
     try {
       await this.hubConnection.start();
+      console.log('SignalR Connected Successfully');
     } catch (err) {
       console.error('SignalR Connection Error:', err);
-
       setTimeout(() => this.startConnection(), 5000);
     }
   }
@@ -95,7 +90,9 @@ export class ChatService {
   public sendMessage(message: any) {
     this.hubConnection
       .invoke('SendMessage', message)
-      .then(() => {})
+      .then(() => {
+        console.log('Message sent successfully');
+      })
       .catch((err) => {
         console.error('Error sending message:', err);
       });
@@ -104,9 +101,15 @@ export class ChatService {
     return this.messageDeleted$.asObservable();
   }
 
-  public deleteMessage(messageId: any) {
+  public deleteMessage(messageId: string) {
+    console.log('Attempting to delete message:', messageId);
     this.hubConnection
       .invoke('DeleteMessage', messageId)
-      .catch((err) => console.error('Error deleting message:', err));
+      .then(() => {
+        console.log('Message deleted successfully');
+      })
+      .catch((err) => {
+        console.error('Error deleting message:', err);
+      });
   }
 }

@@ -55,19 +55,21 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.role = this.authService.getRole();
     this.senderId = this.authService.getUserId();
 
-    // Set up message stream subscription for both roles
+    // Set up message stream subscription
     this._ChatService.getMessageStream().subscribe((msg: Message) => {
-      // Only add the message if we're the receiver
-      if (msg.receiverId === this.senderId) {
-        if (this.role === 'parent') {
-          if (msg.senderId === this.selectedDoctorId) {
-            this.messages.push(msg);
-          }
-        } else if (this.role === 'doctor' && this.selectedUserId) {
-          if (msg.senderId === this.selectedUserId) {
-            this.messages.push(msg);
-          }
-        }
+      console.log('Message received in component:', msg);
+      
+      // Check if the message is relevant to the current chat
+      const isRelevantMessage = 
+        (this.role === 'parent' && msg.senderId === this.selectedDoctorId) ||
+        (this.role === 'doctor' && msg.senderId === this.selectedUserId) ||
+        (msg.senderId === this.senderId && 
+          ((this.role === 'parent' && msg.receiverId === this.selectedDoctorId) ||
+           (this.role === 'doctor' && msg.receiverId === this.selectedUserId)));
+
+      if (isRelevantMessage) {
+        this.messages.push(msg);
+        this.scrollToBottom();
       }
     });
 
@@ -92,6 +94,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
             .getMessages(this.selectedDoctorId)
             .subscribe((msgs: any) => {
               this.messages = msgs.data;
+              this.scrollToBottom();
             });
         },
       });
@@ -109,6 +112,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       });
     }
   }
+
   selectUser(id: string) {
     this.selectedUserId = id;
     this.selectedUser = this.userChatList.find(
@@ -121,43 +125,54 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       .getMessages(this.selectedUserId)
       .subscribe((msgs: any) => {
         this.messages = msgs.data;
-      });
-    this._ChatService
-      .getDeletedMessageStream()
-      .subscribe((messageId: string) => {
-        const index = this.messages.findIndex(
-          (msg: Message) => msg.id === messageId
-        );
-        if (index !== -1) {
-          this.messages.splice(index, 1);
-        }
+        this.scrollToBottom();
       });
   }
 
-  sendMessage(): void {
-    if (this.newMessage.trim()) {
-      const receiverId =
-        this.role === 'parent' ? this.selectedDoctorId : this.selectedUserId;
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
 
-      const msg: Message = {
-        message: this.newMessage,
-        file: null,
-        senderId: this.senderId,
-        receiverId: receiverId,
-        sentAt: new Date().toISOString(),
-      };
-
-      this.messages.push(msg);
-      this._ChatService.sendMessage(msg);
-      this.newMessage = '';
-
-      if (this.messageInput) {
-        const textarea = this.messageInput.nativeElement as HTMLTextAreaElement;
-        textarea.style.height = 'auto';
-        textarea.style.height = '24px';
+  private scrollToBottom(): void {
+    try {
+      if (this.scrollContainer) {
+        this.scrollContainer.nativeElement.scrollTop = 
+          this.scrollContainer.nativeElement.scrollHeight;
       }
+    } catch (err) {
+      console.error('Error scrolling to bottom:', err);
     }
   }
+
+  sendMessage() {
+    if (!this.newMessage.trim()) return;
+
+    const message = {
+      message: this.newMessage,
+      senderId: this.senderId,
+      receiverId: this.role === 'parent' ? this.selectedDoctorId : this.selectedUserId,
+      sentAt: new Date()
+    };
+
+    this._ChatService.sendMessage(message);
+    this.newMessage = '';
+  }
+
+  deleteMessage(message: Message) {
+    if (!message.id) {
+      console.error('Cannot delete message: No message ID');
+      return;
+    }
+    console.log('Deleting message with ID:', message.id);
+    this._ChatService.deleteMessage(message.id);
+  }
+
+  isLastMessageOfSender(index: number): boolean {
+    const currentMsg = this.messages[index];
+    const nextMsg = this.messages[index + 1];
+    return !nextMsg || currentMsg.senderId !== nextMsg.senderId;
+  }
+
   sendFile(event: any): void {
     const file = event.target.files[0];
     const reader = new FileReader();
@@ -179,6 +194,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     };
     reader.readAsDataURL(file);
   }
+
   formatTime(dateString: string | null | undefined): string {
     if (!dateString) return '';
 
@@ -198,56 +214,15 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this.sendMessage();
   }
 
-  isLastMessageOfSender(index: number): boolean {
-    const currentMsg = this.messages[index];
-    const nextMsg = this.messages[index + 1];
-    return !nextMsg || currentMsg.senderId !== nextMsg.senderId;
-  }
-
   autoResize(event: Event) {
     const textarea = event.target as HTMLTextAreaElement;
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
   }
+
   isImage(filePath: string): boolean {
     const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'];
     const ext = filePath.split('.').pop()?.toLowerCase();
     return !!ext && imageExtensions.includes('.' + ext);
   }
-
-  ngAfterViewChecked() {
-    this.scrollToBottom();
-  }
-
-  private scrollToBottom(): void {
-    if (this.scrollContainer?.nativeElement) {
-      this.scrollContainer.nativeElement.scrollTop =
-        this.scrollContainer.nativeElement.scrollHeight;
-    }
-  }
-  deleteMessage(msg: any): void {
-    console.log("deleted clicked");
-    //if (this.canDelete(msg)) {
-      
-      const index = this.messages.indexOf(msg);
-      if (index !== -1) {
-        this.messages.splice(index, 1);
-        this._ChatService.deleteMessage(msg.id!);
-      }
-    //}
-  }
-
-  canDelete(msg: any): boolean {
-    if (!msg || !msg.sentAt) {
-      return false;
-    }
-    const now = Date.now();
-    const sentTime = new Date(msg.sentAt).getTime();
-    const thMinutes = 30 * 60 * 1000;
-    return msg.senderId === this.senderId && now - sentTime < thMinutes;
-  }
-  // selectMessage(msg: any): void {
-  //   console.log(msg);
-    
-  // }
 }

@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <Folder Include="Files\ChatFiles\" />
+    <Folder Include="Files\ChildReports\" />
   </ItemGroup>
 
 </Project>

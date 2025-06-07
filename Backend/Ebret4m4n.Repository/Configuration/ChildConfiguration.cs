@@ -28,6 +28,7 @@ public class ChildConfiguration : IEntityTypeConfiguration<Child>
 
         builder.Property(p => p.Gender)
             .IsRequired();
+
         builder.Property(p => p.PatientHistory)
             .HasMaxLength(2500);
 

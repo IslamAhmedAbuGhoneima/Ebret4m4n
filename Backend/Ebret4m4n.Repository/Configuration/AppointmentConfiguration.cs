@@ -20,6 +20,11 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
         builder.Property(p => p.VaccineName)
             .HasMaxLength(150);
 
+        builder.HasOne(p => p.Child)
+            .WithMany(p => p.Appointments)
+            .HasForeignKey(p => p.ChildId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         builder.HasIndex(p => p.UserId);
 
         builder.HasIndex(p => p.ChildId);

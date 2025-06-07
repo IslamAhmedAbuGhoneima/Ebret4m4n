@@ -38,10 +38,16 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     [HttpGet("{id}/child")]
     public async Task<IActionResult> GetChild(string id)
     {
-        var child = await unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false, ["Vaccines", "Transaction"]);
+        var child = await unitOfWork.ChildRepo.FindAsync(e => e.Id == id, false, ["Vaccines", "HealthReportFiles", "Transaction"]);
 
         if (child is null)
             return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد طفل مسجل بهذا الرقم : {id}"));
+
+        if((child.PatientHistory is not null || child.HealthReportFiles.Any()) && !child.Vaccines.Any())
+            return BadRequest(GeneralResponse<string>.FailureResponse("تم تحويل هذا الطفل الي طبيب الوحده لمراجعه اماكنيه اعطائه التطعيم"));
+
+        if (child.IsNormal == false)
+            return BadRequest(GeneralResponse<string>.FailureResponse("هذا الطفل مؤجل من التطعيمات"));
 
         if (child.Transaction is null || !child.Transaction.Paid)
             return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم دفع رسوم تسجيل الطفل"));

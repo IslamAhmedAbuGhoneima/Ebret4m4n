@@ -13,6 +13,7 @@ public class Chat
 
     // for uploadFiles
     public string? File { get; set; }
+    public bool IsRead { get; set; } = false;
     #endregion
 
     #region Relations

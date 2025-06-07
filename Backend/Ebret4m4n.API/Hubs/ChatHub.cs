@@ -4,6 +4,8 @@ using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.API.Utilites;
 using Mapster;
+using Ebret4m4n.Repository.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Ebret4m4n.API.Hubs;
 
@@ -45,6 +47,34 @@ public class ChatHub
            .SendAsync("NotificationMessage", notificationDto);
 
         await Clients.Users([chat.SenderId!, chat.ReceiverId!]).SendAsync("ReceiveMessage", chatDto);
+    }
+
+    public async Task MarkMessagesAsRead(Guid senderId)
+    {
+        var receiverId = Context.UserIdentifier;
+
+        // Get the IDs first
+        var readMessageIds = await unitOfWork.ChatRepo
+            .FindByCondition(m => m.SenderId == senderId.ToString()
+                               && m.ReceiverId == receiverId
+                               && !m.IsRead, true)
+            .Select(m => m.Id)
+            .ToListAsync();
+
+        if (readMessageIds.Count == 0)
+            return;
+
+        // Now update those by ID
+        await unitOfWork.ChatRepo
+            .FindByCondition(m => readMessageIds.Contains(m.Id), true)
+            .ExecuteUpdateAsync(setter => setter
+                .SetProperty(m => m.IsRead, true));
+
+        await Clients.User(senderId.ToString()).SendAsync("MessagesMarkedAsRead" , new
+        {
+            ReceiverId = receiverId,
+            MessageIds = readMessageIds
+        });
     }
 
     public async Task DeleteMessage(Guid messageId)

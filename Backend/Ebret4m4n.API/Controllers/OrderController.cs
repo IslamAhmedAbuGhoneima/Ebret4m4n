@@ -88,13 +88,27 @@ public class OrderController
             await unitOfWork.OrderRepo.AddAsync(order);
 
             var orderSaveResult = await unitOfWork.SaveAsync();
+
             if (orderSaveResult == 0)
                 return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ بيانات الطلب"));
+
+            order = await unitOfWork.OrderRepo.GetOrderWithStaffAsync(order.Id);
+
+            if (order is null)
+                return BadRequest(GeneralResponse<string>.FailureResponse("فشل في تحميل بيانات الطلب بعد الحفظ"));
+
+            var notification = await Notification(adminRole, "request", order);
+
+            await unitOfWork.NotificationRepo.AddAsync(notification);
 
             var saveItemsResult = await SaveOrderItems(model, order.Id);
 
             if (!saveItemsResult)
                 return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ عناصر الطلب"));
+
+            var notificationDto = notification.Adapt<NotificationDto>();
+
+            await SendNotification(notification.UserId, notificationDto);
 
             await unitOfWork.CommitTransactionAsync();
 
@@ -144,7 +158,7 @@ public class OrderController
             order.DateApproved = DateTime.UtcNow;
             unitOfWork.OrderRepo.Update(order);
 
-            var notification = await Notification(adminRole, order);
+            var notification = await Notification(adminRole, "recived", order);
 
             await unitOfWork.NotificationRepo.AddAsync(notification);
 
@@ -212,12 +226,12 @@ public class OrderController
 
             var notificationDto = notification.Adapt<NotificationDto>();
 
-            await hubContext.Clients.User(notification.UserId).SendAsync("NotificationMessage", notificationDto);
+            await SendNotification(notification.UserId, notificationDto);
 
             await unitOfWork.CommitTransactionAsync();
 
             var response = GeneralResponse<string>.SuccessResponse("تم قبول الطلب بنجاح جاري الارسال");
-
+            
             return Ok(response);
         }
         catch (Exception ex)
@@ -303,7 +317,7 @@ public class OrderController
                 return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم حفظ البيانات"));
 
             var notificationDto = notification.Adapt<NotificationDto>();
-            await hubContext.Clients.User(notification.UserId).SendAsync("NotificationMessage", notificationDto);
+            await SendNotification(notification.UserId, notificationDto);
 
             await unitOfWork.CommitTransactionAsync();
 
@@ -354,7 +368,7 @@ public class OrderController
 
             unitOfWork.OrderRepo.Update(order);
 
-            var notification = await Notification(adminRole, order);
+            var notification = await Notification(adminRole, "recived", order);
 
             await unitOfWork.NotificationRepo.AddAsync(notification);
 
@@ -380,33 +394,42 @@ public class OrderController
         return NoContent();
     }
 
-
-    private async Task<Notification> Notification(string adminRole, Order order)
+    private async Task<Notification> Notification(string adminRole, string notificationType, Order order)
     {
-        string title = "استلام الطلبات";
+        string title;
         string message;
-        string userId;
+        string userId = string.Empty;
 
-        var notification = new Notification() { Title = title };
+        bool isReceived = notificationType == "recived";
 
-        if (adminRole == "cityAdmin")
+        switch (adminRole)
         {
-            message = $"بنجاح {order.CityAdminStaff.City} تم استلام الطلب الخاص بمدينه";
-            userId = order.CityAdminStaff.GovernorateAdminId;
-        }   
-        else if (adminRole == "governorateAdmin")
-        {
-            var ministryOfHealhAdminId = (await userManager.GetUsersInRoleAsync("admin")).FirstOrDefault()!.Id;
-            message = $"بنجاح {order.GovernorateAdminStaff.Governorate} تم استلام الطلب الخاص بمحافظه";
-            userId = ministryOfHealhAdminId;
+            case "cityAdmin":
+                title = isReceived ? "استلام الطلبات" : "تم تلقي طلب لقاحات جديد";
+                message = isReceived
+                    ? $"تم استلام الطلب الخاص بمدينه {order.CityAdminStaff.City}"
+                    : $"هناك طلب لقاحات جديد من مدينه {order.CityAdminStaff.City}";
+                userId = order.CityAdminStaff.GovernorateAdminId;
+                break;
+
+            case "governorateAdmin":
+                var ministryAdminId = (await userManager.GetUsersInRoleAsync("admin")).FirstOrDefault()?.Id
+                                      ?? throw new InvalidOperationException("Admin user not found.");
+                title = isReceived ? "استلام الطلبات" : "تم تلقي طلب لقاحات جديد";
+                message = isReceived
+                    ? $"تم استلام الطلب الخاص بمحافظه {order.GovernorateAdminStaff.Governorate}"
+                    : $"هناك طلب لقاحات جديد من محافظه {order.GovernorateAdminStaff.Governorate}";
+                userId = ministryAdminId;
+                break;
+
+            default:
+                title = isReceived ? "استلام الطلبات" : "تم تلقي طلب لقاحات جديد";
+                message = isReceived
+                    ? $"تم استلام الطلب الخاص بالوحد الصحيه {order.MedicalStaff.HealthCareCenterName}"
+                    : $"هناك طلب لقاحات جديد من الوحد الصحيه {order.MedicalStaff.HealthCareCenterName}";
+                userId = order.MedicalStaff.CityAdminStaffId;
+                break;
         }
-        else
-        {
-            message = $"بنجاح {order.MedicalStaff.HealthCareCenterName} تم استلام الطلب الخاص بالوحد الصحيه";
-            userId = order.MedicalStaff.CityAdminStaffId;
-        }
-
-        notification.Message = message;
 
         return Utility.CreateNotification(title, message, userId);
     }
