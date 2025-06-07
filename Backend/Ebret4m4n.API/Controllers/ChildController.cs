@@ -43,14 +43,16 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
         if (child is null)
             return NotFound(GeneralResponse<string>.FailureResponse($"لا يوجد طفل مسجل بهذا الرقم : {id}"));
 
-        if((child.PatientHistory is not null || child.HealthReportFiles.Any()) && !child.Vaccines.Any())
-            return BadRequest(GeneralResponse<string>.FailureResponse("تم تحويل هذا الطفل الي طبيب الوحده لمراجعه اماكنيه اعطائه التطعيم"));
-
         if (child.IsNormal == false)
-            return BadRequest(GeneralResponse<string>.FailureResponse("هذا الطفل مؤجل من التطعيمات"));
+            return BadRequest(new { Success = false, ErrorNumber = 1, Message = "هذا الطفل مؤجل من التطعيمات" });
+
+
+        if ((child.PatientHistory is not null || child.HealthReportFiles.Any()) && !child.Vaccines.Any())
+            return BadRequest(new { Success = false, ErrorNumber = 2, Message = "تم تحويل هذا الطفل الي طبيب الوحده لمراجعه اماكنيه اعطائه التطعيم" });
 
         if (child.Transaction is null || !child.Transaction.Paid)
-            return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم دفع رسوم تسجيل الطفل"));
+            return BadRequest(new { Success = false, ErrorNumber = 3, Message = "لم يتم دفع رسوم تسجيل هذا الطفل" });
+
 
         var childDto = child.Adapt<ChildDto>();
 
