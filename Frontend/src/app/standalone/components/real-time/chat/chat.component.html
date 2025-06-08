@@ -120,8 +120,12 @@
           </span>
 
           <button
-            *ngIf="msg.senderId === senderId && canDelete(msg)"
-            (click)="deleteMessage(msg)"
+            *ngIf="
+              selectedMessage === msg &&
+              canDelete(msg) &&
+              msg.senderId === senderId
+            "
+            (click)="removeMessage(msg)"
             title="حذف الملف"
             class="text-[10px] text-red-500 absolute top-0 -left-3.5"
           >
@@ -180,8 +184,12 @@
           </span>
 
           <button
-            *ngIf="msg.senderId === senderId && canDelete(msg)"
-            (click)="deleteMessage(msg)"
+            *ngIf="
+              selectedMessage === msg &&
+              canDelete(msg) &&
+              msg.senderId === senderId
+            "
+            (click)="removeMessage(msg)"
             title="حذف الملف"
             class="text-[10px] text-red-500 absolute top-0 -left-3.5"
           >

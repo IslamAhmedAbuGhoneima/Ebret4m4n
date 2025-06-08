@@ -68,19 +68,38 @@ export class MyChildrenHomePageComponent {
         ]);
       },
       error: (error) => {
-
-
-
-        // console.log(error.error.message);
-        // this.matDialog.open(PaymentRequiredComponent, {
-        //   width: '400px',
-        //   disableClose: true,
-        //   data: childId,
-        //   panelClass: 'dialog-payment-container',
-        // });
-
-
-        
+        const errorNumber = error.error?.errorNumber;
+        const message = error.error?.message;
+        if (errorNumber === 1) {
+          Swal.fire({
+            title: message,
+            text: 'أذهب للتواصل مع طبيبك للمراجعه',
+            icon: 'success',
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonColor: '#127453',
+            cancelButtonColor: '#B4231B',
+            confirmButtonText: 'تواصل',
+            cancelButtonText: 'إغلاق',
+            allowOutsideClick: false,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.router.navigate(['/chat']);
+            }
+          });
+        } else if (errorNumber === 2) {
+          // ✅ تم تحويل الطفل إلى طبيب الوحدة
+          // نفذ سيناريو مخصص (مثلاً: عرض تنبيه أو إعادة توجيه)
+        } else if (errorNumber === 3) {
+          this.matDialog.open(PaymentRequiredComponent, {
+            width: '400px',
+            disableClose: true,
+            data: childId,
+            panelClass: 'dialog-payment-container',
+          });
+        } else {
+          // ⚠️ خطأ غير متوقع
+        }
       },
     });
   }

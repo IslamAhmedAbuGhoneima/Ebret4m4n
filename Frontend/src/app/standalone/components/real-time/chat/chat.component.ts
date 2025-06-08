@@ -268,7 +268,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     const thMinutes = 10 * 60 * 1000;
     return msg.senderId === this.senderId && now - sentTime < thMinutes;
   }
-  deleteMessage(msg: any): void {
+  removeMessage(msg: any): void {
     const index = this.messages.indexOf(msg);
     if (index !== -1) {
       this.messages.splice(index, 1);
