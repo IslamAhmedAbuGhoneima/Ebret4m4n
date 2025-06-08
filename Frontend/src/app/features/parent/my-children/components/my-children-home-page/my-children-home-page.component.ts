@@ -70,11 +70,11 @@ export class MyChildrenHomePageComponent {
       error: (error) => {
         const errorNumber = error.error?.errorNumber;
         const message = error.error?.message;
-        if (errorNumber === 1) {
+        if (errorNumber === 1 || errorNumber === 2) {
           Swal.fire({
             title: message,
             text: 'أذهب للتواصل مع طبيبك للمراجعه',
-            icon: 'success',
+            icon: 'info',
             showCancelButton: true,
             showConfirmButton: true,
             confirmButtonColor: '#127453',
@@ -87,9 +87,6 @@ export class MyChildrenHomePageComponent {
               this.router.navigate(['/chat']);
             }
           });
-        } else if (errorNumber === 2) {
-          // ✅ تم تحويل الطفل إلى طبيب الوحدة
-          // نفذ سيناريو مخصص (مثلاً: عرض تنبيه أو إعادة توجيه)
         } else if (errorNumber === 3) {
           this.matDialog.open(PaymentRequiredComponent, {
             width: '400px',

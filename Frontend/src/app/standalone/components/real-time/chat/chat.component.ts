@@ -18,6 +18,7 @@ import {
   RouterModule,
 } from '@angular/router';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -59,6 +60,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     // Set up message stream subscription for both roles
     this._ChatService.getMessageStream().subscribe((msg: Message) => {
       // Only add the message if we're the receiver
+
       if (msg.receiverId === this.senderId) {
         if (this.role === 'parent') {
           if (msg.senderId === this.selectedDoctorId) {
@@ -92,8 +94,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
       });
       this.messages = [...this.messages];
-
-      this.cdr.detectChanges();
     });
 
     if (this.role == 'parent') {
@@ -105,8 +105,10 @@ export class ChatComponent implements OnInit, AfterViewChecked {
           this._ChatService
             .getMessages(this.selectedDoctorId)
             .subscribe((msgs: any) => {
-              this.messages = msgs.data;
-
+              this.messages = msgs.data.map((msg: any) => ({
+                ...msg,
+                sentAt: new Date(msg.sentAt),
+              }));
               this._ChatService.markMessagesAsRead(this.selectedDoctorId);
             });
         },
@@ -136,7 +138,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     this._ChatService
       .getMessages(this.selectedUserId)
       .subscribe((msgs: any) => {
-        this.messages = msgs.data;
+        this.messages = msgs.data.map((msg: any) => ({
+          ...msg,
+          sentAt: new Date(msg.sentAt),
+        }));
+
         this.scrollToBottom();
 
         this._ChatService
@@ -258,21 +264,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         this.scrollContainer.nativeElement.scrollHeight;
     }
   }
-
-  canDelete(msg: any): boolean {
-    if (!msg || !msg.sentAt) {
-      return false;
-    }
-    const now = Date.now();
-    const sentTime = new Date(msg.sentAt).getTime();
-    const thMinutes = 10 * 60 * 1000;
-    return msg.senderId === this.senderId && now - sentTime < thMinutes;
-  }
-  removeMessage(msg: any): void {
+  deleteMessage(msg: any): void {
     const index = this.messages.indexOf(msg);
     if (index !== -1) {
       this.messages.splice(index, 1);
-      this._ChatService.deleteMessage(msg.id);
+      this._ChatService.deleteMessage(msg.id!);
     }
   }
 }
