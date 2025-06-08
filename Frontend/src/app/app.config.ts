@@ -18,6 +18,8 @@ import { loaderInterceptor } from './core/interceptors/loader.interceptor';
 import { refreshTokenInterceptor } from './core/interceptors/refresh-token.interceptor';
 import { NgxSpinnerModule } from 'ngx-spinner';
 import { ToastrModule } from 'ngx-toastr';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -33,18 +35,19 @@ export const appConfig: ApplicationConfig = {
       BrowserAnimationsModule,
       NgxSpinnerModule,
       ToastrModule.forRoot({
-        timeOut: 1000000,
+        timeOut: 5000,
         positionClass: 'toast-top-center',
         toastClass: 'ngx-toastr',
         preventDuplicates: true,
+        countDuplicates: true,
         closeButton: true,
         tapToDismiss: true,
         progressBar: false,
         iconClasses: {
-          // success: '',
-          // error: '',
+          success: ' ',
         },
-      })
+      }),
+      SweetAlert2Module.forRoot()
     ),
   ],
 };

@@ -13,10 +13,10 @@ export class ChatService {
   private hubConnection: signalR.HubConnection;
   private messageReceived$ = new Subject<any>();
   private currentUserId: string | null = null;
-  private messageDeleted$ = new Subject<string>();
+  private messageDeleted$ = new Subject<any>();
+  private messagesRead$ = new Subject<any>();
 
   constructor(private authService: AuthService, private http: HttpClient) {
-    // Get current user ID from token
     this.currentUserId = this.authService.getUserId();
 
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -42,16 +42,22 @@ export class ChatService {
       console.log('SignalR Connection Closed:', error);
     });
 
-    // Add message received handler
+    // Add message received handler with duplicate prevention
     this.hubConnection.on('ReceiveMessage', (data) => {
-      console.log("received message ", data);
-      this.messageReceived$.next(data);
+      // Only process the message if we're the receiver
+      if (data.receiverId === this.currentUserId) {
+        this.messageReceived$.next(data);
+      } else if (data.senderId === this.currentUserId) {
+        // If we're the sender, just log it but don't emit
+      }
     });
 
     this.hubConnection.on('MessageDeleted', (messageId: any) => {
       this.messageDeleted$.next(messageId);
     });
-
+    this.hubConnection.on('MessagesMarkedAsRead', (data) => {
+      this.messagesRead$.next(data);
+    });
     // Start the connection
     this.startConnection();
   }
@@ -76,9 +82,9 @@ export class ChatService {
   private async startConnection() {
     try {
       await this.hubConnection.start();
-      console.log('SignalR Connected Successfully');
     } catch (err) {
       console.error('SignalR Connection Error:', err);
+
       setTimeout(() => this.startConnection(), 5000);
     }
   }
@@ -90,26 +96,26 @@ export class ChatService {
   public sendMessage(message: any) {
     this.hubConnection
       .invoke('SendMessage', message)
-      .then(() => {
-        console.log('Message sent successfully');
-      })
+      .then(() => {})
       .catch((err) => {
         console.error('Error sending message:', err);
       });
   }
+
+  public deleteMessage(messageId: any) {
+    this.hubConnection
+      .invoke('DeleteMessage', messageId)
+      .catch((err) => console.error('Error deleting message:', err));
+  }
   public getDeletedMessageStream() {
     return this.messageDeleted$.asObservable();
   }
-
-  public deleteMessage(messageId: string) {
-    console.log('Attempting to delete message:', messageId);
-    this.hubConnection
-      .invoke('DeleteMessage', messageId)
-      .then(() => {
-        console.log('Message deleted successfully');
-      })
-      .catch((err) => {
-        console.error('Error deleting message:', err);
-      });
+  public markMessagesAsRead(senderId: string): Promise<void> {
+    return this.hubConnection
+      .invoke('MarkMessagesAsRead', senderId)
+      .catch((err) => console.error('Error marking messages as read:', err));
+  }
+  public getReadMessageStream() {
+    return this.messagesRead$.asObservable();
   }
 }

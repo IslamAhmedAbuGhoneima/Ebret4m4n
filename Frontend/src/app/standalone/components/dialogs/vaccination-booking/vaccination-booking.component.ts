@@ -8,6 +8,8 @@ import { MatRadioModule } from '@angular/material/radio';
 import { ParentService } from '../../../../features/parent/services/parent.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vaccination-booking',
@@ -24,7 +26,8 @@ export class VaccinationBookingComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private _ParentService: ParentService,
-    private dialog: MatDialogRef<VaccinationBookingComponent>
+    private dialog: MatDialogRef<VaccinationBookingComponent>,
+    private router: Router
   ) {}
   ngOnInit(): void {
     this._ParentService.getBookingDates().subscribe({
@@ -87,12 +90,30 @@ export class VaccinationBookingComponent implements OnInit {
     };
   }
   deleteAppointment() {
-    this._ParentService.appointmentCancel(this.data.appointmentId).subscribe({
-      next: (res) => {},
-      error: (err) => {
-        this.errorMessage = err.error.message;
-      },
-    });
+    // Swal.fire({
+    //   title: 'هل تريد ألغاء الحجز؟',
+    //   text: 'سيحذف هذا موعد الحجز الذي أضافته من قبل ',
+    //   icon: 'error',
+    //   showCancelButton: true,
+    //   confirmButtonColor: '#127453',
+    //   cancelButtonColor: '#B4231B',
+    //   confirmButtonText: 'نعم , حذف',
+    //   cancelButtonText: 'لا',
+    //   allowOutsideClick: false,
+    // }).then((result) => {
+    //   if (result.isConfirmed) {
+        this._ParentService
+          .appointmentCancel(this.data.appointmentId)
+          .subscribe({
+            next: (res) => {
+              this.close();
+            },
+            error: (err) => {
+              this.errorMessage = err.error.message;
+            },
+          });
+      // }
+    // });
   }
   close() {
     this.dialog.close();

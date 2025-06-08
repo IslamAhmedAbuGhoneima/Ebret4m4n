@@ -5,6 +5,7 @@ import { passwordMatch } from '../../../../core/customValidation/passwordMatch.v
 import { AuthService } from '../../services/auth.service';
 import { Register } from '../../../../core/interfaces/register';
 import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -341,8 +342,20 @@ export class RegisterComponent implements OnInit {
       const model: Register = this.formatData();
       this._AuthService.signUp(model).subscribe({
         next: (res) => {
-     
-          this.router.navigate(['/auth/login']);
+          Swal.fire({
+            title: 'تم إنشاء حسابك بنجاح',
+            text: 'يمكنك الآن تسجيل الدخول إلى حسابك.',
+            icon: 'success',
+            showCancelButton: false,
+            confirmButtonColor: '#127453',
+            cancelButtonColor: '#B4231B',
+            confirmButtonText: 'تسجيل الدخول',
+            allowOutsideClick: false,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this.router.navigate(['/auth/login']);
+            }
+          });
         },
         error: (error) => {
           this.errorMessage = error.error.Message;

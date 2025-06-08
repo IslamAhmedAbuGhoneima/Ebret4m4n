@@ -24,10 +24,10 @@
             </div>
           </div>
           <small
-            *ngIf="unreadCount"
+            *ngIf="item.unreadCount"
             class="block bg-[#099250] text-white rounded-full w-7 h-7 text-center leading-7 text-sm"
           >
-            {{ unreadCount }}+
+            {{ item.unreadCount }}
           </small>
         </a>
       </li>
@@ -66,12 +66,14 @@
             }"
           >
             @if (isImage(msg.file)) {
-            <a [href]="'http://localhost:5112' + msg.file" target="_blank"
-              ><img
-                [src]="'http://localhost:5112' + msg.file"
+            <a [href]="getFileUrl(msg.file)" target="_blank">
+              <img
+                [src]="getFileUrl(msg.file)"
                 alt="sent image"
                 class="object-cover w-48 h-56"
-            /></a>
+              />
+            </a>
+
             <small
               [ngClass]="{
               'right-1': msg.senderId === senderId,
@@ -84,9 +86,7 @@
 
             }@else {
 
-            <a [href]="'http://localhost:5112' + msg.file" target="_blank">
-              📄 عرض الملف
-            </a>
+            <a [href]="getFileUrl(msg.file)" target="_blank"> 📄 عرض الملف </a>
             <small class="text-[10px] whitespace-nowrap">
               {{ formatTime(msg.sentAt) }}
             </small>
@@ -105,22 +105,36 @@
             alt=""
             class="absolute -left-[10px] bottom-0"
           />
+
+          <span
+            *ngIf="msg.senderId == senderId && !msg.isRead"
+            class="absolute left-2.5 -bottom-0.5 text-gray-400 text-[10px]"
+          >
+            ✓
+          </span>
+          <span
+            *ngIf="msg.senderId == senderId && msg.isRead"
+            class="absolute left-3 -bottom-0.5 text-gray-400 text-[10px]"
+          >
+            ✓✓
+          </span>
+
           <button
+            *ngIf="msg.senderId === senderId && canDelete(msg)"
             (click)="deleteMessage(msg)"
             title="حذف الملف"
-            class="text-xs text-red-500"
+            class="text-[10px] text-red-500 absolute top-0 -left-3.5"
           >
             ❌
           </button>
         </li>
         } @else{
         <li
-          
           [ngClass]="{
             'ml-auto bg-primary-bg text-white ': msg.senderId === senderId,
             'mr-auto text-black bg-[#EAEDEB]': msg.senderId !== senderId
           }"
-          class="max-w-[60%] font-normal rounded-2xl px-4 py-2 relative shadow-md break-words"
+          class="max-w-[60%] font-normal rounded-2xl px-6 py-2 relative shadow-md break-words"
         >
           <div
             class="flex items-end gap-1"
@@ -152,17 +166,30 @@
             alt=""
             class="absolute -left-[10px] bottom-0"
           />
+          <span
+            *ngIf="msg.senderId == senderId && !msg.isRead"
+            class="absolute left-2.5 -bottom-0.5 text-gray-400 text-[10px]"
+          >
+            ✓
+          </span>
+          <span
+            *ngIf="msg.senderId == senderId && msg.isRead"
+            class="absolute left-3 -bottom-0.5 text-gray-400 text-[10px]"
+          >
+            ✓✓
+          </span>
 
           <button
+            *ngIf="msg.senderId === senderId && canDelete(msg)"
             (click)="deleteMessage(msg)"
             title="حذف الملف"
-            class="text-xs text-red-500"
+            class="text-[10px] text-red-500 absolute top-0 -left-3.5"
           >
             ❌
           </button>
         </li>
 
-        }}
+        } }
       </ul>
     </div>
 

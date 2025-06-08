@@ -154,15 +154,65 @@ input[type="password"]::-webkit-textfield-decoration-container {
   opacity: 0;
   pointer-events: none;
 }
-.toast-success {
-  background-color: #127453 !important;
+.ngx-toastr {
+  border: 2.5px solid #06291d !important;
+  background-color: #fff !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-  margin-top: 10px !important;
+  margin-top: 20px !important;
   width: 350px !important;
   max-width: 90vw !important;
   border-radius: 8px !important;
   padding: 12px 16px !important;
-  color: white !important;
+  color: #06291d !important;
   font-family: "Cairo", sans-serif !important;
   font-size: 14px !important;
+  position: relative;
+}
+.ngx-toastr .toast-close-button {
+  color: #06291d !important;
+  font-size: 30px;
+  width: fit-content;
+  opacity: 1 !important;
+  position: absolute;
+  top: -3px;
+  right: calc(100% - 30px);
+}
+
+/* Success */
+.swal2-icon.swal2-success {
+  border-color: #127453 !important; /* لون الدائرة الخارجية */
+  color: #127453 !important; /* اللون العام */
+}
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: #127453 !important; /* الدائرة */
+}
+.swal2-icon.swal2-success .swal2-success-line-tip,
+.swal2-icon.swal2-success .swal2-success-line-long {
+  background-color: #127453 !important; /* خطوط علامة الصح */
+}
+
+/* Error */
+.swal2-icon.swal2-error {
+  border-color: #b4231b !important;
+  color: #b4231b !important;
+}
+.swal2-icon.swal2-error .swal2-x-mark-line {
+  background-color: #b4231b !important;
+}
+.swal2-icon.swal2-error .swal2-x-mark-line-left,
+.swal2-icon.swal2-error .swal2-x-mark-line-right {
+  background-color: #b4231b !important; /* لون خطوط الـ X */
+}
+/* Info */
+.swal2-icon.swal2-info {
+  color: #8e98a8 !important;
+  border-color: #8e98a8 !important;
+}
+
+.swal2-title {
+  padding: 0px !important; /* عدل القيم حسب اللي يناسبك */
+}
+.swal2-html-container {
+  padding-top: 0px !important; /* تعديل padding النص (body) */
+  padding-bottom: 0px !important; /* تعديل padding النص (body) */
 }

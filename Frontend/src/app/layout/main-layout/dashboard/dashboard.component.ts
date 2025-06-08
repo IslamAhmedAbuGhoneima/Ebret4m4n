@@ -33,16 +33,11 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // بيانات المستخدم
     this.role = this.authService.getRole();
     this.email = this.authService.getUserEmail();
     this.userName = this.authService.getUserName();
     this.userId = this.authService.getUserId();
     this.loadUnreadCount();
-
-    // setInterval(() => {
-    //   this.loadUnreadCount();
-    // }, 15000);
 
     this._notificationService.getNotificationStream().subscribe(() => {
       this.loadUnreadCount();
@@ -69,7 +64,7 @@ export class DashboardComponent implements OnInit {
                   this._notificationService.markAsRead(msg.id).subscribe(() => {
                     completed++;
                     if (completed === unreadChatMessages.length) {
-                      this.loadUnreadCount(); 
+                      this.loadUnreadCount();
                     }
                   });
                 });

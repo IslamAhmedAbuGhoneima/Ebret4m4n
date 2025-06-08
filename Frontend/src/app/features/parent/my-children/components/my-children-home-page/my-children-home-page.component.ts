@@ -3,6 +3,7 @@ import { ParentService } from '../../../services/parent.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { PaymentRequiredComponent } from '../../../../../standalone/components/dialogs/payment-required/payment-required.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-my-children-home-page',
@@ -33,25 +34,29 @@ export class MyChildrenHomePageComponent {
     });
   }
   deleteChild(id: any) {
-    (document.activeElement as HTMLElement)?.blur();
-    // setTimeout(() => {
-    //   const dialogRef = this.matDialog
-    //     .open(ConfirmComponent, {
-    //       width: '690px',
-    //       panelClass: 'dialog-delete-container',
-    //       autoFocus: true,
-    //       restoreFocus: false,
-    //       disableClose: true,
-    //       data: [id],
-    //     })
-    //     .afterClosed()
-    //     .subscribe((confirmed) => {
-    //       if (confirmed) {
-    //         this.getAllChildren();
-    //       }
-    //     });
-    // }, 0);
+    Swal.fire({
+      title: 'هل تريد حذف هذا الطفل ؟',
+      text: '',
+      icon: 'error',
+      showCancelButton: true,
+      confirmButtonColor: '#127453',
+      cancelButtonColor: '#B4231B',
+      confirmButtonText: 'نعم',
+      cancelButtonText: 'لا',
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this._ParentService.deleteChild(id).subscribe({
+          next: (res) => {
+            this.getAllChildren();
+            Swal.close();
+          },
+          error: (err) => {},
+        });
+      }
+    });
   }
+
   onNavigateToVaccineSchedule(id: any) {
     const childId = id;
     (document.activeElement as HTMLElement)?.blur();
@@ -63,12 +68,19 @@ export class MyChildrenHomePageComponent {
         ]);
       },
       error: (error) => {
-        this.matDialog.open(PaymentRequiredComponent, {
-          width: '400px',
-          disableClose: true,
-          data: childId,
-          panelClass: 'dialog-payment-container',
-        });
+
+
+
+        // console.log(error.error.message);
+        // this.matDialog.open(PaymentRequiredComponent, {
+        //   width: '400px',
+        //   disableClose: true,
+        //   data: childId,
+        //   panelClass: 'dialog-payment-container',
+        // });
+
+
+        
       },
     });
   }

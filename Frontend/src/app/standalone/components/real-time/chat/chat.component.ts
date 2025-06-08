@@ -39,7 +39,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   selectedUser: any;
   showWelcomeImage = true;
   chatImages: any;
-  unreadCount: any;
+
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
   selectedMessage: Message | null = null;
 
@@ -48,28 +48,27 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     private _ChatService: ChatService,
     private _NotificationService: NotificationService,
     private _ActivatedRoute: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.role = this.authService.getRole();
     this.senderId = this.authService.getUserId();
 
-    // Set up message stream subscription
+    // Set up message stream subscription for both roles
     this._ChatService.getMessageStream().subscribe((msg: Message) => {
-      console.log('Message received in component:', msg);
-      
-      // Check if the message is relevant to the current chat
-      const isRelevantMessage = 
-        (this.role === 'parent' && msg.senderId === this.selectedDoctorId) ||
-        (this.role === 'doctor' && msg.senderId === this.selectedUserId) ||
-        (msg.senderId === this.senderId && 
-          ((this.role === 'parent' && msg.receiverId === this.selectedDoctorId) ||
-           (this.role === 'doctor' && msg.receiverId === this.selectedUserId)));
-
-      if (isRelevantMessage) {
-        this.messages.push(msg);
-        this.scrollToBottom();
+      // Only add the message if we're the receiver
+      if (msg.receiverId === this.senderId) {
+        if (this.role === 'parent') {
+          if (msg.senderId === this.selectedDoctorId) {
+            this.messages.push(msg);
+          }
+        } else if (this.role === 'doctor' && this.selectedUserId) {
+          if (msg.senderId === this.selectedUserId) {
+            this.messages.push(msg);
+          }
+        }
       }
     });
 
@@ -84,6 +83,19 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         }
       });
 
+    this._ChatService.getReadMessageStream().subscribe((data: any) => {
+      const { ReceiverId, MessageIds } = data;
+
+      this.messages.forEach((msg: any) => {
+        if (MessageIds.includes(msg.id)) {
+          msg.isRead = true;
+        }
+      });
+      this.messages = [...this.messages];
+
+      this.cdr.detectChanges();
+    });
+
     if (this.role == 'parent') {
       this._ChatService.getHealthcareDoctorId().subscribe({
         next: (res: any) => {
@@ -94,7 +106,8 @@ export class ChatComponent implements OnInit, AfterViewChecked {
             .getMessages(this.selectedDoctorId)
             .subscribe((msgs: any) => {
               this.messages = msgs.data;
-              this.scrollToBottom();
+
+              this._ChatService.markMessagesAsRead(this.selectedDoctorId);
             });
         },
       });
@@ -102,6 +115,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       this._ChatService.getUserChatList().subscribe({
         next: (res: any) => {
           this.userChatList = res.data;
+
           this._ActivatedRoute.paramMap.subscribe((params) => {
             const userId = params.get('userId');
             if (userId) {
@@ -112,7 +126,6 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       });
     }
   }
-
   selectUser(id: string) {
     this.selectedUserId = id;
     this.selectedUser = this.userChatList.find(
@@ -120,28 +133,23 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     );
     this.user = `${this.selectedUser.firstName} ${this.selectedUser.lastName}`;
     this.showWelcomeImage = false;
-
     this._ChatService
       .getMessages(this.selectedUserId)
       .subscribe((msgs: any) => {
         this.messages = msgs.data;
         this.scrollToBottom();
+
+        this._ChatService
+          .markMessagesAsRead(this.selectedUserId)
+          .then(() => {
+            this._ChatService.getUserChatList().subscribe((res: any) => {
+              this.userChatList = res.data;
+            });
+          })
+          .catch((err: any) =>
+            console.error('Error marking messages as read:', err)
+          );
       });
-  }
-
-  ngAfterViewChecked() {
-    this.scrollToBottom();
-  }
-
-  private scrollToBottom(): void {
-    try {
-      if (this.scrollContainer) {
-        this.scrollContainer.nativeElement.scrollTop = 
-          this.scrollContainer.nativeElement.scrollHeight;
-      }
-    } catch (err) {
-      console.error('Error scrolling to bottom:', err);
-    }
   }
 
   sendMessage() {
@@ -150,21 +158,15 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     const message = {
       message: this.newMessage,
       senderId: this.senderId,
-      receiverId: this.role === 'parent' ? this.selectedDoctorId : this.selectedUserId,
-      sentAt: new Date()
+      receiverId:
+        this.role === 'parent' ? this.selectedDoctorId : this.selectedUserId,
+      sentAt: new Date(),
     };
 
     this._ChatService.sendMessage(message);
-    this.newMessage = '';
-  }
+    this.messages.push(message);
 
-  deleteMessage(message: Message) {
-    if (!message.id) {
-      console.error('Cannot delete message: No message ID');
-      return;
-    }
-    console.log('Deleting message with ID:', message.id);
-    this._ChatService.deleteMessage(message.id);
+    this.newMessage = '';
   }
 
   isLastMessageOfSender(index: number): boolean {
@@ -189,9 +191,11 @@ export class ChatComponent implements OnInit, AfterViewChecked {
         receiverId: receiverId,
         sentAt: new Date().toISOString(),
       };
-      this.messages.push(msg);
       this._ChatService.sendMessage(msg);
+
+      this.messages.push(msg);
     };
+
     reader.readAsDataURL(file);
   }
 
@@ -220,9 +224,55 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     textarea.style.height = textarea.scrollHeight + 'px';
   }
 
-  isImage(filePath: string): boolean {
+  isImage(filePath: any): boolean {
+    if (!filePath) return false;
+
+    // Check if it's a base64 image
+    if (filePath.startsWith('data:image')) {
+      return true;
+    }
+
+    // Check if it's a file path with an image extension
     const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp'];
-    const ext = filePath.split('.').pop()?.toLowerCase();
-    return !!ext && imageExtensions.includes('.' + ext);
+    const match = filePath.match(/\.\w+(?=($|\?))/); // match extension
+    const ext = match ? match[0].toLowerCase() : '';
+
+    return imageExtensions.includes(ext);
+  }
+  getFileUrl(file: string): string {
+    if (!file) return '';
+
+    if (file.startsWith('data:image')) {
+      return file;
+    } else {
+      return 'http://localhost:5112' + file;
+    }
+  }
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom(): void {
+    if (this.scrollContainer?.nativeElement) {
+      this.scrollContainer.nativeElement.scrollTop =
+        this.scrollContainer.nativeElement.scrollHeight;
+    }
+  }
+
+  canDelete(msg: any): boolean {
+    if (!msg || !msg.sentAt) {
+      return false;
+    }
+    const now = Date.now();
+    const sentTime = new Date(msg.sentAt).getTime();
+    const thMinutes = 10 * 60 * 1000;
+    return msg.senderId === this.senderId && now - sentTime < thMinutes;
+  }
+  deleteMessage(msg: any): void {
+    const index = this.messages.indexOf(msg);
+    if (index !== -1) {
+      this.messages.splice(index, 1);
+      this._ChatService.deleteMessage(msg.id);
+    }
   }
 }

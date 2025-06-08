@@ -47,10 +47,12 @@ export class ChildVaccinationScheduleComponent implements OnInit {
         this.checkAllVaccinesTaken();
         this.vaccines.forEach((vaccine: any) => {
           if (this.ageInMonth === vaccine.childAge) {
+            console.log(this.data.id,vaccine.name)
             this._ParentService
               .appointmentExists(this.data.id, vaccine.name)
               .subscribe({
                 next: (res) => {
+                  console.log('/**************************',res);
                   this.bookingOrNot = true;
                   this.appointmentId = res.data.appointmentId;
                 },
@@ -84,21 +86,27 @@ export class ChildVaccinationScheduleComponent implements OnInit {
     (document.activeElement as HTMLElement)?.blur();
 
     setTimeout(() => {
-      const dialogRef = this.matDialog.open(VaccinationBookingComponent, {
-        width: '520px',
-        panelClass: 'dialog-vaccination-booking-container',
-        autoFocus: true,
-        restoreFocus: false,
-        disableClose: true,
-        data: {
-          childId: this.childId,
-          vaccineName: this.getCurrentVaccineName(vaccineId),
-          bookingExists: this.bookingOrNot,
-          appointmentId: this.appointmentId,
-        },
-      });
+      const dialogRef = this.matDialog
+        .open(VaccinationBookingComponent, {
+          width: '520px',
+          panelClass: 'dialog-vaccination-booking-container',
+          autoFocus: true,
+          restoreFocus: false,
+          disableClose: true,
+          data: {
+            childId: this.childId,
+            vaccineName: this.getCurrentVaccineName(vaccineId),
+            bookingExists: this.bookingOrNot,
+            appointmentId: this.appointmentId,
+          },
+        })
+        .afterClosed()
+        .subscribe((result) => {
+          this.getChildVaccines();
+        });
     }, 0);
   }
+
   expectedSideEffects(vaccineName: any) {
     (document.activeElement as HTMLElement)?.blur();
 

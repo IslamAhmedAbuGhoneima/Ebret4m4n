@@ -4,8 +4,13 @@
 
     <div class="mt-10 px-5">
       <ul class="space-y-10">
-        @if (data) { @for (item of data; track $index) {
+        @if (data?.length=== 0) {
 
+        <li class="bg-[#E7F1EE] text-center py-6 px-16 rounded-md">
+          لم يتم حجز أي موعد
+        </li>
+
+        }@else { @for (item of data; track $index) {
         <li class="bg-[#E7F1EE] text-center py-6 px-16 rounded-md">
           <h5 class="text-black text-xl mb-8 font-bold">
             اللقاح القادم لإبنك
@@ -28,12 +33,7 @@
             </div>
           </div>
         </li>
-        }}@else {
-        <li class="bg-[#E7F1EE] text-center py-6 px-16 rounded-md">
-          لم يتم حجز أي موعد
-        </li>
-
-        }
+        } }
       </ul>
     </div>
   </div>

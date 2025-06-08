@@ -25,11 +25,10 @@ export class NotificationService {
       .build();
 
     this.hubConnection.on('NotificationMessage', (data) => {
-      console.log("notification data ",data);
+      console.log('notification data ', data);
       this.notificationReceived$.next(data);
       if (data && data.message && data.title) {
         this.toastr.success(data.message, data.title);
-
         this.showNotification(data.title, data.message);
       } else {
         console.error('Invalid notification data:', data);

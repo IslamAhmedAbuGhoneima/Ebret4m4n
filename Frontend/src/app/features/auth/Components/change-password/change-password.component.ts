@@ -52,7 +52,9 @@ export class ChangePasswordComponent implements OnInit {
       };
 
       this.authService.changePass(model).subscribe({
-        next: (res) => {},
+        next: (res) => {
+     
+        },
         error: (err) => {
           this.errorMessage = err.error.Message || 'حدث خطأ أثناء إرسال الطلب';
         },

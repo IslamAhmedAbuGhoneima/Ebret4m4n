@@ -15,7 +15,7 @@
       <mat-radio-group
         [(ngModel)]="selectedDay"
         aria-label="Select an option"
-        style="display: flex; flex-direction: column"
+        style="display: flex; justify-content: center; gap: 10px"
       >
         <mat-radio-button [value]="bookingDate?.firstDay"
           >{{ bookingDate?.firstDayAr }}
@@ -29,18 +29,25 @@
 
   <div class="mx-auto flex items-center justify-center gap-6 w-fit">
     <button
-
+       *ngIf="!data.bookingExists"
       (click)="bookAppointment()"
-      
       class="mx-auto block cursor-pointer py-[11px] px-6 rounded-lg text-sm font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
     >
       <span>
-        {{ data.bookingExists ? "تعديل" : "حجز" }}
+    حجز
       </span>
     </button>
 
     <button
-      *ngIf="!data.bookingExists"
+      *ngIf="data.bookingExists"
+      (click)="bookAppointment()"
+      class="mx-auto block cursor-pointer py-[11px] px-6 rounded-lg text-sm font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
+    >
+      <span> تعديل </span>
+    </button>
+
+    <button
+      *ngIf="data.bookingExists"
       (click)="deleteAppointment()"
       class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-error text-mainBg-100 transition duration-200 hover:bg-errorHov"
     >

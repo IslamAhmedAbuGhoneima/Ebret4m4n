@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Route, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { MatDialog } from '@angular/material/dialog';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-forget-password',
@@ -30,17 +31,20 @@ export class ForgetPasswordComponent {
   verifyEmail() {
     if (this.forgetPasswordForm.valid) {
       this.authService.forgetPassword(this.forgetPasswordForm.value).subscribe({
-        next: (res) => {
-          (document.activeElement as HTMLElement)?.blur();
-          // this.matDialog.open(GoToMailComponent, {
-          //   width: '400px',
-          //   disableClose: true,
-          //   data: res,
-          //   panelClass: 'dialog-goto-mail-container',
-          // });
+        next: (res: any) => {
+          Swal.fire({
+            title: 'تنبيه',
+            text: 'إذا كان بريدك الإلكتروني مسجلًا لدينا، فستصلك رسالة في صندوق الوارد قريبًا.',
+            icon: 'info',
+            showCancelButton: true,
+            showConfirmButton: false,
+            cancelButtonColor: '#127453',
+            cancelButtonText: 'حسناً, سأذهب لفحص بريدي الإلكتروني ',
+            allowOutsideClick: false,
+          });
         },
         error: (err) => {
-          this.errorMessage = err.error.Message ;
+          this.errorMessage = err.error.Message;
         },
       });
     } else {
