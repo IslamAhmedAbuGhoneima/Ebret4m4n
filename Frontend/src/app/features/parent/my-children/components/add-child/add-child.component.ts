@@ -11,6 +11,7 @@ import { AddVaccinesComponent } from '../../../../../standalone/components/dialo
 import { ParentService } from '../../../services/parent.service';
 import { Router } from '@angular/router';
 import { birthDateNotInFutureValidator } from '../../../../../core/customValidation/birthDateNotInFuture.validator';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-child',
@@ -22,7 +23,7 @@ import { birthDateNotInFutureValidator } from '../../../../../core/customValidat
 export class AddChildComponent implements OnInit {
   formAddChild!: FormGroup;
   showPassword: boolean = false;
-  errorMessage: string = '';
+
   medicalImagesFiles: { preview: string; type: string; name?: string }[] = [];
   formValue: any = {};
   today: Date = new Date();
@@ -97,8 +98,25 @@ export class AddChildComponent implements OnInit {
         next: (response) => {
           this.router.navigate(['/parent/my-children']);
         },
-        error: (error) => {
-          this.errorMessage = error.error.message;
+        error: (error) => {const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
+        
         },
       });
     }

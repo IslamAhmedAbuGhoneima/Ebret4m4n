@@ -4,6 +4,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../auth/services/auth.service';
 import { CityCenterService } from '../../../services/cityCenter.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-edit-doctor',
@@ -18,8 +19,7 @@ export class EditDoctorComponent implements OnInit {
   adminOfgovernorate: any;
   userId: any;
   data: any;
-  msgError: any;
-  errorMessage: any;
+
   healthUnits: any;
   cityAdminName: any;
   constructor(
@@ -42,7 +42,25 @@ export class EditDoctorComponent implements OnInit {
         next: (res) => {
           this.healthUnits = res.data;
         },
-        error: (err) => {
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
           this.healthUnits = [];
         },
       });
@@ -91,8 +109,25 @@ export class EditDoctorComponent implements OnInit {
           next: (res) => {
             this.route.navigate(['/admins']);
           },
-          error: (err) => {
-            this.errorMessage = err.error.Message;
+          error: (error) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
           },
         });
     }
@@ -111,8 +146,25 @@ export class EditDoctorComponent implements OnInit {
 
         this.formEditProfileDoctor.patchValue(userData);
       },
-      error: (err) => {
-        this.msgError = err.error.message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }

@@ -10,6 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-vaccination-booking',
@@ -19,7 +20,6 @@ import { Router } from '@angular/router';
   encapsulation: ViewEncapsulation.None,
 })
 export class VaccinationBookingComponent implements OnInit {
-  errorMessage: any;
   bookingDate: any;
   selectedDay: string = '';
 
@@ -34,8 +34,25 @@ export class VaccinationBookingComponent implements OnInit {
       next: (res) => {
         this.bookingDate = this.formateData(res.data);
       },
-      error: (err) => {
-        this.errorMessage = err.error.message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }
@@ -49,9 +66,39 @@ export class VaccinationBookingComponent implements OnInit {
         .appointmentReBook(this.data.appointmentId, bookingData)
         .subscribe({
           next: (res) => {
+            Swal.fire({
+              title: `تم تعديل  موعد التطعيم لطفلك  <br/> ${this.data.childName} بنجاح `,
+              text: 'ننتظرك في الوحده الصحيه الاسبوع المقبل في اليوم الذي اخترته',
+              icon: 'success',
+              showCancelButton: true,
+              showConfirmButton: false,
+              confirmButtonColor: '#127453',
+              cancelButtonColor: '#127453',
+              cancelButtonText: 'حسناً , إغلاق',
+              allowOutsideClick: false,
+            });
             this.close();
           },
-          error: (err) => {},
+          error: (error) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
+          },
         });
     } else {
       const bookingData = {
@@ -61,9 +108,39 @@ export class VaccinationBookingComponent implements OnInit {
       };
       this._ParentService.appointmentBook(bookingData).subscribe({
         next: (res) => {
+          Swal.fire({
+            title: `تم حجز موعد التطعيم  لطفلك  <br/> ${this.data.childName} بنجاح `,
+            text: 'ننتظرك في الوحده الصحيه الاسبوع المقبل في اليوم الذي اخترته',
+            icon: 'success',
+            showCancelButton: true,
+            showConfirmButton: false,
+            confirmButtonColor: '#127453',
+            cancelButtonColor: '#127453',
+            cancelButtonText: 'حسناً , إغلاق',
+            allowOutsideClick: false,
+          });
           this.close();
         },
-        error: (err) => {},
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
+        },
       });
     }
   }
@@ -90,30 +167,50 @@ export class VaccinationBookingComponent implements OnInit {
     };
   }
   deleteAppointment() {
-    // Swal.fire({
-    //   title: 'هل تريد ألغاء الحجز؟',
-    //   text: 'سيحذف هذا موعد الحجز الذي أضافته من قبل ',
-    //   icon: 'error',
-    //   showCancelButton: true,
-    //   confirmButtonColor: '#127453',
-    //   cancelButtonColor: '#B4231B',
-    //   confirmButtonText: 'نعم , حذف',
-    //   cancelButtonText: 'لا',
-    //   allowOutsideClick: false,
-    // }).then((result) => {
-    //   if (result.isConfirmed) {
+    Swal.fire({
+      title: `هل تريد ألغاء موعد تطعيم  <br/> طفلك  ${this.data.childName} ؟`,
+      text: ``,
+      icon: 'error',
+      showCancelButton: true,
+      confirmButtonColor: '#127453',
+      cancelButtonColor: '#B4231B',
+      confirmButtonText: 'نعم',
+      cancelButtonText: 'لا',
+      allowOutsideClick: false,
+    }).then((result) => {
+      if (result.isConfirmed) {
         this._ParentService
           .appointmentCancel(this.data.appointmentId)
           .subscribe({
             next: (res) => {
+              Swal.close();
               this.close();
             },
-            error: (err) => {
-              this.errorMessage = err.error.message;
+            error: (error) => {
+              const containsNonArabic =
+                /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                  error.error.message
+                );
+
+              const finalMessage = containsNonArabic
+                ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+                : error.error.message;
+
+              Swal.fire({
+                icon: 'error',
+                title: 'عذراً، حدث خطأ',
+                text: finalMessage,
+                confirmButtonColor: '#127453',
+                confirmButtonText: 'حسناً , إغلاق',
+              });
             },
           });
-      // }
-    // });
+      } else if (result.dismiss) {
+        this.close();
+      }
+    });
   }
   close() {
     this.dialog.close();

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { CityCenterService } from '../../../services/cityCenter.service';
 import { AuthService } from '../../../../auth/services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-complaint-details',
@@ -39,19 +40,71 @@ export class ComplaintDetailsComponent implements OnInit {
       next: (res) => {
         this.data = res.data;
       },
-      error: (err) => {},
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
+      },
     });
   }
   handleComplaint() {
     this._CityCenterService.handleComplaint(this.complaintId).subscribe({
       next: (res) => {
-        this.route.navigate(['/city-center-admin/complaints']);
+        Swal.fire({
+          title: res.data,
+          text: 'تم حل الشكوى بنجاح وإبلاغ ولي الأمر. يُرجى متابعة أي ردود لاحقة إن وُجدت.',
+          icon: 'success',
+          showCancelButton: false,
+          showConfirmButton: true,
+          confirmButtonColor: '#127453',
+          cancelButtonColor: '#127453',
+          confirmButtonText: 'إغلاق',
+          allowOutsideClick: false,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.route.navigate(['/city-center-admin/complaints']);
+          }
+        });
       },
-      error: (err) => {
+
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }
   goBack() {
-    this.location.back();
+    this.route.navigate(['/city-center-admin/complaints']);
   }
 }

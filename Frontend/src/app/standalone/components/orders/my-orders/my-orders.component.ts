@@ -9,6 +9,7 @@ import { registerLocaleData } from '@angular/common';
 import localeAr from '@angular/common/locales/ar';
 import { FormsModule } from '@angular/forms';
 import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
+import Swal from 'sweetalert2';
 registerLocaleData(localeAr);
 
 @Component({
@@ -72,19 +73,53 @@ export class MyOrdersComponent implements OnInit {
       this._GovernorateAdminService
         .markReceivedOrder(this.selectedOrderId)
         .subscribe({
-          next: () => {
+          next: (res) => {
             this.receivedMap.set(this.selectedOrderId!, true);
             this.loadOrders(false);
           },
-          error: (err) => {},
+          error: (error) => {const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });},
         });
     } else if (this.role == 'organizer') {
       this._CityCenterService.acceptOrders(this.selectedOrderId).subscribe({
-        next: () => {
+        next: (res) => {
           this.receivedMap.set(this.selectedOrderId!, true);
           this.loadOrders(false);
         },
-        error: (err) => {},
+        error: (error) => {const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });},
       });
     }
   }
@@ -129,7 +164,24 @@ export class MyOrdersComponent implements OnInit {
             orderStatus: orderStatus,
           }));
         },
-        error: (err) => {},
+        error: (error) => {const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });},
       });
     }
   }

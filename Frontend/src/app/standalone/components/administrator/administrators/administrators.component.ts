@@ -6,6 +6,7 @@ import { HealthMinistryService } from '../../../../features/health-ministry-admi
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 import { FormsModule } from '@angular/forms';
 import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-administrators',
@@ -38,8 +39,25 @@ export class AdministratorsComponent implements OnInit {
           this.data = res.data;
           this.filteredData = res.data;
         },
-        error: (err: any) => {
-          console.log(err);
+        error: (error: any) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else if (this.role === 'governorateAdmin') {
@@ -48,8 +66,25 @@ export class AdministratorsComponent implements OnInit {
           this.data = res.data;
           this.filteredData = res.data;
         },
-        error: (err: any) => {
-          console.log(err);
+        error: (error: any) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else if (this.role === 'cityAdmin') {
@@ -58,8 +93,25 @@ export class AdministratorsComponent implements OnInit {
           this.data = res.data;
           this.filteredData = res.data;
         },
-        error: (err: any) => {
-          console.log(err);
+        error: (error: any) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     }

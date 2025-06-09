@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { GovernorateAdminService } from '../../../services/governorateAdmin.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-centers-home-page',
@@ -9,7 +10,7 @@ import { GovernorateAdminService } from '../../../services/governorateAdmin.serv
 })
 export class CentersHomePageComponent implements OnInit {
   CitiesCentersList: string[] = [];
-  errorMessage: any;
+
   constructor(private _GovernorateAdminService: GovernorateAdminService) {}
   ngOnInit(): void {
     this.getAllCities();
@@ -21,7 +22,24 @@ export class CentersHomePageComponent implements OnInit {
         this.CitiesCentersList = res.data;
       },
       error: (error) => {
-        this.errorMessage = error.error.Message;
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }

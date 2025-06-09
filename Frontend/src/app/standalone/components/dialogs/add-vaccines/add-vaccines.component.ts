@@ -11,6 +11,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { ParentService } from '../../../../features/parent/services/parent.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-vaccines',
@@ -24,9 +25,7 @@ export class AddVaccinesComponent implements OnInit {
   selectedStates: { [key: string]: boolean } = {};
   vaccines: any;
   ageInMonths: any;
-
   @ViewChildren('vaccineCheckbox') vaccineCheckboxes!: QueryList<ElementRef>;
-  errorMessage: any;
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -43,8 +42,25 @@ export class AddVaccinesComponent implements OnInit {
           this.filterVaccinesByAge(res.data, this.ageInMonths)
         );
       },
-      error: (err) => {
-        this.errorMessage = err.error.message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }

@@ -13,7 +13,7 @@ import Swal from 'sweetalert2';
 })
 export class ForgetPasswordComponent {
   forgetPasswordForm!: FormGroup;
-  errorMessage: string = '';
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -43,8 +43,25 @@ export class ForgetPasswordComponent {
             allowOutsideClick: false,
           });
         },
-        error: (err) => {
-          this.errorMessage = err.error.Message;
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else {

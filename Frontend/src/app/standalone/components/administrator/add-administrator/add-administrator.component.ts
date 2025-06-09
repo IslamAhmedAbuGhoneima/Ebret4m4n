@@ -13,6 +13,7 @@ import { AuthService } from '../../../../features/auth/services/auth.service';
 import { HealthMinistryService } from '../../../../features/health-ministry-admin/services/health-ministry.service';
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-administrator',
@@ -25,7 +26,7 @@ export class AddAdministratorComponent implements OnInit {
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
   role: string | null | undefined;
-  errorMessage: string = '';
+
   egyptGovernorates: string[] = [
     'القاهرة',
     'الجيزة',
@@ -311,7 +312,24 @@ export class AddAdministratorComponent implements OnInit {
           next: (res) => {
             this.healthUnits = res.data;
           },
-          error: (err) => {
+          error: (error) => {const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
             this.healthUnits = [];
           },
         });
@@ -393,8 +411,25 @@ export class AddAdministratorComponent implements OnInit {
         next: (res) => {
           this.route.navigate(['/admins']);
         },
-        error: (err) => {
-          this.errorMessage = err.error.Message;
+        error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
         },
       });
     } else if (this.role === 'governorateAdmin') {
@@ -410,8 +445,25 @@ export class AddAdministratorComponent implements OnInit {
         next: (res) => {
           this.route.navigate(['/admins']);
         },
-        error: (err) => {
-          this.errorMessage = err.error.Message;
+        error: (error) => {
+         const containsNonArabic =
+           /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+             error.error.message
+           );
+
+         const finalMessage = containsNonArabic
+           ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+           : error.error.message;
+
+         Swal.fire({
+           icon: 'error',
+           title: 'عذراً، حدث خطأ',
+           text: finalMessage,
+           confirmButtonColor: '#127453',
+           confirmButtonText: 'حسناً , إغلاق',
+         });
         },
       });
     } else if (this.role === 'cityAdmin') {
@@ -429,8 +481,25 @@ export class AddAdministratorComponent implements OnInit {
         next: (res) => {
           this.route.navigate(['/admins']);
         },
-        error: (err) => {
-          this.errorMessage = err.error.Message;
+        error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
         },
       });
     }

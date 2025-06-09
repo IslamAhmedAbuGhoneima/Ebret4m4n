@@ -2,7 +2,6 @@ import { Component, ViewEncapsulation } from '@angular/core';
 import { ParentService } from '../../../services/parent.service';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { PaymentRequiredComponent } from '../../../../../standalone/components/dialogs/payment-required/payment-required.component';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -28,8 +27,25 @@ export class MyChildrenHomePageComponent {
       next: (res) => {
         this.data = res.data;
       },
-      error: (err) => {
-        this.errorMessage = err.error.message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }
@@ -88,14 +104,53 @@ export class MyChildrenHomePageComponent {
             }
           });
         } else if (errorNumber === 3) {
-          this.matDialog.open(PaymentRequiredComponent, {
-            width: '400px',
-            disableClose: true,
-            data: childId,
-            panelClass: 'dialog-payment-container',
+          Swal.fire({
+            title: message,
+            text: 'الرجاء الدفع لأستخدام هذه الميزة',
+            icon: 'info',
+            showCancelButton: true,
+            showConfirmButton: true,
+            confirmButtonColor: '#127453',
+            cancelButtonColor: '#B4231B',
+            confirmButtonText: 'دفع',
+            cancelButtonText: 'إغلاق',
+            allowOutsideClick: false,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              this._ParentService.payment(this.data, {}).subscribe({
+                next: (res) => {
+                  const url = res.data;
+                  if (url) {
+                    window.open(url, '_self');
+                  }
+                },
+                error: (err) => {
+                  this.errorMessage = err.error.message;
+                },
+              });
+            } else if (result.dismiss) {
+              Swal.close();
+            }
           });
         } else {
-          // ⚠️ خطأ غير متوقع
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         }
       },
     });

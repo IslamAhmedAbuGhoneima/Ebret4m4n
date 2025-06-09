@@ -97,6 +97,7 @@ export class ParentService {
       `${environment.apiUrl}/Parent/${childId}/${vaccineName}/appointment-exists`
     );
   }
+  
   appointmentBook(model: {
     childId: string;
     vaccineName: string;

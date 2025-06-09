@@ -18,7 +18,7 @@ import {
   RouterModule,
 } from '@angular/router';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { interval } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-chat',
@@ -152,9 +152,26 @@ export class ChatComponent implements OnInit, AfterViewChecked {
               this.userChatList = res.data;
             });
           })
-          .catch((err: any) =>
-            console.error('Error marking messages as read:', err)
-          );
+          .catch((error: any) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
+          });
       });
   }
 

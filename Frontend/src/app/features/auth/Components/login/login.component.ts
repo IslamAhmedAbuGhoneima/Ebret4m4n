@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { jwtDecode } from 'jwt-decode';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +14,6 @@ import { jwtDecode } from 'jwt-decode';
 export class LoginComponent {
   formLogin!: FormGroup;
   showPassword: boolean = false;
-  errorMessage: string = '';
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -35,7 +35,24 @@ export class LoginComponent {
           this.navigateByRole();
         },
         error: (error) => {
-          this.errorMessage = error.error.message;
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else {

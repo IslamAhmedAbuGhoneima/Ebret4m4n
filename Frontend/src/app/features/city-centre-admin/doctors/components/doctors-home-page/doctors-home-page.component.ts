@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CityCenterService } from '../../../services/cityCenter.service';
 import { AuthService } from '../../../../auth/services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-doctors-home-page',
@@ -29,8 +30,23 @@ export class DoctorsHomePageComponent implements OnInit {
         this.data = res.data;
         this.filteredData = res.data;
       },
-      error: (err: any) => {
-        console.log(err);
+      error: (error: any) => {
+      const containsNonArabic =
+        /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(error.error.message);
+
+      const finalMessage = containsNonArabic
+        ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+        : error.error.message;
+
+      Swal.fire({
+        icon: 'error',
+        title: 'عذراً، حدث خطأ',
+        text: finalMessage,
+        confirmButtonColor: '#127453',
+        confirmButtonText: 'حسناً , إغلاق',
+      });
       },
     });
   }

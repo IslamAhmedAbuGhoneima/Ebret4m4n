@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { AddHealthCare } from '../../../../../core/interfaces/addHealthCare';
 import { CityCenterService } from '../../../services/cityCenter.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-unit',
@@ -274,7 +275,6 @@ export class AddUnitComponent implements OnInit {
     'عابدين',
     'قصر النيل',
   ];
-  errorMessage: any;
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -320,7 +320,24 @@ export class AddUnitComponent implements OnInit {
             this.router.navigate(['/city-center-admin/units']);
           },
           error: (error) => {
-            this.errorMessage = error.error.message;
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
           },
         });
       }

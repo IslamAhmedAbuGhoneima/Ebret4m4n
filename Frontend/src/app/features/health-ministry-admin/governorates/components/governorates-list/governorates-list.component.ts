@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HealthMinistryService } from '../../../services/health-ministry.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-governorates-list',
@@ -9,7 +10,7 @@ import { HealthMinistryService } from '../../../services/health-ministry.service
 })
 export class GovernoratesListComponent implements OnInit {
   governoratesList: string[] = [];
-  errorMessage: any;
+
   constructor(private _HealthMinistryService: HealthMinistryService) {}
   ngOnInit(): void {
     this.getAllCities();
@@ -21,7 +22,24 @@ export class GovernoratesListComponent implements OnInit {
         this.governoratesList = res.data;
       },
       error: (error) => {
-        this.errorMessage = error.error.Message;
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }

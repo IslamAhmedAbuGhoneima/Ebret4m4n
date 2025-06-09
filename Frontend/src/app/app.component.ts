@@ -19,7 +19,5 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this._NotificationService.requestPermission();
-
-   
   }
 }

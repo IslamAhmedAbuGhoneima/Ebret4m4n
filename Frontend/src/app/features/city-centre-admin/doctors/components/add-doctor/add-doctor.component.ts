@@ -5,6 +5,7 @@ import { passwordMatch } from '../../../../../core/customValidation/passwordMatc
 import { AuthService } from '../../../../auth/services/auth.service';
 import { CityCenterService } from '../../../services/cityCenter.service';
 import { Router, RouterModule } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-add-doctor',
@@ -18,7 +19,7 @@ export class AddDoctorComponent implements OnInit {
   showConfirmPassword: boolean = false;
   cityAdminName: any;
   adminOfgovernorate: any;
-  errorMessage: any;
+
   healthUnits: any;
   constructor(
     private fb: FormBuilder,
@@ -38,7 +39,25 @@ export class AddDoctorComponent implements OnInit {
         next: (res) => {
           this.healthUnits = res.data;
         },
-        error: (err) => {
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
           this.healthUnits = [];
         },
       });
@@ -91,8 +110,25 @@ export class AddDoctorComponent implements OnInit {
         next: (res) => {
           this.route.navigate(['/city-center-admin/doctors']);
         },
-        error: (err) => {
-          this.errorMessage = err.error.Message;
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     }

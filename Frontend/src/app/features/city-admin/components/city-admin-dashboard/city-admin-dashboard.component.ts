@@ -5,6 +5,7 @@ import { BaseChartDirective } from 'ng2-charts';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { Chart } from 'chart.js';
 import { GovernorateAdminService } from '../../services/governorateAdmin.service';
+import Swal from 'sweetalert2';
 
 Chart.register(ChartDataLabels);
 @Component({
@@ -19,7 +20,6 @@ export class CityAdminDashboardComponent implements OnInit {
     | BaseChartDirective<'bar'>
     | undefined;
   data: any = {};
-  errorMessage: any;
   constructor(private _GovernorateAdminService: GovernorateAdminService) {}
 
   ngOnInit(): void {
@@ -40,8 +40,25 @@ export class CityAdminDashboardComponent implements OnInit {
         this.barChartData.datasets[0].data = vaccines;
         this.barChartData = { ...this.barChartData };
       },
-      error: (err) => {
-        this.errorMessage = err.error.Message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }

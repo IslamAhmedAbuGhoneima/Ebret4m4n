@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { CityCenterService } from '../../services/cityCenter.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-city-center-admin-dashboard',
@@ -15,7 +16,6 @@ export class CityCenterAdminDashboardComponent {
     | BaseChartDirective<'bar'>
     | undefined;
   data: any = {};
-  errorMessage: any;
   constructor(private _CityCenterService: CityCenterService) {}
 
   ngOnInit(): void {
@@ -36,8 +36,25 @@ export class CityCenterAdminDashboardComponent {
         this.barChartData.datasets[0].data = vaccines;
         this.barChartData = { ...this.barChartData };
       },
-      error: (err) => {
-        this.errorMessage = err.error.Message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }

@@ -11,7 +11,7 @@ import Swal from 'sweetalert2';
 })
 export class ReportComplaintComponent implements OnInit {
   formComplaint!: FormGroup;
-  errorMessage: any;
+
   data: any;
   constructor(private fb: FormBuilder, private _ParentService: ParentService) {}
   ngOnInit() {
@@ -42,7 +42,24 @@ export class ReportComplaintComponent implements OnInit {
           this.formComplaint.reset();
         },
         error: (error) => {
-          this.errorMessage = error.error.Message;
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else {

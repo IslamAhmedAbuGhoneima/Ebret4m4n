@@ -4,6 +4,7 @@ import { ReportShortageComponent } from '../dialogs/report-shortage/report-short
 import { AuthService } from '../../../features/auth/services/auth.service';
 import { InventoryService } from '../../../core/services/inventory.service';
 import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vaccines',
@@ -30,8 +31,25 @@ export class VaccinesComponent implements OnInit {
         next: (res) => {
           this.data = res.data?.length ? res.data : null;
         },
-        error: (err) => {
-          console.log('error : ', err.error);
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else if (this.role == 'organizer') {
@@ -39,8 +57,25 @@ export class VaccinesComponent implements OnInit {
         next: (res) => {
           this.data = res.data?.length ? res.data : null;
         },
-        error: (err) => {
-          console.log('error : ', err.error);
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     }
@@ -69,8 +104,25 @@ export class VaccinesComponent implements OnInit {
         next: (res) => {
           this.getServiceInventory();
         },
-        error: (err) => {
-          console.log('error : ', err.error);
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else if (this.role == 'organizer') {
@@ -78,8 +130,25 @@ export class VaccinesComponent implements OnInit {
         next: (res) => {
           this.data = res.data?.length ? res.data : null;
         },
-        error: (err) => {
-          console.log('error : ', err.error);
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     }

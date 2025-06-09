@@ -11,6 +11,8 @@ import { HealthMinistryService } from '../../../../features/health-ministry-admi
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
+import Swal from 'sweetalert2';
+
 @Component({
   selector: 'app-edit-admin',
   imports: [CommonModule, ReactiveFormsModule],
@@ -285,9 +287,8 @@ export class EditAdministratorComponent implements OnInit {
   adminOfgovernorate: any;
   userId: any;
   data: any;
-  msgError: any;
+
   role: any;
-  errorMessage: any;
   healthUnits: any;
   cityAdminName: any;
   constructor(
@@ -312,7 +313,25 @@ export class EditAdministratorComponent implements OnInit {
           next: (res) => {
             this.healthUnits = res.data;
           },
-          error: (err) => {
+          error: (error) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
             this.healthUnits = [];
           },
         });
@@ -394,8 +413,25 @@ export class EditAdministratorComponent implements OnInit {
 
             this.formEditProfileAdmin.patchValue(userData);
           },
-          error: (err) => {
-            this.msgError = err.error.message;
+          error: (error) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
           },
         });
     } else if (this.role === 'governorateAdmin') {
@@ -411,27 +447,63 @@ export class EditAdministratorComponent implements OnInit {
 
           this.formEditProfileAdmin.patchValue(userData);
         },
-        error: (err) => {
-          this.msgError = err.error.message;
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else if (this.role === 'cityAdmin') {
-      this._CityCenterService.getOrganizerOrDoctorDetails(this.userId).subscribe({
-        next: (res) => {
-          this.data = res.data;
-          const userData = {
-            firstName: this.data.firstName,
-            secondName: this.data.lastName,
-            email: this.data.email,
-            healthCareCenterId: this.data?.hcCenterId,
-          };
+      this._CityCenterService
+        .getOrganizerOrDoctorDetails(this.userId)
+        .subscribe({
+          next: (res) => {
+            this.data = res.data;
+            const userData = {
+              firstName: this.data.firstName,
+              secondName: this.data.lastName,
+              email: this.data.email,
+              healthCareCenterId: this.data?.hcCenterId,
+            };
 
-          this.formEditProfileAdmin.patchValue(userData);
-        },
-        error: (err) => {
-          this.msgError = err.error.message;
-        },
-      });
+            this.formEditProfileAdmin.patchValue(userData);
+          },
+          error: (error) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
+          },
+        });
     }
   }
 
@@ -449,8 +521,25 @@ export class EditAdministratorComponent implements OnInit {
           next: (res) => {
             this.route.navigate(['/admins']);
           },
-          error: (err) => {
-            this.errorMessage = err.error.Message;
+          error: (error) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
           },
         });
     } else if (this.role == 'governorateAdmin') {
@@ -466,8 +555,25 @@ export class EditAdministratorComponent implements OnInit {
           next: (res) => {
             this.route.navigate(['/admins']);
           },
-          error: (err) => {
-            this.errorMessage = err.error.Message;
+          error: (error) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
           },
         });
     } else if (this.role == 'cityAdmin') {
@@ -483,8 +589,25 @@ export class EditAdministratorComponent implements OnInit {
           next: (res) => {
             this.route.navigate(['/admins']);
           },
-          error: (err) => {
-            this.errorMessage = err.error.Message;
+          error: (error) => {
+            const containsNonArabic =
+              /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+                error.error.message
+              );
+
+            const finalMessage = containsNonArabic
+              ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+              : error.error.message;
+
+            Swal.fire({
+              icon: 'error',
+              title: 'عذراً، حدث خطأ',
+              text: finalMessage,
+              confirmButtonColor: '#127453',
+              confirmButtonText: 'حسناً , إغلاق',
+            });
           },
         });
     }

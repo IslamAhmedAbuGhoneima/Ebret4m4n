@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { DatePipe, Location } from '@angular/common';
 import { ParentService } from '../../../services/parent.service';
 import { birthDateNotInFutureValidator } from '../../../../../core/customValidation/birthDateNotInFuture.validator';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-child-edit-profile',
@@ -19,7 +20,7 @@ import { birthDateNotInFutureValidator } from '../../../../../core/customValidat
 })
 export class ChildEditProfileComponent implements OnInit {
   formEditProfile!: FormGroup;
-  msgError: string = '';
+
   data: any;
   userId: any;
   medicalImagesFromApi: any = [];
@@ -141,8 +142,25 @@ export class ChildEditProfileComponent implements OnInit {
 
         this.cdr.detectChanges(); // تحديث الفيو بعد تغيير الفورم
       },
-      error: (err) => {
-        this.msgError = err.error.message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }
@@ -192,11 +210,27 @@ export class ChildEditProfileComponent implements OnInit {
             this.formEditProfile.markAsDirty(); // تعيين النموذج كـ "معدل"
             this.formEditProfile.updateValueAndValidity(); // تحديث القيمة والتأكد من صحة الفورم
           } else {
-            this.msgError = 'فشل حذف الملف من السيرفر.';
           }
         },
-        error: (err) => {
-          this.msgError = err?.error?.message || 'حدث خطأ أثناء الحذف.';
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else {
@@ -255,13 +289,30 @@ export class ChildEditProfileComponent implements OnInit {
   saveNewData() {
     if (this.formEditProfile.valid && this.formEditProfile.dirty) {
       const model = this.formDataFormate();
-   
+
       this._ParentService.childUpdate(this.userId, model).subscribe({
         next: (res) => {
           this.router.navigate(['/parent/my-children']);
         },
         error: (error) => {
-          this.msgError = error.error.message;
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     }

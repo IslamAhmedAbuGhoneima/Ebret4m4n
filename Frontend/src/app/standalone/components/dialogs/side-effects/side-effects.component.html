@@ -1,52 +1,83 @@
-<section class="font-arabic">
+<section class="font-arabic px-6 py-4 space-y-6">
   <button (click)="close()" class="p-1 block">
-    <img src="./icons/close.svg" alt="" class="block w-5 h-5" />
+    <img src="./icons/close.svg" alt="إغلاق" class="block w-5 h-5" />
   </button>
 
-  <div class="text-center px-[26px] pb-8 mt-5">
-    <div class="mb-3">
-      <h4 class="font-bold text-[22px] text-[#121212] mb-2">
-        الآثار الجانبية للقاح {{ data.vaccineName }}
-      </h4>
+  <div class="text-center">
+    <h4 class="font-bold text-2xl text-[#121212]">
+      الآثار الجانبية للقاح {{ data.vaccineName }}
+    </h4>
+  </div>
+
+  <div class="grid gap-4">
+    <!-- أعراض عامة -->
+    <div
+      *ngIf="!effects.excludeGeneral"
+      class="rounded-2xl bg-[#f9f9f9] p-4 shadow"
+    >
+      <h3 class="font-semibold text-[#127453] mb-2">الأعراض العامة</h3>
+      <div class="flex flex-wrap gap-2">
+        <span
+          *ngFor="let item of effects.general"
+          class="bg-white text-sm px-3 py-1 rounded-full border"
+        >
+          {{ item }}
+        </span>
+      </div>
     </div>
 
-    <div *ngIf="!effects.excludeGeneral">
-      <h3 class="font-semibold">الأعراض العامة:</h3>
-      <ul class="list-disc list-inside font-semibold">
-        <li *ngFor="let item of effects.general" class="mb-[6px] text-base">
+    <!-- الأعراض الموضعية -->
+    <div class="rounded-2xl bg-[#f9f9f9] p-4 shadow">
+      <h3 class="font-semibold text-[#127453] mb-2">الأعراض الموضعية</h3>
+      <div class="flex flex-wrap gap-2">
+        <span
+          *ngFor="let item of effects.local"
+          class="bg-white text-sm px-3 py-1 rounded-full border"
+        >
           {{ item }}
-        </li>
+        </span>
+      </div>
+    </div>
+
+    <!-- أعراض تظهر بمعدل منخفض -->
+    <div class="rounded-2xl bg-[#f9f9f9] p-4 shadow">
+      <h3 class="font-semibold text-[#127453] mb-2">أعراض تظهر بمعدل منخفض</h3>
+      <div class="flex flex-wrap gap-2">
+        <span
+          *ngFor="let item of effects.lowFrequency"
+          class="bg-white text-sm px-3 py-1 rounded-full border"
+        >
+          {{ item }}
+        </span>
+      </div>
+    </div>
+
+    <!-- متى يجب التواصل مع الطبيب -->
+    <div class="rounded-2xl bg-[#fff4f4] p-4 shadow border border-[#B4231B]">
+      <h3 class="font-semibold text-[#B4231B] mb-2">
+        متى يجب التواصل مع الطبيب
+      </h3>
+      <ul
+        class="list-disc list-inside text-sm text-[#B4231B] font-medium space-y-1"
+      >
+        <li *ngFor="let item of effects.contactDoctor">{{ item }}</li>
       </ul>
     </div>
 
-    <h6 class="font-semibold mt-4">الأعراض الموضعية:</h6>
-    <ul class="list-disc list-inside font-semibold">
-      <li *ngFor="let item of effects.local" class="mb-[6px] text-base">
-        {{ item }}
-      </li>
-    </ul>
-
-    <h3 class="font-semibold mt-4">أعراض تظهر بمعدل منخفض:</h3>
-    <ul class="list-disc list-inside font-semibold">
-      <li *ngFor="let item of effects.lowFrequency" class="mb-[6px] text-base">
-        {{ item }}
-      </li>
-    </ul>
-
-    <h3 class="font-semibold mt-4">متى يجب التواصل مع الطبيب:</h3>
-    <ul class="list-disc list-inside font-semibold">
-      <li *ngFor="let item of effects.contactDoctor" class="mb-[6px] text-base">
-        {{ item }}
-      </li>
-    </ul>
-
-    <div *ngIf="effects.rare?.length">
-      <h3 class="font-semibold mt-4">أعراض نادرة:</h3>
-      <ul class="list-disc list-inside font-semibold">
-        <li *ngFor="let item of effects.rare" class="mb-[6px] text-base">
+    <!-- أعراض نادرة -->
+    <div
+      *ngIf="effects.rare?.length"
+      class="rounded-2xl bg-[#f9f9f9] p-4 shadow"
+    >
+      <h3 class="font-semibold text-[#127453] mb-2">أعراض نادرة</h3>
+      <div class="flex flex-wrap gap-2">
+        <span
+          *ngFor="let item of effects.rare"
+          class="bg-white text-sm px-3 py-1 rounded-full border"
+        >
           {{ item }}
-        </li>
-      </ul>
+        </span>
+      </div>
     </div>
   </div>
 </section>

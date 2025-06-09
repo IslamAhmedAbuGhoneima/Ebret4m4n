@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { OrganizerService } from '../../services/organizer.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-vaccinated-children',
@@ -33,12 +34,42 @@ export class VaccinatedChildrenComponent implements OnInit {
   done() {
     this._OrganizerService.updateVaccineStatues(this.vaccinatedList).subscribe({
       next: (res) => {
+        Swal.fire({
+          title: res.data,
+          text: 'تم تعديل حاله اللقاح لهؤلاء الاطفال',
+          icon: 'success',
+          showCancelButton: true,
+          showConfirmButton: false,
+          confirmButtonColor: '#127453',
+          cancelButtonColor: '#127453',
+          cancelButtonText: 'حسناً , إغلاق',
+          allowOutsideClick: false,
+        });
+
         localStorage.removeItem('vaccinatedList');
         this.vaccinatedList = [];
         this.filteredList = [];
-
       },
-      error: (err) => {},
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
+      },
     });
   }
 }

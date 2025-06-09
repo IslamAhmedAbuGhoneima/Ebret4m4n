@@ -5,6 +5,7 @@ import { SideEffectsComponent } from '../../../../../standalone/components/dialo
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParentService } from '../../../services/parent.service';
 import { Location } from '@angular/common';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-child-vaccination-schedule',
@@ -15,7 +16,7 @@ import { Location } from '@angular/common';
 export class ChildVaccinationScheduleComponent implements OnInit {
   childId: any;
   childName: any;
-  msgError: any;
+
   data: any;
   vaccines: any;
   ageInMonth: any;
@@ -23,6 +24,7 @@ export class ChildVaccinationScheduleComponent implements OnInit {
   appointmentId: any;
   allVaccinesTaken: boolean = false;
   timeTakenVaccine: any;
+  selectDay: any;
 
   constructor(
     private matDialog: MatDialog,
@@ -47,22 +49,39 @@ export class ChildVaccinationScheduleComponent implements OnInit {
         this.checkAllVaccinesTaken();
         this.vaccines.forEach((vaccine: any) => {
           if (this.ageInMonth === vaccine.childAge) {
-            console.log(this.data.id,vaccine.name)
             this._ParentService
               .appointmentExists(this.data.id, vaccine.name)
               .subscribe({
                 next: (res) => {
-                  console.log('/**************************',res);
                   this.bookingOrNot = true;
                   this.appointmentId = res.data.appointmentId;
                 },
-                error: (error) => {},
+                error: (error) => {
+                  this.bookingOrNot = false;
+                },
               });
           }
         });
       },
-      error: (err) => {
-        this.msgError = err.error.message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }
@@ -95,9 +114,11 @@ export class ChildVaccinationScheduleComponent implements OnInit {
           disableClose: true,
           data: {
             childId: this.childId,
+            childName: this.childName,
             vaccineName: this.getCurrentVaccineName(vaccineId),
             bookingExists: this.bookingOrNot,
             appointmentId: this.appointmentId,
+            selectDay: this.selectDay,
           },
         })
         .afterClosed()
@@ -112,7 +133,7 @@ export class ChildVaccinationScheduleComponent implements OnInit {
 
     setTimeout(() => {
       const dialogRef = this.matDialog.open(SideEffectsComponent, {
-        width: '600px',
+        width: '700px',
         panelClass: 'dialog-side-effects-container',
         autoFocus: true,
         restoreFocus: false,

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ParentService } from '../../../services/parent.service';
 import { VaccinationBookingComponent } from '../../../../../standalone/components/dialogs/vaccination-booking/vaccination-booking.component';
-import { elements } from 'chart.js';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-parent-home-page',
@@ -12,7 +12,7 @@ import { elements } from 'chart.js';
 })
 export class ParentHomePageComponent implements OnInit {
   data: any;
-  errorMessage: string = '';
+
   constructor(
     private matDialog: MatDialog,
     private _ParentService: ParentService
@@ -24,18 +24,23 @@ export class ParentHomePageComponent implements OnInit {
   editVaccine(element: any) {
     (document.activeElement as HTMLElement)?.blur();
     setTimeout(() => {
-      const dialogRef = this.matDialog.open(VaccinationBookingComponent, {
-        width: '520px',
-        panelClass: 'dialog-vaccination-booking-container',
-        autoFocus: true,
-        restoreFocus: false,
-        disableClose: true,
-        data: {
-          vaccineName: element.vaccineName,
-          bookingExists: true,
-          appointmentId: element.id,
-        },
-      });
+      const dialogRef = this.matDialog
+        .open(VaccinationBookingComponent, {
+          width: '520px',
+          panelClass: 'dialog-vaccination-booking-container',
+          autoFocus: true,
+          restoreFocus: false,
+          disableClose: true,
+          data: {
+            vaccineName: element.vaccineName,
+            bookingExists: true,
+            appointmentId: element.id,
+          },
+        })
+        .afterClosed()
+        .subscribe((result) => {
+          this.getReservations();
+        });
     }, 0);
   }
   getReservations() {
@@ -43,8 +48,25 @@ export class ParentHomePageComponent implements OnInit {
       next: (res) => {
         this.data = this.formateData(res.data);
       },
-      error: (err) => {
-        this.errorMessage = err.error.message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { passwordMatch } from '../../../../core/customValidation/passwordMatch.validator';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-change-password',
@@ -15,7 +16,6 @@ export class ChangePasswordComponent implements OnInit {
   changePasswordForm!: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
-  errorMessage: any;
 
   userId: string = '';
   token: string = '';
@@ -52,11 +52,26 @@ export class ChangePasswordComponent implements OnInit {
       };
 
       this.authService.changePass(model).subscribe({
-        next: (res) => {
+        next: (res) => {},
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
      
-        },
-        error: (err) => {
-          this.errorMessage = err.error.Message || 'حدث خطأ أثناء إرسال الطلب';
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else {

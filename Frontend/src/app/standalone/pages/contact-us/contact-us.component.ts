@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Location } from '@angular/common';
 
 @Component({
@@ -17,7 +17,7 @@ import { Location } from '@angular/common';
 })
 export class ContactUsComponent implements OnInit {
   formComplaint!: FormGroup;
-  constructor(private fb: FormBuilder, private location: Location) {}
+  constructor(private fb: FormBuilder, private router: Router) {}
 
   ngOnInit() {
     this.createForm();
@@ -58,7 +58,8 @@ export class ContactUsComponent implements OnInit {
       }
     });
   }
+
   goBack() {
-    this.location.back();
+    this.router.navigate(['/home']);
   }
 }

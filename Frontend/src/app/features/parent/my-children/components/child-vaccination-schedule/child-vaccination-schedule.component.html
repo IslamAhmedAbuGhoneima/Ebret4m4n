@@ -9,20 +9,12 @@
         class="rotate-90 h-3 w-3 mt-[6px]"
       />
       <a [routerLink]="['/parent/my-children/child-vaccine-schedule', childId]"
-        >جدول طفلك {{ childName }}</a
+        >جدول طفلك {{ childName  }}</a
       >
     </div>
+    <span class="block mt-4 mb-1"> عمر الطفل بالشهور : {{ ageInMonth }}</span>
 
-    @if (msgError) {
-    <div
-      class="text-red-700 mt-4 font-semibold font-arabic font-base flex items-center justify-center"
-      *ngIf="msgError"
-    >
-      {{ msgError }}
-    </div>
-
-    }@else {
-    <table class="min-w-full overflow-x-auto mt-4">
+    <table class="min-w-full overflow-x-auto">
       <thead class="bg-primary-table">
         <tr class="border border-[#E5E7EB] border-b-transparent">
           <th
@@ -66,7 +58,8 @@
         <tr
           class="border border-[#E5E7EB] border-t-transparent"
           [ngClass]="{
-            'text-third-txt': item.isTaken == true,
+            'text-third-txt':
+              item.isTaken == true && getDaysDifference(item.takedAt) < 0,
             'text-[#151419]': item.isTaken == false
           }"
           [ngStyle]="
@@ -81,24 +74,27 @@
               <span
                 class="block w-[22px] h-[22px] rounded border-[#121212] border-[2px]"
               ></span>
-              } @if (item.isTaken && getDaysDifference(item.takedAt) <= 0) {
+              } @if (item.isTaken && getDaysDifference(item.takedAt) < 0) {
               <img
                 src="/icons/Icon-checked-gray.svg"
                 alt=""
                 class="w-[22px] h-[22px]"
               />
+
               } @if (item.isTaken && getDaysDifference(item.takedAt) > 0) {
               <img
                 src="/icons/Icon-checked.svg"
                 alt=""
                 class="w-[22px] h-[22px]"
               />
+
               }
             </div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-center">
             <span class="inline-block text-base">{{ item.name }}</span>
           </td>
+
           <td class="px-6 py-4 whitespace-nowrap text-center">
             <span class="inline-block text-base"
               >{{ item.childAgeDetails }}
@@ -107,7 +103,23 @@
 
           <td class="px-6 py-4 whitespace-nowrap text-center">
             <span class="inline-block text-base">
-              {{ item.isTaken == true ? "تم أخذ اللقاح" : "يمكنك الحجز الآن" }}
+              {{
+                item.isTaken
+                  ? "تم أخذ اللقاح"
+                  : !item.isToken &&
+                    ageInMonth === item.childAge &&
+                    !bookingOrNot
+                  ? "يمكنك الحجز الآن"
+                  : !item.isToken &&
+                    ageInMonth === item.childAge &&
+                    bookingOrNot
+                  ? "يمكنك تعديل الحجز"
+                  : !item.isToken && ageInMonth <= item.childAge
+                  ? "متبقي على موعد أخذ اللقاح " +
+                    (item.childAge - ageInMonth) +
+                    " أشهر"
+                  : ""
+              }}
             </span>
           </td>
 
@@ -138,7 +150,7 @@
               <img src="/icons/icon-park-outline_appointment.svg" alt="" />
             </button>
             } } @else if (item.isTaken && ageInMonth==item.childAge &&
-            getDaysDifference(item.takedAt)<= 0) {
+            getDaysDifference(item.takedAt)> 0) {
             <a
               routerLink="/chat"
               class="mx-auto w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-[24px] rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
@@ -153,7 +165,6 @@
         }
       </tbody>
     </table>
-    }
 
     <div class="flex justify-center items-center gap-6 mt-6">
       @if (allVaccinesTaken) {

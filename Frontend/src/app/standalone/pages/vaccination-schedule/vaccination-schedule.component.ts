@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Location } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-vaccination-schedule',
@@ -9,8 +9,8 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   styleUrl: './vaccination-schedule.component.css',
 })
 export class VaccinationScheduleComponent {
-  constructor(private location: Location) {}
+  constructor(private router: Router) {}
   goBack() {
-    this.location.back();
+    this.router.navigate(['/home']);
   }
 }

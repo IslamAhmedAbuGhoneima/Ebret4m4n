@@ -9,11 +9,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatOption } from '@angular/material/core';
-import { ChildVaccinationScheduleComponent } from './components/child-vaccination-schedule/child-vaccination-schedule.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChildEditProfileComponent } from './components/child-edit-profile/child-edit-profile.component';
 import localeAr from '@angular/common/locales/ar';
+import { ChildVaccinationScheduleComponent } from './components/child-vaccination-schedule/child-vaccination-schedule.component';
 
 registerLocaleData(localeAr);
 
@@ -23,7 +23,6 @@ const routes: Routes = [
   {
     path: 'child-vaccine-schedule/:id',
     component: ChildVaccinationScheduleComponent,
- 
   },
   {
     path: 'child-edit-profile/:id',

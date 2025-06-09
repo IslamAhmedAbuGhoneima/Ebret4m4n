@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { CityCenterService } from '../../../../city-centre-admin/services/cityCenter.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../../../auth/services/auth.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-health-unit',
@@ -39,7 +40,26 @@ export class HealthUnitComponent implements OnInit {
       next: (res) => {
         this.data = this.formateData(res.data);
       },
-      error: (err) => {},
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
+      },
     });
   }
   formateData(data: any): any {

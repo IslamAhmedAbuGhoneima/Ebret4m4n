@@ -19,7 +19,6 @@ export class RegisterComponent implements OnInit {
   secondFormGroup!: FormGroup;
   showPassword: boolean = false;
   showConfirmPassword: boolean = false;
-  errorMessage: any;
   egyptGovernorates: string[] = [
     'القاهرة',
     'الجيزة',
@@ -358,7 +357,24 @@ export class RegisterComponent implements OnInit {
           });
         },
         error: (error) => {
-          this.errorMessage = error.error.Message;
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     } else {
@@ -375,8 +391,25 @@ export class RegisterComponent implements OnInit {
         next: (res) => {
           this.healthUnits = res.data;
         },
-        error: (err) => {
-          console.error('خطأ في تحميل الوحدات الصحية:', err);
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
           this.healthUnits = [];
         },
       });

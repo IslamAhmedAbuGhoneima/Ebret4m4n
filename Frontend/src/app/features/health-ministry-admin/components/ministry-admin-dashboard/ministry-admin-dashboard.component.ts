@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { HealthMinistryService } from '../../services/health-ministry.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-ministry-admin-dashboard',
@@ -14,7 +15,7 @@ export class MinistryAdminDashboardComponent implements OnInit {
   @ViewChild(BaseChartDirective) chartBar:
     | BaseChartDirective<'bar'>
     | undefined;
-  errorMessage: string = '';
+
   data: any = {};
 
   constructor(private _HealthMinistryService: HealthMinistryService) {}
@@ -46,8 +47,25 @@ export class MinistryAdminDashboardComponent implements OnInit {
         this.barChartData2.datasets[0].data = data2;
         this.barChartData2 = { ...this.barChartData2 };
       },
-      error: (err) => {
-        this.errorMessage = err.error.Message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }

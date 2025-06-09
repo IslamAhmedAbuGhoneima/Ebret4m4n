@@ -213,6 +213,7 @@ input[type="password"]::-webkit-textfield-decoration-container {
   padding: 0px !important; /* عدل القيم حسب اللي يناسبك */
 }
 .swal2-html-container {
-  padding-top: 0px !important; /* تعديل padding النص (body) */
+  padding-top: 5px !important; /* تعديل padding النص (body) */
   padding-bottom: 0px !important; /* تعديل padding النص (body) */
 }
+

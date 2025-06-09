@@ -13,7 +13,6 @@ const routes: Routes = [
   { path: 'edit-user-profile/:id', component: ParentProfileEditComponent },
   { path: 'user-profile/:id', component: ParentProfileComponent },
 ];
-
 @NgModule({
   declarations: [
     ParentHomePageComponent,

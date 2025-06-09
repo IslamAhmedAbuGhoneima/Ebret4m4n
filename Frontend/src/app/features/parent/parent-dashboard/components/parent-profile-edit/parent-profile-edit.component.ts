@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ParentService } from '../../../services/parent.service';
 import { forkJoin } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-parent-profile-edit',
@@ -15,7 +16,7 @@ export class ParentProfileEditComponent implements OnInit {
   formEditProfile!: FormGroup;
   userId: any;
   data: any;
-  msgError: any;
+
   healthcareDetails: any;
   heathCareId: any;
   constructor(
@@ -82,8 +83,25 @@ export class ParentProfileEditComponent implements OnInit {
         };
         this.formEditProfile.patchValue(model);
       },
-      error: (err) => {
-        this.msgError = err.error.message;
+      error: (error) => {
+        const containsNonArabic =
+          /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            error.error.message
+          );
+
+        const finalMessage = containsNonArabic
+          ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+          : error.error.message;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'عذراً، حدث خطأ',
+          text: finalMessage,
+          confirmButtonColor: '#127453',
+          confirmButtonText: 'حسناً , إغلاق',
+        });
       },
     });
   }
@@ -103,8 +121,25 @@ export class ParentProfileEditComponent implements OnInit {
         next: (res) => {
           this.route.navigate(['/parent/dashboard/user-profile', this.userId]);
         },
-        error: (err) => {
-          this.msgError = err.error.message;
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
         },
       });
     }

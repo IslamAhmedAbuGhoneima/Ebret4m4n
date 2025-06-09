@@ -7,6 +7,7 @@ import { HealthMinistryService } from '../../../../features/health-ministry-admi
 import { GovernorateAdminService } from '../../../../features/city-admin/services/governorateAdmin.service';
 import { CityCenterService } from '../../../../features/city-centre-admin/services/cityCenter.service';
 import { FormsModule } from '@angular/forms';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-orders',
@@ -54,7 +55,26 @@ export class OrdersComponent implements OnInit {
             this.applyFilters();
           }
         },
-        error: (err) => {},
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
+        },
       });
     } else if (this.role == 'governorateAdmin') {
       this._GovernorateAdminService.getOrders().subscribe({
@@ -69,7 +89,26 @@ export class OrdersComponent implements OnInit {
             this.applyFilters();
           }
         },
-        error: (err) => {},
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
+        },
       });
     } else if (this.role == 'cityAdmin') {
       this._CityCenterService.getOrders().subscribe({
@@ -83,7 +122,26 @@ export class OrdersComponent implements OnInit {
             this.applyFilters();
           }
         },
-        error: (err) => {},
+        error: (error) => {
+          const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });
+        },
       });
     }
   }
@@ -100,7 +158,7 @@ export class OrdersComponent implements OnInit {
       this._HealthMinistryService
         .acceptGovernorateOrder(this.selectedOrderId)
         .subscribe({
-          next: () => {
+          next: (res) => {
             const index = this.allOrders.findIndex(
               (order) => order.id === this.selectedOrderId
             );
@@ -119,6 +177,18 @@ export class OrdersComponent implements OnInit {
             this.pendingOrderCount = this.allOrders.filter(
               (item: any) => item.status === 'Pending'
             ).length;
+
+            Swal.fire({
+              title: res.data,
+              text: 'جاري توصيل الطلب',
+              icon: 'success',
+              showCancelButton: true,
+              showConfirmButton: false,
+              confirmButtonColor: '#127453',
+              cancelButtonColor: '#127453',
+              cancelButtonText: 'حسناً , إغلاق',
+              allowOutsideClick: false,
+            });
           },
           error: (err) => {},
         });
@@ -126,7 +196,7 @@ export class OrdersComponent implements OnInit {
       this._GovernorateAdminService
         .acceptOrders(this.selectedOrderId)
         .subscribe({
-          next: () => {
+          next: (res) => {
             const index = this.allOrders.findIndex(
               (order) => order.id === this.selectedOrderId
             );
@@ -145,8 +215,36 @@ export class OrdersComponent implements OnInit {
             this.pendingOrderCount = this.allOrders.filter(
               (item: any) => item.status === 'Pending'
             ).length;
+            Swal.fire({
+              title: res.data,
+              text: 'جاري توصيل الطلب',
+              icon: 'success',
+              showCancelButton: true,
+              showConfirmButton: false,
+              confirmButtonColor: '#127453',
+              cancelButtonColor: '#127453',
+              cancelButtonText: 'حسناً , إغلاق',
+              allowOutsideClick: false,
+            });
           },
-          error: (err) => {},
+          error: (error) => {const containsNonArabic =
+            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+              error.error.message
+            );
+
+          const finalMessage = containsNonArabic
+            ? `يوجد مشكلة مؤقتة في النظام. نعتذر عن الإزعاج، 
+     
+       الرجاء إعادة المحاولة بعد قليل.`
+            : error.error.message;
+
+          Swal.fire({
+            icon: 'error',
+            title: 'عذراً، حدث خطأ',
+            text: finalMessage,
+            confirmButtonColor: '#127453',
+            confirmButtonText: 'حسناً , إغلاق',
+          });},
         });
     }
   }
