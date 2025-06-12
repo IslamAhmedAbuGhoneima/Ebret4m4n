@@ -29,6 +29,16 @@ export class CityAdminDashboardComponent implements OnInit {
     this._GovernorateAdminService.getStatisticsOfGovernorateAdmin().subscribe({
       next: (res) => {
         this.data = res;
+        this.pieChartData = {
+          labels: ['طفل', 'طفلة'],
+          datasets: [
+            {
+              data: [this.data.maleChildren, this.data.femaleChildren],
+              backgroundColor: ['#00ACF8', '#ec4899'],
+            },
+          ],
+        };
+
         const labels = this.data.topCitiesByVaccines.map(
           (item: any) => item.city
         );
@@ -73,6 +83,7 @@ export class CityAdminDashboardComponent implements OnInit {
         position: 'bottom',
         labels: {
           padding: 20,
+          boxWidth: 20,
           font: {
             family: 'Cairo',
             size: 14, // حجم الخط
@@ -85,7 +96,7 @@ export class CityAdminDashboardComponent implements OnInit {
         color: '#fff',
         font: {
           family: 'Cairo',
-          size: 20,
+          size: 10,
           weight: 'bold',
         },
         align: 'center', // تمركز عمودي

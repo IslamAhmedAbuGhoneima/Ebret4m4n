@@ -97,13 +97,14 @@
       </div>
     </div>
 
-    <div class="mt-5 text-[#151419] bg-white p-4 rounded-lg scroll-container ">
+    <div class="mt-5 text-[#151419] bg-white p-4 rounded-lg">
       <h6 class="mb-5 text-xl font-semibold">الوحدات الأكثر طلباً للقاحات</h6>
       <canvas
         baseChart
         [data]="barChartData"
         [options]="barChartOptions"
         [type]="barChartType"
+        style="max-height: 400px; width: 100%"
       >
       </canvas>
     </div>

@@ -5,14 +5,14 @@
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الوحدات الصحية</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          {{ data.healthCareUnits| number:'1.0-0' }}
+          {{ data.healthCareUnits | number : "1.0-0" }}
         </span>
       </div>
 
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الأطفال المسجلة</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          {{ data.registeredChildren| number:'1.0-0' }}
+          {{ data.registeredChildren | number : "1.0-0" }}
         </span>
       </div>
       <div class="bg-white p-4">
@@ -20,7 +20,7 @@
           عدد الأطفال الحاصلة على جميع التطعيمات
         </h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          {{ data.fullyVaccinatedChildren| number:'1.0-0' }}
+          {{ data.fullyVaccinatedChildren | number : "1.0-0" }}
         </span>
       </div>
       <div class="bg-white p-4">
@@ -32,7 +32,7 @@
       <div class="bg-white p-4">
         <h6 class="text-[#6B7280] font-semibold">عدد الشكاوى</h6>
         <span class="block text-[#151419] text-[22px] font-semibold">
-          {{ data.totalComplaints| number:'1.0-0' }}
+          {{ data.totalComplaints | number : "1.0-0" }}
         </span>
       </div>
     </div>
@@ -40,7 +40,7 @@
     <div class="flex items-start gap-6 mt-5">
       <div class="bg-white flex-1 rounded-lg scroll-container px-5">
         <table
-          class="min-w-full overflow-x-auto text-lg text-center [&_tbody_tr]:bg-white [&_td]:px-6  [&_thead_td]:py-4 [&_td]:py-3 [&_thead_td]:text-[#8E98A8] [&_thead_td]:text-sm [&_tbody_td]text-[#151419] font-semibold"
+          class="min-w-full overflow-x-auto text-lg text-center [&_tbody_tr]:bg-white [&_td]:px-6 [&_thead_td]:py-4 [&_td]:py-3 [&_thead_td]:text-[#8E98A8] [&_thead_td]:text-sm [&_tbody_td]text-[#151419] font-semibold"
         >
           <thead>
             <tr>
@@ -97,13 +97,14 @@
       </div>
     </div>
 
-    <div class="mt-5 text-[#151419] bg-white p-4 rounded-lg scroll-container ">
+    <div class="mt-5 text-[#151419] bg-white p-4 rounded-lg">
       <h6 class="mb-5 text-xl font-semibold">المراكز الأكثر طلباً للقاحات</h6>
       <canvas
         baseChart
         [data]="barChartData"
         [options]="barChartOptions"
         [type]="barChartType"
+        style="max-height: 400px; width: 100%"
       >
       </canvas>
     </div>

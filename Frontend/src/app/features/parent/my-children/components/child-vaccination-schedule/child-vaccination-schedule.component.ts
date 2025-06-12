@@ -22,7 +22,6 @@ export class ChildVaccinationScheduleComponent implements OnInit {
   ageInMonth: any;
   bookingOrNot: boolean = false;
   appointmentId: any;
-  allVaccinesTaken: boolean = false;
   timeTakenVaccine: any;
   selectDay: any;
 
@@ -46,7 +45,7 @@ export class ChildVaccinationScheduleComponent implements OnInit {
         this.childName = this.data.name;
         this.vaccines = this.formateData(this.data.vaccines);
         this.ageInMonth = this.data.ageInMonth;
-        this.checkAllVaccinesTaken();
+
         this.vaccines.forEach((vaccine: any) => {
           if (this.ageInMonth === vaccine.childAge) {
             this._ParentService
@@ -94,11 +93,6 @@ export class ChildVaccinationScheduleComponent implements OnInit {
     });
 
     return currentVaccine?.name || null;
-  }
-  checkAllVaccinesTaken() {
-    this.allVaccinesTaken = this.vaccines.every(
-      (vaccine: any) => vaccine.isTaken
-    );
   }
 
   bookingVaccine(vaccineId: any) {

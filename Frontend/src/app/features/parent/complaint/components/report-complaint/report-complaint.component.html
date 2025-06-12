@@ -7,38 +7,6 @@
     <div class="mt-10 max-w-[488px] mx-auto">
       <form [formGroup]="formComplaint" (ngSubmit)="submit()">
         <div class="mb-4">
-          <input
-            [ngClass]="{
-              'border-red-700': heathCareUnit?.invalid && heathCareUnit?.dirty,
-              'border-third-border':
-                heathCareUnit?.valid || heathCareUnit?.untouched
-            }"
-            class="block w-full placeholder:text-base placeholder:text-third-txt text-right px-4 py-3 outline-none rounded-md border-[1.5px] border-third-border"
-            type="text"
-            formControlName="heathCareUnit"
-            name="healthcare-unit"
-            id="healthcare-unit"
-            placeholder="الوحدة الصحية بقرية الروضة"
-          />
-
-          <div
-            class="text-red-700 ml-2 font-semibold font-arabic font-base flex items-center gap-1"
-            *ngIf="heathCareUnit?.invalid && heathCareUnit?.dirty"
-          >
-            <img
-              src="./icons/si_warning-fill.svg"
-              alt=""
-              class="w-4 h-4 mt-[1px]"
-            />
-            <div>
-              <small *ngIf="heathCareUnit?.errors?.['required']">
-                هذه الخانة مطلوبة.
-              </small>
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-4">
           <label
             class="block text-xl font-semibold mb-2 mr-4 text-[#151419]"
             for="complaint-details"
@@ -71,8 +39,6 @@
               هذه الخانة مطلوبة.
             </small>
           </div>
-
-        
         </div>
 
         <button

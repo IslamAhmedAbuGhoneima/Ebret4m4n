@@ -25,7 +25,6 @@ export class NotificationService {
       .build();
 
     this.hubConnection.on('NotificationMessage', (data) => {
-      console.log('notification data ', data);
       this.notificationReceived$.next(data);
       if (data && data.message && data.title) {
         this.toastr.success(data.message, data.title);

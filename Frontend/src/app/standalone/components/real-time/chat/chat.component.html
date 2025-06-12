@@ -106,21 +106,8 @@
             class="absolute -left-[10px] bottom-0"
           />
 
-          <span
-            *ngIf="msg.senderId == senderId && !msg.isRead"
-            class="absolute left-2.5 -bottom-0.5 text-gray-400 text-[10px]"
-          >
-            ✓
-          </span>
-          <span
-            *ngIf="msg.senderId == senderId && msg.isRead"
-            class="absolute left-3 -bottom-0.5 text-gray-400 text-[10px]"
-          >
-            ✓✓
-          </span>
-
           <button
-            *ngIf="msg.senderId == senderId"
+            *ngIf="shouldShowDeleteButton($index) && msg.senderId == senderId"
             (click)="deleteMessage(msg)"
             title="حذف الملف"
             class="text-[10px] text-red-500 absolute top-0 -left-3.5"
@@ -166,21 +153,9 @@
             alt=""
             class="absolute -left-[10px] bottom-0"
           />
-          <span
-            *ngIf="msg.senderId == senderId && !msg.isRead"
-            class="absolute left-2.5 -bottom-0.5 text-gray-400 text-[10px]"
-          >
-            ✓
-          </span>
-          <span
-            *ngIf="msg.senderId == senderId && msg.isRead"
-            class="absolute left-3 -bottom-0.5 text-gray-400 text-[10px]"
-          >
-            ✓✓
-          </span>
 
           <button
-            *ngIf="msg.senderId == senderId"
+            *ngIf="shouldShowDeleteButton($index) && msg.senderId == senderId"
             (click)="deleteMessage(msg)"
             title="حذف الملف"
             class="text-[10px] text-red-500 absolute top-0 -left-3.5"

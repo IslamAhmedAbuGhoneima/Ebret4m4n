@@ -9,7 +9,7 @@
         class="rotate-90 h-3 w-3 mt-[6px]"
       />
       <a [routerLink]="['/parent/my-children/child-vaccine-schedule', childId]"
-        >جدول طفلك {{ childName  }}</a
+        >جدول طفلك {{ childName }}</a
       >
     </div>
     <span class="block mt-4 mb-1"> عمر الطفل بالشهور : {{ ageInMonth }}</span>
@@ -167,14 +167,6 @@
     </table>
 
     <div class="flex justify-center items-center gap-6 mt-6">
-      @if (allVaccinesTaken) {
-      <a
-        routerLink="#"
-        class="w-fit cursor-pointer flex font-arabic gap-2 py-[11px] px-6 rounded-lg font-bold bg-primary-btn text-mainBg-100 transition duration-200 hover:bg-[#0B4632]"
-      >
-        <span class="inline- text-sm"> عرض الشهادة</span>
-        <img src="/icons/humbleicons_certificate.svg" alt="" /> </a
-      >}
       <button
         (click)="goBack()"
         class="flex w-fit items-center justify-center gap-2 bg-[#151419] text-mainBg-100 px-6 py-[9px] rounded-lg transition duration-200 hover:opacity-80"

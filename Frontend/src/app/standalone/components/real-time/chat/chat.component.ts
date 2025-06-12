@@ -40,27 +40,20 @@ export class ChatComponent implements OnInit, AfterViewChecked {
   selectedUser: any;
   showWelcomeImage = true;
   chatImages: any;
-
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
   selectedMessage: Message | null = null;
 
   constructor(
     private authService: AuthService,
     private _ChatService: ChatService,
-    private _NotificationService: NotificationService,
-    private _ActivatedRoute: ActivatedRoute,
-    private router: Router,
-    private cdr: ChangeDetectorRef
+    private _ActivatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
     this.role = this.authService.getRole();
     this.senderId = this.authService.getUserId();
 
-    // Set up message stream subscription for both roles
     this._ChatService.getMessageStream().subscribe((msg: Message) => {
-      // Only add the message if we're the receiver
-
       if (msg.receiverId === this.senderId) {
         if (this.role === 'parent') {
           if (msg.senderId === this.selectedDoctorId) {
@@ -128,6 +121,7 @@ export class ChatComponent implements OnInit, AfterViewChecked {
       });
     }
   }
+
   selectUser(id: string) {
     this.selectedUserId = id;
     this.selectedUser = this.userChatList.find(
@@ -196,6 +190,27 @@ export class ChatComponent implements OnInit, AfterViewChecked {
     const currentMsg = this.messages[index];
     const nextMsg = this.messages[index + 1];
     return !nextMsg || currentMsg.senderId !== nextMsg.senderId;
+  }
+  shouldShowDeleteButton(index: number): boolean {
+    const currentMsg = this.messages[index];
+
+    // لا نظهر الزر إلا إذا كانت الرسالة من المستخدم الحالي
+    if (currentMsg.senderId !== this.senderId) return false;
+
+    // ابحث عن آخر رسالة من الطرف الآخر
+    let lastReceivedIndex = -1;
+    for (let i = this.messages.length - 1; i >= 0; i--) {
+      if (this.messages[i].senderId !== this.senderId) {
+        lastReceivedIndex = i;
+        break;
+      }
+    }
+
+    // لو مفيش ولا رسالة مستلمة، نظهر الزر لكل الرسائل
+    if (lastReceivedIndex === -1) return true;
+
+    // نظهر الزر فقط للرسائل اللي بعد آخر رسالة من الطرف الآخر
+    return index > lastReceivedIndex;
   }
 
   sendFile(event: any): void {

@@ -5,4 +5,5 @@ export interface Message {
   receiverId: string;
   sentAt: string;
   file?: string | null;
+  isRead?: boolean;
 }

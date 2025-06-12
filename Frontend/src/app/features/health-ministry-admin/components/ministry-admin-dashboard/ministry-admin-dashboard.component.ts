@@ -1,8 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { HealthMinistryService } from '../../services/health-ministry.service';
 import Swal from 'sweetalert2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(ChartDataLabels);
 
 @Component({
   selector: 'app-ministry-admin-dashboard',
@@ -15,6 +17,7 @@ export class MinistryAdminDashboardComponent implements OnInit {
   @ViewChild(BaseChartDirective) chartBar:
     | BaseChartDirective<'bar'>
     | undefined;
+  public pieChartType: ChartType = 'pie';
 
   data: any = {};
 
@@ -26,6 +29,15 @@ export class MinistryAdminDashboardComponent implements OnInit {
     this._HealthMinistryService.getStatisticsOfAdmin().subscribe({
       next: (res) => {
         this.data = res;
+        this.pieChartData = {
+          labels: ['طفل', 'طفلة'],
+          datasets: [
+            {
+              data: [this.data.maleChildren, this.data.femaleChildren],
+              backgroundColor: ['#00ACF8', '#ec4899'],
+            },
+          ],
+        };
 
         const labels1 = this.data.vaccineRequests.map(
           (item: any) => item.vaccineName
@@ -78,6 +90,7 @@ export class MinistryAdminDashboardComponent implements OnInit {
         position: 'bottom',
         labels: {
           padding: 20,
+          boxWidth: 20,
           font: {
             family: 'Cairo',
             size: 14, // حجم الخط
@@ -90,7 +103,7 @@ export class MinistryAdminDashboardComponent implements OnInit {
         color: '#fff',
         font: {
           family: 'Cairo',
-          size: 20,
+          size: 10,
           weight: 'bold',
         },
         align: 'center', // تمركز عمودي
@@ -116,7 +129,6 @@ export class MinistryAdminDashboardComponent implements OnInit {
     ],
   };
   //--------------------------------- bar---------------------------------
-  public pieChartType: ChartType = 'pie';
   // first bar
   public barChartType = 'bar' as const;
 

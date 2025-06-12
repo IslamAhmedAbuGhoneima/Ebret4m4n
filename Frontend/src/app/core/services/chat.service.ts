@@ -58,6 +58,7 @@ export class ChatService {
     this.hubConnection.on('MessagesMarkedAsRead', (data) => {
       this.messagesRead$.next(data);
     });
+
     // Start the connection
     this.startConnection();
   }
@@ -117,5 +118,24 @@ export class ChatService {
   }
   public getReadMessageStream() {
     return this.messagesRead$.asObservable();
+  }
+  private registerHubEvents(): void {
+    this.hubConnection.off('ReceiveMessage');
+    this.hubConnection.off('MessageDeleted');
+    this.hubConnection.off('MessagesMarkedAsRead');
+
+    this.hubConnection.on('ReceiveMessage', (data) => {
+      if (data.receiverId === this.currentUserId) {
+        this.messageReceived$.next(data);
+      }
+    });
+
+    this.hubConnection.on('MessageDeleted', (messageId: any) => {
+      this.messageDeleted$.next(messageId);
+    });
+
+    this.hubConnection.on('MessagesMarkedAsRead', (data) => {
+      this.messagesRead$.next(data);
+    });
   }
 }

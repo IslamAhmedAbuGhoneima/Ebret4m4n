@@ -1,8 +1,10 @@
 import { Component, ViewChild } from '@angular/core';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { Chart, ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { CityCenterService } from '../../services/cityCenter.service';
 import Swal from 'sweetalert2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+Chart.register(ChartDataLabels);
 
 @Component({
   selector: 'app-city-center-admin-dashboard',
@@ -16,6 +18,8 @@ export class CityCenterAdminDashboardComponent {
     | BaseChartDirective<'bar'>
     | undefined;
   data: any = {};
+  public pieChartType: ChartType = 'pie';
+
   constructor(private _CityCenterService: CityCenterService) {}
 
   ngOnInit(): void {
@@ -25,10 +29,20 @@ export class CityCenterAdminDashboardComponent {
     this._CityCenterService.getStatisticsOfCityCenterAdmin().subscribe({
       next: (res) => {
         this.data = res;
+        this.pieChartData = {
+          labels: ['طفل', 'طفلة'],
+          datasets: [
+            {
+              data: [this.data.maleChildren, this.data.femaleChildren],
+              backgroundColor: ['#00ACF8', '#ec4899'],
+            },
+          ],
+        };
+
         const labels = this.data.topHealthCareUnitsByVaccines.map(
           (item: any) => item.unitName
         );
-        const vaccines = this.data.topCitiesByVaccines.map(
+        const vaccines = this.data.topHealthCareUnitsByVaccines.map(
           (item: any) => item.requestedAmount
         );
 
@@ -59,7 +73,6 @@ export class CityCenterAdminDashboardComponent {
     });
   }
   // Pie
-  public pieChartType: ChartType = 'pie';
 
   public pieChartOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -69,6 +82,7 @@ export class CityCenterAdminDashboardComponent {
         position: 'bottom',
         labels: {
           padding: 20,
+          boxWidth: 20,
           font: {
             family: 'Cairo',
             size: 14, // حجم الخط
@@ -81,7 +95,7 @@ export class CityCenterAdminDashboardComponent {
         color: '#fff',
         font: {
           family: 'Cairo',
-          size: 20,
+          size: 10,
           weight: 'bold',
         },
         align: 'center', // تمركز عمودي
@@ -102,11 +116,10 @@ export class CityCenterAdminDashboardComponent {
     datasets: [
       {
         data: [this.data.maleChildren, this.data.femaleChildren],
-        backgroundColor: ['#00ACF8', '#ec4899'], // 💙 ذكر، 💗 أنثى
+        backgroundColor: ['#00ACF8', '#ec4899'],
       },
     ],
   };
-
   // bar;
   public barChartType = 'bar' as const;
 
