@@ -103,7 +103,7 @@ export class ChatService {
       });
   }
 
-  public deleteMessage(messageId: any) {
+  public deleteMessage(messageId: string) {
     this.hubConnection
       .invoke('DeleteMessage', messageId)
       .catch((err) => console.error('Error deleting message:', err));

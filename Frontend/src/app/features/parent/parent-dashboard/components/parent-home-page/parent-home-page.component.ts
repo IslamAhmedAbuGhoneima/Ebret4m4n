@@ -35,6 +35,7 @@ export class ParentHomePageComponent implements OnInit {
             vaccineName: element.vaccineName,
             bookingExists: true,
             appointmentId: element.id,
+            childName: element.childName,
           },
         })
         .afterClosed()

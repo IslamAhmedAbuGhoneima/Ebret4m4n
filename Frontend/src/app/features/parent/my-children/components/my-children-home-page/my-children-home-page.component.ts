@@ -117,7 +117,7 @@ export class MyChildrenHomePageComponent {
             allowOutsideClick: false,
           }).then((result) => {
             if (result.isConfirmed) {
-              this._ParentService.payment(this.data, {}).subscribe({
+              this._ParentService.payment(childId, {}).subscribe({
                 next: (res) => {
                   const url = res.data;
                   if (url) {

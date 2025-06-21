@@ -167,11 +167,15 @@ public class ChildController(IUnitOfWork unitOfWork) : ControllerBase
     [HttpDelete("{childId}/child-remove")]
     public async Task<IActionResult> RemoveChild(string childId)
     {
-        var child = await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false);
+        var child = await unitOfWork.ChildRepo.FindAsync(child => child.Id == childId, false, ["Appointments"]);
         if (child is null)
             return BadRequest(GeneralResponse<string>.FailureResponse("لم يتم ايجاد هذا الطفل"));
 
+
         unitOfWork.ChildRepo.Remove(child);
+        if(child.Appointments is not null && child.Appointments.Any())
+            unitOfWork.AppointmentRepo.RemoveRange(child.Appointments);
+        
         var result = await unitOfWork.SaveAsync();
 
         if (result == 0)

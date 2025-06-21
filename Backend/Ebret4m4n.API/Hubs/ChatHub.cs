@@ -1,11 +1,10 @@
 ﻿using Ebret4m4n.Shared.DTOs.SignalRDtos;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
 using Ebret4m4n.Entities.Models;
 using Ebret4m4n.Contracts;
 using Ebret4m4n.API.Utilites;
 using Mapster;
-using Ebret4m4n.Repository.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace Ebret4m4n.API.Hubs;
 

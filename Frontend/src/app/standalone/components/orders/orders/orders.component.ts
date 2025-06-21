@@ -57,7 +57,7 @@ export class OrdersComponent implements OnInit {
         },
         error: (error) => {
           const containsNonArabic =
-            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            /[a-zA-Z0-9!@#$%^&*(),.?"{}|<>[\]\\\/+=_-]/.test(
               error.error.message
             );
 
@@ -91,7 +91,7 @@ export class OrdersComponent implements OnInit {
         },
         error: (error) => {
           const containsNonArabic =
-            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            /[a-zA-Z0-9!@#$%^&*(),.?"{}|<>[\]\\\/+=_-]/.test(
               error.error.message
             );
 
@@ -124,7 +124,7 @@ export class OrdersComponent implements OnInit {
         },
         error: (error) => {
           const containsNonArabic =
-            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            /[a-zA-Z0-9!@#$%^&*(),.?"{}|<>[\]\\\/+=_-]/.test(
               error.error.message
             );
 
@@ -228,7 +228,7 @@ export class OrdersComponent implements OnInit {
             });
           },
           error: (error) => {const containsNonArabic =
-            /[a-zA-Z0-9!@#$%^&*(),.?":{}|<>[\]\\\/+=_-]/.test(
+            /[a-zA-Z0-9!@#$%^&*(),.?"{}|<>[\]\\\/+=_-]/.test(
               error.error.message
             );
 

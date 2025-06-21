@@ -19,4 +19,6 @@ public interface IBaseRepository<T>
     void Update(T entity);
 
     void Remove(T entity);
+
+    void RemoveRange(IEnumerable<T> entities);
 }
